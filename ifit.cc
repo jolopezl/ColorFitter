@@ -173,7 +173,6 @@ void ifit(){
   TFile *fout = new TFile("fullfit.root","RECREATE");
   // for the future ---> here I have only one Q2 bin so do it thiking on multiple bins
   // I think now I will interpolate RM values from data to be in the same z-bins that dPt2
-  
   //#pragma omp parallel for 
   for (int iz=0; iz<ZDIM; ++iz) {
     std::cout << "Working for bin #" << iz+1 << " of " << ZDIM << std::endl;
@@ -236,14 +235,12 @@ void modelplot(int iQ2x, int iz){
   double xuplim=0; 
   int iuint=0;
   int NPAR=5;
-  std::string chnam_foo;
   TString chnam;
   double par[NPAR], par_errors[NPAR];
   std::ostringstream out;
   for (int parNo=0; parNo<NPAR; ++parNo) {
     out << "a" << parNo;
-    chnam_foo = out.str();
-    chnam = (TString)chnam_foo;
+    chnam = (TString) out.str();
     out.flush();
     gMinuit->mnpout(parNo, chnam, val, err, xlolim, xuplim, iuint);
     par[parNo]=val;

@@ -128,7 +128,7 @@ void Model::Compute(double A){
       // zrange1*= log(pow(L/par[3],2))*log(pow(L/par[3],2));   // log squared term
     }
     if(z>ul){// this should not be possible
-      std::cout << "Point A: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp<<" "<< R<<" "<< x<<" "<< y<<" "<< z<<" "<< R*R-x*x-y*y<< std::endl;
+      std::cout << "Point A: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp << " " << R << " " << x << " " << y << " " << z << " " << R*R-x*x-y*y << std::endl;
     }
     if(temp<0){ // this integral should always be positive.
       std::cout << "igdtd1 is negative!! Error!! \n";
@@ -142,8 +142,8 @@ void Model::Compute(double A){
       accumulator1+= zrange1*temp*weight; 
     }
     else{
-      std::cout<<"zrange1 of length zero or negative encountered: " << zrange1 <<" \n";
-      std::cout << "Point B: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp<<" "<< R<<" "<< x<<" "<< y<<" "<< z<<" "<< R*R-x*x-y*y<< std::endl;
+      std::cout << "zrange1 of length zero or negative encountered: " << zrange1 << " \n";
+      std::cout << "Point B: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp <<" "<< R <<" "<< x <<" "<< y <<" "<< z << " " << R*R-x*x-y*y << std::endl;
     }
     // Next, integrate from the prehadron vertex up to the end of the sphere of integration
     if (z+L<ul){
