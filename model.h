@@ -33,6 +33,7 @@ public:
   Model();
   ~Model();
   void setParameters(std::vector<double>);
+  void setParameters(std::string, double);
   void initialization();
   void Compute(double);
   double get1();
