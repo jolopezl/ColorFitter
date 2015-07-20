@@ -104,6 +104,7 @@ Double_t RM_errors[3][10] = {
 */
 
 double func_array[2] = {0,0};
+
 double zzz[6],errorzzz[6],xxx[6];
 
 double fermi(double f) {
@@ -114,6 +115,7 @@ double fermi(double f) {
 Model *m = new Model("default");
 
 void callModel(double A,double *par){
+  // qhat, lp, pre-hadron cross-section, log behaviour, energy loss
   std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4]};
   double nucleus = (double) A*A*A;
   m->setParameters(my_pars);
@@ -237,18 +239,18 @@ void modelplot(int iQ2x, int iz){
   std::string chnam_foo;
   TString chnam;
   double par[NPAR], par_errors[NPAR];
+  std::ostringstream out;
   for (int parNo=0; parNo<NPAR; ++parNo) {
-    std::ostringstream out;
     out << "a" << parNo;
-    //sprintf (chnam, "a%i",parNo+1);
     chnam_foo = out.str();
     chnam = (TString)chnam_foo;
+    out.flush();
     gMinuit->mnpout(parNo, chnam, val, err, xlolim, xuplim, iuint);
     par[parNo]=val;
     par_errors[parNo]=err;
   }
   double chisquared = chisq(par);
-  /*
+  /* I don't know what this piece of code is does
   // Now make the plots of lpA for C, Fe, and Pb, with the final parameters, only for the first bin:
   if(doC_lpA_plot==0){
     doC_lpA_plot=1; // turn it on
@@ -291,8 +293,6 @@ void modelplot(int iQ2x, int iz){
     mr_fiterr[i]=0.;
     mr_x[i] = i/6.;
   }
-  //char mrname[6];
-  //char ptname[6];
   std::string mrname;
   std::string ptname;
   std::ostringstream out_mr, out_pt;
@@ -300,8 +300,6 @@ void modelplot(int iQ2x, int iz){
   mrname = out_mr.str();
   out_pt << "pt" << iQ2x << iz;
   ptname = out_pt.str();
-  //sprintf (mrname, "mr%i%i",iQ2x,iz);
-  //sprintf (ptname, "pt%i%i",iQ2x,iz);
   TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
   TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
   c1->SetGrid();c2->SetGrid();
@@ -352,6 +350,7 @@ void modelplot(int iQ2x, int iz){
   c2->Print(out_mr.str().c_str());
 }
 
+// For testing only
 int test() {
   std::vector<std::string> atoms = {"Carbon","Iron","Lead"};
   std::vector<double> masses = {12.0107,55.845,207.2};

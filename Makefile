@@ -1,14 +1,26 @@
-CC=g++
-CFLAGS=-c -g -Wall `root-config --cflags` -m64
-LDFLAGS=`root-config --libs` -lMinuit -lGSL -lMathMore -m64
-SOURCES=main.cc ifit.cc model.cc
-OBJECTS=$(SOURCES:.cc=.o)
-EXECUTABLE=ifitx.exe
+CC         = clang++
+CFLAGS     = -c -g -Wall `root-config --cflags`
+LDFLAGS    = `root-config --libs` -lMinuit -lGSL -lMathMore
+SOURCES    = $(wildcard *.cc)
+DEPS       = $(wildcard *.h)
+OBJECTS    = $(SOURCES:.cc=.o)
+EXECUTABLE = ifitx.exe
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(SOURCES) $(DEPS) $(EXECUTABLE)
 
-$(OBJECTS):
+$(OBJECTS): $(SOURCES) $(DEPS)
 	$(CC) $(CFLAGS) $(SOURCES)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+#.cc.o :
+%.o: %.cc $(DEPS)
+	@echo Compiling $@
+	@$(CXX) $(CCFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(EXECUTABLE) $(OBJECTS)
+
+print:
+	@echo $(DEPS)
