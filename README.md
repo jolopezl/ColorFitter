@@ -1,7 +1,7 @@
 # iFit
 
-# Authors
+## Authors
 
-Dr. William Brooks
+- Dr. William Brooks
 
-Jorge López
+- Jorge López
