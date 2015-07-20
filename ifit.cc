@@ -76,27 +76,27 @@ double RM_errors[3][4] =
 
 
 /* Jlab data 
-Double_t zbin[10] = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95};
+double zbin[10] = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95};
 
-Double_t dPt2_values[3][10] = {
+double dPt2_values[3][10] = {
 {0.000371518,0.00863379,0.0151782,0.0141445,0.0133822,0.00665999,0.00857385,-6.41318e-05,0.0142515,0.0168077},
 {0.000856483,0.0160724,0.0315945,0.0280917,0.0266616,0.0288261,0.022009,0.0191083,0.0326184,0.0449803},
 {0.0014003,0.0215559,0.041029,0.0356387,0.0351237,0.0300144,0.0243309,0.0355309,0.0165417,0.0410554}
 };
 
-Double_t dPt2_errors[3][10] = {
+double dPt2_errors[3][10] = {
 {8.62358e-05,0.000212014,0.000534801,0.000913602,0.00142702,0.00526272,0.00285298,0.0102465,0.0279433,0.0159634},
 {7.82608e-05,0.00020264,0.00053443,0.000900986,0.00124469,0.00448796,0.00300828,0.00957407,0.0151779,0.0172},
 {9.45994e-05,0.000259157,0.000697902,0.00130221,0.00179537,0.00335751,0.00401528,0.00965185,0.0411052,0.019054}
 };
 
-Double_t RM_values[3][10] = {
+double RM_values[3][10] = {
 {1.13479,0.962451,0.889687,0.860711,0.849438,0.853472,0.827186,0.710289,0.724836,0.699427},
 {1.12019,0.857052,0.715913,0.66561,0.638018,0.609745,0.566012,0.495528,0.464202,0.425779},
 {0.958637,0.717765,0.572328,0.52392,0.492814,0.489257,0.445196,0.315524,0.363646,0.285614}
 };
 
-Double_t RM_errors[3][10] = {
+double RM_errors[3][10] = {
 {0.00409792,0.00267193,0.00378442,0.00488795,0.00618195,0.0124229,0.00915825,0.102163,0.0290839,0.0364005},
 {0.00366706,0.00218369,0.00280078,0.00353991,0.00429012,0.00686596,0.0259369,0.0344201,0.0145574,0.0165368},
 {0.0036491,0.0021428,0.00271263,0.00337343,0.00426634,0.0180179,0.00614704,0.0619927,0.0136452,0.0209563}
@@ -118,10 +118,10 @@ void callModel(double A,double *par){
   // qhat, lp, pre-hadron cross-section, log behaviour, energy loss
   std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4]};
   double nucleus = (double) A*A*A;
-  m->setParameters(my_pars);
+  m->SetParameters(my_pars);
   m->Compute(nucleus);
-  func_array[0] = m->get1(); 
-  func_array[1] = m->get2();
+  func_array[0] = m->Get1(); 
+  func_array[1] = m->Get2();
 }
 
 // I will write the Chi-Squared and some other functions here
@@ -156,7 +156,7 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
 }
 
 void ifit(){
-  m->initialization();
+  m->Initialization();
   // This is for Jlab
   // xxx[0]=pow(12.0107,1./3.); // C
   // xxx[1]=pow(55.845,1./3.);  // Fe
@@ -356,15 +356,15 @@ int test() {
   std::vector<double> masses = {12.0107,55.845,207.2};
   std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0}; //{ 0.2, 7.,1.0 }
   Model *m = new Model("default");
-  m->setParameters(parms);
-  m->initialization();
+  m->SetParameters(parms);
+  m->Initialization();
   std::vector<double> foo;
   double nucleus;
   double nu[3]={20.1797,83.798,131.293};
   for (int i=1; i<=3; ++i){
     nucleus = (double) nu[i];
     m->Compute(nucleus);
-    std::cout << nu[i] << "\t" << m->get1() << "\t" << m->get2() << std::endl;
+    std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
   }
   delete(m);
   return 1;

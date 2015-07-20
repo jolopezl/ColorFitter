@@ -12,20 +12,20 @@ Model::~Model() {
   std::cout << "Model destructed: " << m_ModelName << std::endl;
 }
 
-std::vector<double> Model::getResult() {
+std::vector<double> Model::GetResult() {
   std::vector<double> output = {m_dPt2, m_Rm};
   return output;
 }
 
-double Model::get1(){
+double Model::Get1(){
   return m_dPt2;
 }
 
-double Model::get2(){
+double Model::Get2(){
   return m_Rm; 
 }
 
-void Model::setParameters(std::vector<double> parms){
+void Model::SetParameters(std::vector<double> parms){
   m_qhat = parms.at(0);
   m_lp = parms.at(1);
   m_sigma_ph = parms.at(2);
@@ -33,7 +33,7 @@ void Model::setParameters(std::vector<double> parms){
   m_dz = parms.at(4);
 }
 
-void Model::initialization(){
+void Model::Initialization(){
   // This will do the interpolation in the future
   m_c_interpolation = {0, 0, 0, 0, 1.321, 1.46802, 1.61163, 1.74843, 1.875, 1.98877, 2.09042, 2.18148, 2.26346, 2.33789, 2.40628, \
     2.47014, 2.531, 2.59013, 2.64781, 2.70407, 2.75897, 2.81252, 2.86478, 2.91577, 2.96554, 3.01412, 3.06154, 3.10785, 3.15309, 3.19728, \
@@ -175,5 +175,5 @@ void Model::Compute(double A){
     */
   }
   m_dPt2=accumulator1/normalize; //  pT broadening
-  m_Rm=accumulator2/normalize; //  pT broadening
+  m_Rm=accumulator2/normalize; //  Multiplicity
 }

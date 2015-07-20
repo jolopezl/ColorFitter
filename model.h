@@ -32,12 +32,13 @@ public:
   Model(std::string);
   Model();
   ~Model();
-  void setParameters(std::vector<double>);
-  void initialization();
+  void SetParameters(std::vector<double>);
+  void SetParameters(std::string,double);
+  void Initialization();
   void Compute(double);
-  double get1();
-  double get2();
-  std::vector<double> getResult();
+  double Get1();
+  double Get2();
+  std::vector<double> GetResult();
 };
 
 #endif
