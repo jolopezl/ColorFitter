@@ -33,15 +33,6 @@ void Model::setParameters(std::vector<double> parms){
   m_dz = parms.at(4);
 }
 
-void Model::setParameters(std::string par, double value){
-  if(par=="qhat") m_qhat = value;
-  else if(par=="lp") m_lp = value;
-  else if(par=="sigma_ph") m_sigma_ph = value;
-  else if(par=="dlog") m_dlog = value;
-  else if(par=="dz") m_dz = value;
-  else std::cerr << "Error when setting a parameter: Parameter not found" << std::endl;
-}
-
 void Model::initialization(){
   // This will do the interpolation in the future
   m_c_interpolation = {0, 0, 0, 0, 1.321, 1.46802, 1.61163, 1.74843, 1.875, 1.98877, 2.09042, 2.18148, 2.26346, 2.33789, 2.40628, \
