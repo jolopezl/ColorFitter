@@ -15,3 +15,8 @@ To download, compile and run the code, create a work directory and then type:
 `$ make`
 
 `$ ./ifitx.exe`
+
+
+## More info
+
+See the Twiki: <a> https://github.com/jorgext/iFit/wiki </a>
