@@ -364,5 +364,5 @@ int test() {
     std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
   }
   delete(m);
-  return 1;
+  return 0;
 }

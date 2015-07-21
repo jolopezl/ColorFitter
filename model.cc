@@ -25,7 +25,7 @@ double Model::Get2(){
   return m_Rm; 
 }
 
-void Model::SetParameters(std::vector<double> parms){
+void Model::SetParameters(std::vector<double> parms) {
   m_qhat = parms.at(0);
   m_lp = parms.at(1);
   m_sigma_ph = parms.at(2);
@@ -33,7 +33,17 @@ void Model::SetParameters(std::vector<double> parms){
   m_dz = parms.at(4);
 }
 
-void Model::Initialization(){
+void Model::SetParameters(std::string parameter, double value) {
+  if (parameter == "qhat") m_qhat = value;
+  else if (parameter == "lp") m_lp = value;
+  else if (parameter == "sigma_ph") m_sigma_ph = value;
+  else if (parameter == "dlog") m_dlog = value;
+  else if (parameter == "dz") m_dz = value;
+  else if (parameter == "density threshold") m_density_threshold = value;
+  else std::cout << "Not a valid parameter name" << std::endl;
+}
+
+void Model::Initialization() {
   // This will do the interpolation in the future
   m_c_interpolation = {0, 0, 0, 0, 1.321, 1.46802, 1.61163, 1.74843, 1.875, 1.98877, 2.09042, 2.18148, 2.26346, 2.33789, 2.40628, \
     2.47014, 2.531, 2.59013, 2.64781, 2.70407, 2.75897, 2.81252, 2.86478, 2.91577, 2.96554, 3.01412, 3.06154, 3.10785, 3.15309, 3.19728, \
