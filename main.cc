@@ -2,8 +2,8 @@
 
 int main() {
   std::cout << "Running iFit now" << std::endl;
-  // ifit();
-  test();
+  ifit();
+  // test();
   std::cout << "Running iFit ended" << std::endl;
   return 0;
 }
