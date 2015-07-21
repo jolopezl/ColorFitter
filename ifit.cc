@@ -358,7 +358,7 @@ int test() {
   std::vector<double> foo;
   double nucleus;
   double nu[3]={20.1797,83.798,131.293};
-  for (int i=1; i<=3; ++i){
+  for (int i=0; i<3; ++i){
     nucleus = (double) nu[i];
     m->Compute(nucleus);
     std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;

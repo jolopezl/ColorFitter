@@ -1,6 +1,6 @@
-CC         = clang++
+CC         =  g++
 CFLAGS     = -c -g -Wall `root-config --cflags`
-LDFLAGS    = `root-config --libs` -lMinuit -lGSL -lMathMore
+LDFLAGS    = `root-config --libs` -lMinuit -lgsl -lMathMore
 SOURCES    = $(wildcard *.cc)
 DEPS       = $(wildcard *.h)
 OBJECTS    = $(SOURCES:.cc=.o)

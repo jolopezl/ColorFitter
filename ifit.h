@@ -20,5 +20,6 @@ double chisq(double*);
 void fcn(int&, double*, double&, double*, int);
 void ifit();
 void modelplot(int, int);
+int test();
 
 #endif
