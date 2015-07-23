@@ -2,109 +2,16 @@
 
 double SYSTEMATIC_DPT2 = 0.04;
 double SYSTEMATIC_RM = 0.03;
-int ZDIM = 4;
 
-// At the beggining I will do everything here
+int ZDIM = 10;
+int Q2DIM = 16;
 
-/****************     This is the input data
-z_h dPt2 Error Rm Error
-Nucleus #1
-0.313333  0.0064  0.0013  0.870164  0.0321384
-0.536667  0.0067  0.0022  0.872621  0.0310056
-0.75      -0.0088 0.0044  0.856658  0.0374072
-0.94      -0.0131 0.0073  0.788588  0.0356487
-SetData
-Nucleus #2
-0.313333  0.0205  0.0015  0.736377  0.0313015
-0.536667  0.0228  0.0025  0.695501  0.0273214
-0.75      0.0012  0.0051  0.635427  0.0327105
-0.94      0.0021  0.009   0.539358  0.0269801
-SetData
-Nucleus #3
-0.313333  0.0269  0.0019  0.668259  0.0332506
-0.536667  0.03    0.0033  0.632413  0.0268708
-0.75      0.0071  0.0067  0.594249  0.0284847
-0.94      -0.0021 0.0116  0.459519  0.0264920
-
-**********************************************/
-
-/* HERMES data */
-double zbin[4] = {0.32, 0.53, 0.75, 0.94};
-
-double dPt2_zbin[3][4] =
-{
-  {0.32, 0.53, 0.75, 0.94},
-  {0.31, 0.54, 0.75, 0.94},
-  {0.31, 0.54, 0.75, 0.94}
-};
-
-double dPt2_values[3][4] =
-{
-  {0.0064, 0.0067, -0.0088, -0.0131},
-  {0.0205, 0.0228, 0.0012, 0.0021},
-  {0.0269, 0.0300, 0.0071, -0.0021}
-};
-
-double dPt2_errors[3][4] = 
-{
-  {0.0013, 0.0022, 0.0044, 0.0073},
-  {0.0015, 0.0025, 0.0051, 0.0090},
-  {0.0019, 0.0033, 0.0067, 0.0116}
-};
-
-double RM_zbin[3][4] =
-{
-  {0.32, 0.53, 0.75, 0.94},
-  {0.31, 0.54, 0.75, 0.94},
-  {0.31, 0.54, 0.75, 0.94}
-};
-
-
-double RM_values[3][4] =
-{
-  {0.870164,0.872621,0.856658,0.788588},
-  {0.736377,0.695501,0.635427,0.539358},
-  {0.668259,0.632413,0.594249,0.459519}
-};
-
-double RM_errors[3][4] = 
-{
-  {0.0321384,0.0310056,0.0374072,0.0356487},
-  {0.0313015,0.0273214,0.0327105,0.0269801},
-  {0.0332506,0.0268708,0.0284847,0.0264920}
-};
-
-
-/* Jlab data 
-double zbin[10] = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95};
-
-double dPt2_values[3][10] = {
-{0.000371518,0.00863379,0.0151782,0.0141445,0.0133822,0.00665999,0.00857385,-6.41318e-05,0.0142515,0.0168077},
-{0.000856483,0.0160724,0.0315945,0.0280917,0.0266616,0.0288261,0.022009,0.0191083,0.0326184,0.0449803},
-{0.0014003,0.0215559,0.041029,0.0356387,0.0351237,0.0300144,0.0243309,0.0355309,0.0165417,0.0410554}
-};
-
-double dPt2_errors[3][10] = {
-{8.62358e-05,0.000212014,0.000534801,0.000913602,0.00142702,0.00526272,0.00285298,0.0102465,0.0279433,0.0159634},
-{7.82608e-05,0.00020264,0.00053443,0.000900986,0.00124469,0.00448796,0.00300828,0.00957407,0.0151779,0.0172},
-{9.45994e-05,0.000259157,0.000697902,0.00130221,0.00179537,0.00335751,0.00401528,0.00965185,0.0411052,0.019054}
-};
-
-double RM_values[3][10] = {
-{1.13479,0.962451,0.889687,0.860711,0.849438,0.853472,0.827186,0.710289,0.724836,0.699427},
-{1.12019,0.857052,0.715913,0.66561,0.638018,0.609745,0.566012,0.495528,0.464202,0.425779},
-{0.958637,0.717765,0.572328,0.52392,0.492814,0.489257,0.445196,0.315524,0.363646,0.285614}
-};
-
-double RM_errors[3][10] = {
-{0.00409792,0.00267193,0.00378442,0.00488795,0.00618195,0.0124229,0.00915825,0.102163,0.0290839,0.0364005},
-{0.00366706,0.00218369,0.00280078,0.00353991,0.00429012,0.00686596,0.0259369,0.0344201,0.0145574,0.0165368},
-{0.0036491,0.0021428,0.00271263,0.00337343,0.00426634,0.0180179,0.00614704,0.0619927,0.0136452,0.0209563}
-};
-*/
-
+double zbin[10] = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95}; // hide this?
+double dPt2_values[3][10];
+double dPt2_errors[3][10];
+double RM_values[3][10];
+double RM_errors[3][10];
 double func_array[2] = {0,0};
-
 double zzz[6],errorzzz[6],xxx[6];
 
 double fermi(double f) {
@@ -112,7 +19,8 @@ double fermi(double f) {
   return 0.0;
 }
 
-Model *m = new Model("default");
+// I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
+Model *m = new Model("default"); 
 
 void callModel(double A,double *par){
   // qhat, lp, pre-hadron cross-section, log behaviour, energy loss
@@ -158,13 +66,13 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
 void ifit(){
   m->Initialization();
   // This is for Jlab
-  // xxx[0]=pow(12.0107,1./3.); // C
-  // xxx[1]=pow(55.845,1./3.);  // Fe
-  // xxx[2]=pow(207.2,1./3.); // Pb
+  xxx[0]=pow(12.0107,1./3.); // C
+  xxx[1]=pow(55.845,1./3.);  // Fe
+  xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
-  xxx[0]=pow(20.1797,1./3.); // Ne
-  xxx[1]=pow(83.798,1./3.);  // Kr
-  xxx[2]=pow(131.293,1./3.); // Xe
+  // xxx[0]=pow(20.1797,1./3.); // Ne
+  // xxx[1]=pow(83.798,1./3.);  // Kr
+  // xxx[2]=pow(131.293,1./3.); // Xe
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
@@ -174,53 +82,110 @@ void ifit(){
   // for the future ---> here I have only one Q2 bin so do it thiking on multiple bins
   // I think now I will interpolate RM values from data to be in the same z-bins that dPt2
   //#pragma omp parallel for 
-  for (int iz=0; iz<ZDIM; ++iz) {
-    std::cout << "Working for bin #" << iz+1 << " of " << ZDIM << std::endl;
-    for (int a=0; a<3; ++a) {
-      zzz[a] = (dPt2_values[a][iz]-fermi(a)); // fermi is now returning zero
-      zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
-      errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
-      errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
-    }
-    TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
-    gMinuit->SetFCN(fcn);      
-    double arglist[10];
-    int ierflg = 0;      
-    arglist[0] = 1;
-    gMinuit->mnexcm("SET ERR", arglist ,1,ierflg);
-    arglist[0] = 3;
-    gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
-    // Set starting values and step sizes for parameters
-    double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
-    double step[]   = {0.03,0.8,3.,0.5,0.005};
-    double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration                   
-    double lim_hi[] = {1000.,50.,1000.,1000.0,1000.};
-    gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
-    gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
-    gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
-    gMinuit->mnparm(3, "a4", vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
-    gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss      
-    //gMinuit->FixParameter(0);
-    gMinuit->FixParameter(3);
-    gMinuit->FixParameter(4);
-    // Now ready for minimization step
-    arglist[0] = 500;
-    arglist[1] = 1.;
-    gMinuit->mnexcm("MIGRAD", arglist, 5,ierflg);      
-    // Print results
-    double amin,edm,errdef;
-    int nvpar,nparx,icstat;
-    gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
-    gMinuit->mnprin(3,amin);
-    modelplot(0,iz);
-    fout->Write();
+  // Adding the read to multiple Q2 bins
+  std::string line = "";
+  std::string bin_info = "";
+  std::ifstream infile1;
+  std::ifstream infile2;
+  infile1.open("broadening.txt");
+  infile2.open("multiplicities.txt");
+  std::vector<std::string> words = {};
+  std::string foo = "";
+  for (int i=1; i<=2; ++i) { // read two dummy lines
+    std::getline(infile1,foo);
+    std::getline(infile2,foo);
   }
-  
+  for (int iQ2=0; iQ2<Q2DIM; ++iQ2) {
+    // Test first
+    // Read 12 lines
+    // 1 bin ifo
+    // 2-11 data
+    // 12 blank line
+    std::getline(infile1,line);
+    bin_info = line; // tokenize this? 
+    std::getline(infile2,line); // read the bin_info of other file, cross check?
+    for (int idx=0; idx<10; ++idx) {
+      // read data
+      std::getline(infile1, line); // broadening
+      boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
+      dPt2_values[0][idx] = boost::lexical_cast<double>(words.at(1));
+      dPt2_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
+      dPt2_values[1][idx] = boost::lexical_cast<double>(words.at(3));
+      dPt2_errors[1][idx] = boost::lexical_cast<double>(words.at(4));
+      dPt2_values[2][idx] = boost::lexical_cast<double>(words.at(5));
+      dPt2_errors[2][idx] = boost::lexical_cast<double>(words.at(6));
+      words.clear();
+      std::getline(infile2, line); // multiplicity
+      boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
+      RM_values[0][idx] = boost::lexical_cast<double>(words.at(1));
+      RM_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
+      RM_values[1][idx] = boost::lexical_cast<double>(words.at(3));
+      RM_errors[1][idx] = boost::lexical_cast<double>(words.at(4));
+      RM_values[2][idx] = boost::lexical_cast<double>(words.at(5));
+      RM_errors[2][idx] = boost::lexical_cast<double>(words.at(6));
+      words.clear();
+    }
+    std::getline(infile1,line); // skip empty line
+    std::getline(infile2,line); // skip empty line
+    // std::cout << bin_info << std::endl;
+    // boost::split(words, bin_info, boost::is_any_of("< "));
+    // for (const auto &ww : words) std::cout << ww << std::endl;
+    // for (int idx=0; idx<10; ++idx) {
+    //   std::cout << RM_values[0][idx] << "\t" << RM_errors[0][idx] << "\t" << RM_values[1][idx] << "\t" << RM_errors[1][idx] << std::endl;
+    // }
+  //}
+    // Loop over z-bins
+    for (int iz=0; iz<ZDIM; ++iz) {
+      std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
+      std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)Q2DIM*ZDIM) << "%" << std::endl;
+      for (int a=0; a<3; ++a) {
+        zzz[a] = (dPt2_values[a][iz]-fermi(a)); // fermi is now returning zero
+        zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
+        errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
+        errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
+      }
+      TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
+      gMinuit->SetFCN(fcn);      
+      double arglist[10];
+      int ierflg = 0;      
+      arglist[0] = 1;
+      gMinuit->mnexcm("SET ERR", arglist ,1,ierflg);
+      arglist[0] = 3;
+      gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
+      // Set starting values and step sizes for parameters
+      double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
+      double step[]   = {0.03,0.8,3.,0.5,0.005};
+      double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration                   
+      double lim_hi[] = {1000.,50.,1000.,1000.0,1000.};
+      gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
+      gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
+      gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
+      gMinuit->mnparm(3, "a4", vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
+      gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss      
+      //gMinuit->FixParameter(0);
+      gMinuit->FixParameter(3);
+      gMinuit->FixParameter(4);
+      // Now ready for minimization step
+      arglist[0] = 500;
+      arglist[1] = 1.;
+      gMinuit->mnexcm("MIGRAD", arglist, 5,ierflg);      
+      // Print results
+      double amin,edm,errdef;
+      int nvpar,nparx,icstat;
+      gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
+      gMinuit->mnprin(3,amin);
+      modelplot(bin_info,iQ2,iz);
+      fout->Write();
+    }
+  // End of loop over z-bins
+  }
+  infile1.close();
+  infile2.close();
   std::cout << "iFit has finished" << std::endl;
   //return 0;
 }
 
-void modelplot(int iQ2x, int iz){
+void modelplot(std::string bin_info, int iQ2x, int iz){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -268,7 +233,8 @@ void modelplot(int iQ2x, int iz){
   // At this point, we know the parameters, so let's write them out
   std::ofstream fout;
   fout.open("Fit_output", std::ios::out | std::ios::app);
-  fout << iQ2x <<iz <<"\t";
+  if (iz == 0) fout << bin_info << "\n";
+  fout << iQ2x << "\t" << iz << "\t";
   fout << zbin[iz] << "\t";
   fout <<par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
   fout <<par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t"<<chisquared<<"\n"; 
@@ -293,9 +259,9 @@ void modelplot(int iQ2x, int iz){
   std::string mrname;
   std::string ptname;
   std::ostringstream out_mr, out_pt;
-  out_mr << "mr" << iQ2x << iz;
+  out_mr << "mr_" << iQ2x << "_" << iz;
   mrname = out_mr.str();
-  out_pt << "pt" << iQ2x << iz;
+  out_pt << "pt_" << iQ2x << "_" << iz;
   ptname = out_pt.str();
   TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
   TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
