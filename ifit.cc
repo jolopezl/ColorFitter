@@ -191,6 +191,7 @@ void ifit(){
       gMinuit->mnprin(3,amin);
       modelplot(gMinuit,bin_info,iQ2,iz);
       fout->Write();
+      delete(gMinuit);
     }
   // End of loop over z-bins
   }
