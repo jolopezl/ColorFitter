@@ -1,10 +1,10 @@
 #include "model.h"
 
-Model::Model(): m_ModelName("Default"), m_dPt2(0.0), m_Rm(0.0) {
+Model::Model(): m_ModelName("Default"), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false) {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
-Model::Model(std::string name): m_ModelName(name), m_dPt2(0.0), m_Rm(0.0) {
+Model::Model(std::string name): m_ModelName(name), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false) {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
@@ -41,6 +41,20 @@ void Model::SetParameters(std::string parameter, double value) {
   else if (parameter == "dz") m_dz = value;
   else if (parameter == "density threshold") m_density_threshold = value;
   else std::cout << "Not a valid parameter name" << std::endl;
+}
+
+void Model::SetBinRatio(int diz, double dbinw, double dbinratio){
+  m_iz = diz;
+  m_zbinwidth = dbinw;
+  m_binratio = dbinratio;
+}
+
+void Model::DoEnergyLoss(bool foo){
+  m_DoEnergyLoss = foo;
+}
+
+void Model::DoLogBehavior(bool foo){
+  m_DoLogBehavior = foo;
 }
 
 void Model::Initialization() {
@@ -108,7 +122,7 @@ void Model::Compute(double A){
       x = gRandom->Uniform(-R,R);
       y = gRandom->Uniform(-R,R);
       z = gRandom->Uniform(-R,R);
-    if(x*x+y*y+z*z<R*R) break;
+      if(x*x+y*y+z*z<R*R) break;
     }
     L = gRandom->Exp(m_lp); // exponentially distributed production length
     dtd1->SetParameter(0,m_qhat); // qhat parameter  
@@ -135,7 +149,9 @@ void Model::Compute(double A){
     if(z+L>=ul){// endpoint of quark path is outside the sphere of integration
       temp=constant*igdtd1->Integral(z,ul) ; // find partonic lengths
       zrange1=ul-z;
-      // zrange1*= log(pow(L/par[3],2))*log(pow(L/par[3],2));   // log squared term
+      if(m_DoLogBehavior == true) {
+        zrange1*= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2));   // log squared term
+      }
     }
     if(z>ul){// this should not be possible
       std::cout << "Point A: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp << " " << R << " " << x << " " << y << " " << z << " " << R*R-x*x-y*y << std::endl;
@@ -178,11 +194,15 @@ void Model::Compute(double A){
     }
     //      normalize+= 1.;
     normalize+=weight; // weight initial interaction by density  
-    /*
-
-    ADD ENERGY LOSS
-
-    */
+    // ADD ENERGY LOSS, From Will's original code:
+    if (m_DoEnergyLoss == true) {
+      if (m_iz > 0) {
+        temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+      }
+      else {
+        temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
+      }
+    }
   }
   m_dPt2=accumulator1/normalize; //  pT broadening
   m_Rm=accumulator2/normalize; //  Multiplicity

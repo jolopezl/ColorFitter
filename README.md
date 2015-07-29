@@ -16,6 +16,9 @@ To download, compile and run the code, create a work directory and then type:
 
 `$ ./ifitx.exe`
 
+## Note 
+
+Code under constant development.
 
 ## More info
 

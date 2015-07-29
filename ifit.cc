@@ -1,16 +1,21 @@
 #include "ifit.h"
 
-double SYSTEMATIC_DPT2 = 0.04;
-double SYSTEMATIC_RM = 0.03;
+const double SYSTEMATIC_DPT2 = 0.04;
+const double SYSTEMATIC_RM = 0.03;
+
+bool ENERGYLOSS = false;
+bool LOGBEHAVIOR = false;
 
 int ZDIM = 10;
 int Q2DIM = 16;
 
+double zbinw = 0.1;
 double zbin[10] = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95}; // hide this?
 double dPt2_values[3][10];
 double dPt2_errors[3][10];
 double RM_values[3][10];
 double RM_errors[3][10];
+double binratios[10] = {0,0,0,0,0,0,0,0,0,0};
 double func_array[2] = {0,0};
 double zzz[6],errorzzz[6],xxx[6];
 
@@ -65,6 +70,8 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
 
 void ifit(){
   m->Initialization();
+  m->DoEnergyLoss(ENERGYLOSS);
+  m->DoLogBehavior(LOGBEHAVIOR);
   // This is for Jlab
   xxx[0]=pow(12.0107,1./3.); // C
   xxx[1]=pow(55.845,1./3.);  // Fe
@@ -76,19 +83,18 @@ void ifit(){
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
-  std::cout << "Starting iFit at " << std::endl; // I would like to print time here
+  std::cout << "Starting iFit at " << std::endl;
   // Here the rest of the code
   TFile *fout = new TFile("fullfit.root","RECREATE");
-  // for the future ---> here I have only one Q2 bin so do it thiking on multiple bins
-  // I think now I will interpolate RM values from data to be in the same z-bins that dPt2
-  //#pragma omp parallel for 
   // Adding the read to multiple Q2 bins
   std::string line = "";
   std::string bin_info = "";
   std::ifstream infile1;
   std::ifstream infile2;
+  std::ifstream infile3;
   infile1.open("broadening.txt");
   infile2.open("multiplicities.txt");
+  infile3.open("binratios.txt");
   std::vector<std::string> words = {};
   std::string foo = "";
   for (int i=1; i<=2; ++i) { // read two dummy lines
@@ -96,18 +102,22 @@ void ifit(){
     std::getline(infile2,foo);
   }
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) {
-    // Test first
     // Read 12 lines
-    // 1 bin ifo
-    // 2-11 data
-    // 12 blank line
+    // L#1      bin ifo
+    // L#2-L#11 data
+    // L#12     blank line
     std::getline(infile1,line);
-    bin_info = line; // tokenize this? 
     std::getline(infile2,line); // read the bin_info of other file, cross check?
+    bin_info = line;
     for (int idx=0; idx<10; ++idx) {
       // read data
       std::getline(infile1, line); // broadening
       boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
+      // Casting string as double:
+      // Alternatives
+      // boost::lexical_cast<double>
+      // std::stod
+      // atof
       dPt2_values[0][idx] = boost::lexical_cast<double>(words.at(1));
       dPt2_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
       dPt2_values[1][idx] = boost::lexical_cast<double>(words.at(3));
@@ -124,20 +134,25 @@ void ifit(){
       RM_values[2][idx] = boost::lexical_cast<double>(words.at(5));
       RM_errors[2][idx] = boost::lexical_cast<double>(words.at(6));
       words.clear();
+      std::getline(infile3, line);
+      binratios[idx] = boost::lexical_cast<double>(line);
     }
     std::getline(infile1,line); // skip empty line
     std::getline(infile2,line); // skip empty line
+    // TEST
     // std::cout << bin_info << std::endl;
-    // boost::split(words, bin_info, boost::is_any_of("< "));
-    // for (const auto &ww : words) std::cout << ww << std::endl;
     // for (int idx=0; idx<10; ++idx) {
     //   std::cout << RM_values[0][idx] << "\t" << RM_errors[0][idx] << "\t" << RM_values[1][idx] << "\t" << RM_errors[1][idx] << std::endl;
     // }
-  //}
-    // Loop over z-bins
+    // for (int idx=0; idx<10; ++idx) {
+    //   std::cout << binratios[idx] << std::endl;
+    // }
+  // }
+    // Main Loop over z-bins
     for (int iz=0; iz<ZDIM; ++iz) {
+      m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
       std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
-      std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)Q2DIM*ZDIM) << "%" << std::endl;
+      std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
         zzz[a] = (dPt2_values[a][iz]-fermi(a)); // fermi is now returning zero
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
@@ -162,9 +177,9 @@ void ifit(){
       gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
       gMinuit->mnparm(3, "a4", vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
       gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss      
-      //gMinuit->FixParameter(0);
-      gMinuit->FixParameter(3);
-      gMinuit->FixParameter(4);
+      //gMinuit->FixParameter(0); // Q-HAT
+      if (!LOGBEHAVIOR) gMinuit->FixParameter(3); // Log description
+      if (!ENERGYLOSS)  gMinuit->FixParameter(4); // Energy Loss
       // Now ready for minimization step
       arglist[0] = 500;
       arglist[1] = 1.;
@@ -174,18 +189,19 @@ void ifit(){
       int nvpar,nparx,icstat;
       gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
       gMinuit->mnprin(3,amin);
-      modelplot(bin_info,iQ2,iz);
+      modelplot(gMinuit,bin_info,iQ2,iz);
       fout->Write();
     }
   // End of loop over z-bins
   }
   infile1.close();
   infile2.close();
+  infile3.close();
   std::cout << "iFit has finished" << std::endl;
   //return 0;
 }
 
-void modelplot(std::string bin_info, int iQ2x, int iz){
+void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -207,7 +223,7 @@ void modelplot(std::string bin_info, int iQ2x, int iz){
     out << "a" << parNo;
     chnam = (TString) out.str();
     out.flush();
-    gMinuit->mnpout(parNo, chnam, val, err, xlolim, xuplim, iuint);
+    g->mnpout(parNo, chnam, val, err, xlolim, xuplim, iuint);
     par[parNo]=val;
     par_errors[parNo]=err;
   }

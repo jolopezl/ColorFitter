@@ -18,7 +18,13 @@ private:
   double m_lp; // production lenght
   double m_sigma_ph; // prehadron cross section
   double m_dlog; // log description?
-  double m_dz; // energy loss
+  double m_dz; // energy loss parameter
+  // some assistance for the energy loss part
+  int m_iz;
+  int m_zbinwidth;
+  double m_binratio; // with SetParameters??
+  bool m_DoEnergyLoss;
+  bool m_DoLogBehavior;
   // tools
   std::vector<double> m_c_interpolation;
   // Other parameters
@@ -34,6 +40,9 @@ public:
   ~Model();
   void SetParameters(std::vector<double>);
   void SetParameters(std::string,double);
+  void SetBinRatio(int,double,double);
+  void DoEnergyLoss(bool);
+  void DoLogBehavior(bool);
   void Initialization();
   void Compute(double);
   double Get1();
