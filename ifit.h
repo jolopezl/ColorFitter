@@ -24,7 +24,7 @@ void callModel(double, double*);
 double chisq(double*);
 void fcn(int&, double*, double&, double*, int);
 void ifit();
-void modelplot(TMinuit*, std::string, int, int);
+void modelplot(TMinuit*, std::string, int, int, double, double);
 int test();
 
 #endif

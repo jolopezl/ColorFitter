@@ -5,6 +5,7 @@ const double SYSTEMATIC_RM = 0.03;
 
 bool ENERGYLOSS = false;
 bool LOGBEHAVIOR = false;
+bool FERMIMOTION = false;
 
 int ZDIM = 10;
 int Q2DIM = 16;
@@ -72,6 +73,7 @@ void ifit(){
   m->Initialization();
   m->DoEnergyLoss(ENERGYLOSS);
   m->DoLogBehavior(LOGBEHAVIOR);
+  m->DoFermiMotion(FERMIMOTION);
   // This is for Jlab
   xxx[0]=pow(12.0107,1./3.); // C
   xxx[1]=pow(55.845,1./3.);  // Fe
@@ -139,6 +141,14 @@ void ifit(){
     }
     std::getline(infile1,line); // skip empty line
     std::getline(infile2,line); // skip empty line
+    // Grab bin info data
+    words.clear();
+    boost::split(words,bin_info,boost::is_any_of("< "),boost::token_compress_on);
+    double Q2lo = std::stod(words.at(0));
+    double Q2hi = std::stod(words.at(2));
+    double xBlo = std::stod(words.at(3));
+    double xBhi = std::stod(words.at(5));
+    // std::cout << bin_info << "\t" << Q2lo << Q2hi << xBlo << xBhi << std::endl;
     // TEST
     // std::cout << bin_info << std::endl;
     // for (int idx=0; idx<10; ++idx) {
@@ -147,10 +157,11 @@ void ifit(){
     // for (int idx=0; idx<10; ++idx) {
     //   std::cout << binratios[idx] << std::endl;
     // }
-  // }
+  // } /*
     // Main Loop over z-bins
     for (int iz=0; iz<ZDIM; ++iz) {
       m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
+      m->SetFermiValues((xBhi-xBlo)/2.0,zbin[iz]);
       std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
       std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
@@ -189,7 +200,7 @@ void ifit(){
       int nvpar,nparx,icstat;
       gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
       gMinuit->mnprin(3,amin);
-      modelplot(gMinuit,bin_info,iQ2,iz);
+      modelplot(gMinuit,bin_info,iQ2,iz,(Q2hi-Q2lo)/2.0,zbin[iz]);
       fout->Write();
       delete(gMinuit);
     }
@@ -202,7 +213,7 @@ void ifit(){
   //return 0;
 }
 
-void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz){
+void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double z){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -250,9 +261,10 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz){
   // At this point, we know the parameters, so let's write them out
   std::ofstream fout;
   fout.open("Fit_output", std::ios::out | std::ios::app);
+  fout.precision(10);
   if (iz == 0) fout << bin_info << "\n";
   fout << iQ2x << "\t" << iz << "\t";
-  fout << zbin[iz] << "\t";
+  fout << z << "\t" << Q2 << "\t";
   fout <<par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
   fout <<par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t"<<chisquared<<"\n"; 
   //fout<<C_deltaE<<" "<<Fe_deltaE<<" "<<Pb_deltaE<<" \n";

@@ -25,6 +25,10 @@ private:
   double m_binratio; // with SetParameters??
   bool m_DoEnergyLoss;
   bool m_DoLogBehavior;
+  bool m_DoFermiMotion;
+  // For Fermi momentum
+  double m_xB;
+  double m_zbinvalue;
   // tools
   std::vector<double> m_c_interpolation;
   // Other parameters
@@ -41,13 +45,16 @@ public:
   void SetParameters(std::vector<double>);
   void SetParameters(std::string,double);
   void SetBinRatio(int,double,double);
+  void SetFermiValues(double,double);
   void DoEnergyLoss(bool);
   void DoLogBehavior(bool);
+  void DoFermiMotion(bool);
   void Initialization();
   void Compute(double);
   double Get1();
   double Get2();
   std::vector<double> GetResult();
+  double Fermi(int inucleus);
 };
 
 #endif

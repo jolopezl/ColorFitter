@@ -1,10 +1,10 @@
 #include "model.h"
 
-Model::Model(): m_ModelName("Default"), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false) {
+Model::Model(): m_ModelName("Default"), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false), m_DoFermiMotion(false) {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
-Model::Model(std::string name): m_ModelName(name), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false) {
+Model::Model(std::string name): m_ModelName(name), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false), m_DoFermiMotion(false) {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
@@ -49,12 +49,21 @@ void Model::SetBinRatio(int diz, double dbinw, double dbinratio){
   m_binratio = dbinratio;
 }
 
+void Model::SetFermiValues(double xb, double z) {
+  m_xB = xb;
+  m_zbinvalue = z;
+}
+
 void Model::DoEnergyLoss(bool foo){
   m_DoEnergyLoss = foo;
 }
 
 void Model::DoLogBehavior(bool foo){
   m_DoLogBehavior = foo;
+}
+
+void Model::DoFermiMotion(bool foo){
+  m_DoFermiMotion = foo;
 }
 
 void Model::Initialization() {
@@ -98,6 +107,41 @@ double Model::Density(double A, double xx, double yy, double zz){
   //if(r<1.2*A**(1./3.)){rho=0.170;}
   //else{rho=0.0;};
   return rho;
+}
+
+
+double Model::Fermi(int inucleus){
+  // Computes the contribution of fermi momentum broadening to 
+  // pT broadening using Boris's formula
+  double avgFermi;// <(Fermi momentum)**2>
+  //.033 Pb
+  //.028 Fe
+  //.029 C
+  //.023 D
+  // From Taya's study, not completely final: 
+  //0.019 Pb
+  //0.014 Fe
+  //0.015 C
+  //0.002 D
+  avgFermi=-999.;
+  //  if(inucleus==0){avgFermi=0.029-.023;} // Carbon
+  //  if(inucleus==1){avgFermi=0.028-.023;} // Iron
+  //  if(inucleus==2){avgFermi=0.033-.023;} // Lead
+  if (inucleus == 0) avgFermi=0.015-.002; // Carbon
+  if (inucleus == 1) avgFermi=0.014-.002; // Iron
+  if (inucleus == 2) avgFermi=0.019-.002; // Lead
+  if (avgFermi == -999.) {
+    std::cout << "Fermi error" << std::endl;
+  }
+  // x=Q2/2Mnu
+  //  Double_t x = Q2_lo[iQ2nu][iz][0]/2.+Q2_hi[iQ2nu][iz][0]/2.;
+  //x=x/(2.*0.9385);
+  //x=x/(nu_lo[iQ2nu][iz][0]/2.+nu_hi[iQ2nu][iz][0]/2.);
+  // The part below is for the data when it is read in as x, not as nu.
+  double x = m_xB; 
+  double z_h = m_zbinvalue;
+  double result = 0.6666666*x*x*z_h*z_h*avgFermi;
+  return result; 
 }
 
 void Model::Compute(double A){
