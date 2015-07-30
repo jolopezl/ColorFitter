@@ -200,7 +200,7 @@ void ifit(){
       int nvpar,nparx,icstat;
       gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
       gMinuit->mnprin(3,amin);
-      modelplot(gMinuit,bin_info,iQ2,iz,(Q2hi-Q2lo)/2.0,zbin[iz]);
+      modelplot(gMinuit,bin_info,iQ2,iz,(Q2hi-Q2lo)/2.0,(xBhi-xBlo)/2.0,zbin[iz]);
       fout->Write();
       delete(gMinuit);
     }
@@ -213,7 +213,7 @@ void ifit(){
   //return 0;
 }
 
-void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double z){
+void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double xB, double z){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -264,7 +264,7 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   fout.precision(10);
   if (iz == 0) fout << bin_info << "\n";
   fout << iQ2x << "\t" << iz << "\t";
-  fout << z << "\t" << Q2 << "\t";
+  fout << Q2 << "\t" << xB << "\t" << z << "\t";
   fout <<par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
   fout <<par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t"<<chisquared<<"\n"; 
   //fout<<C_deltaE<<" "<<Fe_deltaE<<" "<<Pb_deltaE<<" \n";
