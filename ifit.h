@@ -23,7 +23,7 @@ double fermi(double);
 void callModel(double, double*);
 double chisq(double*);
 void fcn(int&, double*, double&, double*, int);
-void ifit();
+void ifit(bool,bool,bool,int,int);
 void modelplot(TMinuit*, std::string, int, int, double, double, double);
 int test();
 

@@ -188,13 +188,15 @@ void Model::Compute(double A){
     if(z+L<ul){// endpoint of quark path is within the sphere of integration
       temp=constant*igdtd1->Integral(z,z+L) ; // find partonic lengths
       zrange1=L;
-      // zrange1*= log(pow(L/par[3],2))*log(pow(L/par[3],2));  // log squared term
+      if(m_DoLogBehavior == true) {
+        zrange1*= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
+      }
     }
-    if(z+L>=ul){// endpoint of quark path is outside the sphere of integration
+    if(z+L>=ul){ // endpoint of quark path is outside the sphere of integration
       temp=constant*igdtd1->Integral(z,ul) ; // find partonic lengths
       zrange1=ul-z;
       if(m_DoLogBehavior == true) {
-        zrange1*= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2));   // log squared term
+        zrange1*= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
       }
     }
     if(z>ul){// this should not be possible

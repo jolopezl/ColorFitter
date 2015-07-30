@@ -3,10 +3,6 @@
 const double SYSTEMATIC_DPT2 = 0.04;
 const double SYSTEMATIC_RM = 0.03;
 
-bool ENERGYLOSS = false;
-bool LOGBEHAVIOR = false;
-bool FERMIMOTION = false;
-
 int ZDIM = 10;
 int Q2DIM = 16;
 
@@ -69,7 +65,7 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
   f = chisq(par);
 }
 
-void ifit(){
+void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT) {
   m->Initialization();
   m->DoEnergyLoss(ENERGYLOSS);
   m->DoLogBehavior(LOGBEHAVIOR);
@@ -148,21 +144,16 @@ void ifit(){
     double Q2hi = std::stod(words.at(2));
     double xBlo = std::stod(words.at(3));
     double xBhi = std::stod(words.at(5));
-    // std::cout << bin_info << "\t" << Q2lo << Q2hi << xBlo << xBhi << std::endl;
-    // TEST
-    // std::cout << bin_info << std::endl;
-    // for (int idx=0; idx<10; ++idx) {
-    //   std::cout << RM_values[0][idx] << "\t" << RM_errors[0][idx] << "\t" << RM_values[1][idx] << "\t" << RM_errors[1][idx] << std::endl;
-    // }
-    // for (int idx=0; idx<10; ++idx) {
-    //   std::cout << binratios[idx] << std::endl;
-    // }
-  // } /*
+    // Selects an specific Q2,x bin if desired.
+    if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) continue;
     // Main Loop over z-bins
     for (int iz=0; iz<ZDIM; ++iz) {
+      // Selects and specific z bin to fit.
+      if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) continue;
       m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
       m->SetFermiValues((xBhi-xBlo)/2.0,zbin[iz]);
       std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
+      std::cout << "Bin info " << bin_info << std::endl;
       std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
         zzz[a] = (dPt2_values[a][iz]-fermi(a)); // fermi is now returning zero
