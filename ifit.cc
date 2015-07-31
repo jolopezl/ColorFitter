@@ -152,9 +152,7 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     // Selects an specific Q2,x bin if desired.
     if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) continue;
     // Main Loop over z-bins
-    continue;
     for (int iz=0; iz<ZDIM; ++iz) {
-      continue;
       // Selects and specific z bin to fit.
       if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) continue;
       m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
