@@ -144,14 +144,21 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     double Q2hi = std::stod(words.at(2));
     double xBlo = std::stod(words.at(3));
     double xBhi = std::stod(words.at(5));
+    double Q2 = (Q2hi+Q2lo)/2.0;
+    double xB = (xBhi+xBlo)/2.0;
+    std::cout << bin_info << std::endl;
+    std::cout << Q2 << std::endl;
+    std::cout << xB << std::endl;
     // Selects an specific Q2,x bin if desired.
     if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) continue;
     // Main Loop over z-bins
+    continue;
     for (int iz=0; iz<ZDIM; ++iz) {
+      continue;
       // Selects and specific z bin to fit.
       if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) continue;
       m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
-      m->SetFermiValues((xBhi-xBlo)/2.0,zbin[iz]);
+      m->SetFermiValues(xB,zbin[iz]);
       std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
       std::cout << "Bin info " << bin_info << std::endl;
       std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
@@ -191,7 +198,7 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       int nvpar,nparx,icstat;
       gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
       gMinuit->mnprin(3,amin);
-      modelplot(gMinuit,bin_info,iQ2,iz,(Q2hi-Q2lo)/2.0,(xBhi-xBlo)/2.0,zbin[iz]);
+      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz]);
       fout->Write();
       delete(gMinuit);
     }
