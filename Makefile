@@ -1,5 +1,7 @@
 CC         =  g++
-CFLAGS     = -c -g -Wall -O2 `root-config --cflags`
+CFLAGS     = -c -g -Wall
+CFLAGS    += -O2
+CFLAGS    += `root-config --cflags`
 CFLAGS    += -I/usr/local/boost/1_57_0/include
 LDFLAGS    = `root-config --libs` -lMinuit -lgsl -lMathMore
 LDFLAGS   += -L/usr/local/boost/1_57_0/lib

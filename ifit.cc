@@ -3,7 +3,7 @@
 const double SYSTEMATIC_DPT2 = 0.04;
 const double SYSTEMATIC_RM = 0.03;
 
-int ZDIM = 10;
+int ZDIM  = 10;
 int Q2DIM = 16;
 
 double zbinw = 0.1;
@@ -179,14 +179,20 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     double Q2 = (Q2hi+Q2lo)/2.0;
     double xB = (xBhi+xBlo)/2.0;
     // Selects an specific Q2,x bin if desired.
-    if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) continue;
+    if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) {
+      std::cout << "Ignoring this bin" << std::endl;
+      continue;
+    }
     std::cout << bin_info << std::endl;
     std::cout << "Q2lo = " << Q2lo << "\t Q2hi = " << Q2hi << "\t Q2 = " << Q2 << std::endl;
     std::cout << "xBlo = " << xBlo << "\t xBhi = " << xBhi << "\t xB = " << xB << std::endl;
     // Main Loop over z-bins
     for (int iz=0; iz<ZDIM; ++iz) {
       // Selects and specific z bin to fit.
-      if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) continue;
+      if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) {
+        std::cout << "Ignoring this bin" << std::endl;
+        continue;
+      }
       std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
       m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
       m->SetFermiValues(xB,zbin[iz]);
