@@ -19,7 +19,7 @@
 // 
 #include "model.h"
 
-double fermi(double);
+double fermi(double,double,int);
 void callModel(double, double*);
 double chisq(double*);
 void fcn(int&, double*, double&, double*, int);

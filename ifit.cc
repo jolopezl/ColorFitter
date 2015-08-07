@@ -16,9 +16,38 @@ double binratios[10] = {0,0,0,0,0,0,0,0,0,0};
 double func_array[2] = {0,0};
 double zzz[6],errorzzz[6],xxx[6];
 
-double fermi(double f) {
-  // To be included
-  return 0.0;
+double fermi(double m_xB, double m_zbinvalue, int inucleus) {
+  // Computes the contribution of fermi momentum broadening to 
+  // pT broadening using Boris's formula
+  double avgFermi;// <(Fermi momentum)**2>
+  //.033 Pb
+  //.028 Fe
+  //.029 C
+  //.023 D
+  // From Taya's study, not completely final: 
+  //0.019 Pb
+  //0.014 Fe
+  //0.015 C
+  //0.002 D
+  avgFermi=-999.;
+  //  if(inucleus==0){avgFermi=0.029-.023;} // Carbon
+  //  if(inucleus==1){avgFermi=0.028-.023;} // Iron
+  //  if(inucleus==2){avgFermi=0.033-.023;} // Lead
+  if (inucleus == 0) avgFermi=0.015-.002; // Carbon
+  if (inucleus == 1) avgFermi=0.014-.002; // Iron
+  if (inucleus == 2) avgFermi=0.019-.002; // Lead
+  if (avgFermi == -999.) {
+    std::cout << "Fermi error" << std::endl;
+  }
+  // x=Q2/2Mnu
+  //  Double_t x = Q2_lo[iQ2nu][iz][0]/2.+Q2_hi[iQ2nu][iz][0]/2.;
+  //x=x/(2.*0.9385);
+  //x=x/(nu_lo[iQ2nu][iz][0]/2.+nu_hi[iQ2nu][iz][0]/2.);
+  // The part below is for the data when it is read in as x, not as nu.
+  double x = m_xB; 
+  double z_h = m_zbinvalue;
+  double result = 0.6666666*x*x*z_h*z_h*avgFermi;
+  return result; 
 }
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
@@ -105,8 +134,10 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     // L#2-L#11 data
     // L#12     blank line
     std::getline(infile1,line);
-    std::getline(infile2,line); // read the bin_info of other file, cross check?
+    std::cout << "Bin info <broadening>     " << line << std::endl;
     bin_info = line;
+    std::getline(infile2,line); // read the bin_info of other file, cross check?
+    std::cout << "Bin info <multiplicities> " << line << std::endl;
     for (int idx=0; idx<10; ++idx) {
       // read data
       std::getline(infile1, line); // broadening
@@ -139,6 +170,7 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     std::getline(infile2,line); // skip empty line
     // Grab bin info data
     words.clear();
+    // read bin_info from both files and compare
     boost::split(words,bin_info,boost::is_any_of("< "),boost::token_compress_on);
     double Q2lo = std::stod(words.at(0));
     double Q2hi = std::stod(words.at(2));
@@ -147,8 +179,8 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     double Q2 = (Q2hi+Q2lo)/2.0;
     double xB = (xBhi+xBlo)/2.0;
     std::cout << bin_info << std::endl;
-    std::cout << Q2 << std::endl;
-    std::cout << xB << std::endl;
+    std::cout << "Q2lo = " << Q2lo << "\t Q2hi = " << Q2hi << "\t Q2 = " << Q2 << std::endl;
+    std::cout << "xBlo = " << xBlo << "\t xBhi = " << xBhi << "\t xB = " << xB << std::endl;
     // Selects an specific Q2,x bin if desired.
     if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) continue;
     // Main Loop over z-bins
@@ -161,7 +193,7 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       std::cout << "Bin info " << bin_info << std::endl;
       std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
-        zzz[a] = (dPt2_values[a][iz]-fermi(a)); // fermi is now returning zero
+        zzz[a] = dPt2_values[a][iz]-fermi(xB,zbin[iz],a); // fermi is now returning zero
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
         errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
         errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
@@ -353,6 +385,11 @@ int test() {
     nucleus = (double) nu[i];
     m->Compute(nucleus);
     std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
+  }
+  for (int i=1; i<=6; ++i){
+    nucleus = (double) i*i*i;
+    m->Compute(nucleus);
+    std::cout << i << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
   }
   delete(m);
   return 0;

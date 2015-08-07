@@ -21,7 +21,7 @@ private:
   double m_dz; // energy loss parameter
   // some assistance for the energy loss part
   int m_iz;
-  int m_zbinwidth;
+  double m_zbinwidth;
   double m_binratio; // with SetParameters??
   bool m_DoEnergyLoss;
   bool m_DoLogBehavior;
