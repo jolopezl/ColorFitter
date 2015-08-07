@@ -178,20 +178,20 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     double xBhi = std::stod(words.at(5));
     double Q2 = (Q2hi+Q2lo)/2.0;
     double xB = (xBhi+xBlo)/2.0;
+    // Selects an specific Q2,x bin if desired.
+    if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) continue;
     std::cout << bin_info << std::endl;
     std::cout << "Q2lo = " << Q2lo << "\t Q2hi = " << Q2hi << "\t Q2 = " << Q2 << std::endl;
     std::cout << "xBlo = " << xBlo << "\t xBhi = " << xBhi << "\t xB = " << xB << std::endl;
-    // Selects an specific Q2,x bin if desired.
-    if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) continue;
     // Main Loop over z-bins
     for (int iz=0; iz<ZDIM; ++iz) {
       // Selects and specific z bin to fit.
       if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) continue;
+      std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
       m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
       m->SetFermiValues(xB,zbin[iz]);
-      std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
-      std::cout << "Bin info " << bin_info << std::endl;
-      std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
+      // std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
+      // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
         zzz[a] = dPt2_values[a][iz]-fermi(xB,zbin[iz],a); // fermi is now returning zero
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
