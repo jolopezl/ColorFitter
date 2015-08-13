@@ -69,24 +69,36 @@ double chisq(double *par){
   double chisq = 0;
   double delta;
   chisq = 0.;
+  std::cout.precision(10);
+  std::cout << "\n";
+  std::cout << "DEBUG - Parameters - " << par[0] << " " << par[1] << " " << par[2] << " " << std::endl;
+  std::cout << "DEBUG - Pt broadening data - " << zzz[0] << " " << zzz[1] << " " << zzz[2] << " " << std::endl;
+  std::cout << "DEBUG - Multiplicity ratio data - " << zzz[3] << " " << zzz[4] << " " << zzz[5] << " " << std::endl;
   callModel(xxx[0],par);
   delta = (zzz[0]-func_array[0])/errorzzz[0];
   chisq += delta*delta;
+  std::cout << "DEBUG - Pt broadening Model values " << func_array[0] << " " ;
   callModel(xxx[1],par);
   delta = (zzz[1]-func_array[0])/errorzzz[1];
   chisq += delta*delta;
+  std::cout << func_array[0] << " " ;
   callModel(xxx[2],par);
   delta = (zzz[2]-func_array[0])/errorzzz[2];
   chisq += delta*delta;
+  std::cout << func_array[0] << "\n" ;
   callModel(xxx[3],par);
   delta = (zzz[3]-func_array[1])/errorzzz[3];
   chisq += delta*delta;
+  std::cout << "DEBUG - Multiplicity ratio model values " << func_array[1] << " " ;
   callModel(xxx[4],par);
   delta = (zzz[4]-func_array[1])/errorzzz[4];
   chisq += delta*delta;
+  std::cout << func_array[1] << " " ;
   callModel(xxx[5],par);
   delta = (zzz[5]-func_array[1])/errorzzz[5];
   chisq += delta*delta;
+  std::cout << func_array[1] << " \n" ;
+  std::cout << "DEBUG - chisquared " << chisq << "\n";
   return chisq;
 }
 
@@ -142,11 +154,23 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       // read data
       std::getline(infile1, line); // broadening
       boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
-      // Casting string as double:
-      // Alternatives
-      // boost::lexical_cast<double>
-      // std::stod
-      // atof
+/*    Testing the input/output
+      std::cout.precision(10);
+      std::cout << "DEBUG -- Line read: " << line << std::endl;
+      std::cout << "DEBUG -- Values as string: ";
+      for (const auto &ww : words) std::cout << ww << " ";
+      std::cout << "\n";
+      std::cout << "DEBUG -- Values as double: ";
+      for (int i=1; i<=6; ++i) std::cout << boost::lexical_cast<double>(words.at(i)) << " ";
+      std::cout << "\n";
+      for (int i=1; i<=6; ++i) std::cout << std::stoi(words.at(i)) << " ";
+*/
+/*    Casting string as double:
+      Alternatives
+      boost::lexical_cast<double>
+      std::stod
+      atof
+*/
       dPt2_values[0][idx] = boost::lexical_cast<double>(words.at(1));
       dPt2_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
       dPt2_values[1][idx] = boost::lexical_cast<double>(words.at(3));
