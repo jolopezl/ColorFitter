@@ -3,52 +3,40 @@
 const double SYSTEMATIC_DPT2 = 0.04;
 const double SYSTEMATIC_RM = 0.03;
 
-int ZDIM  = 10;
-int Q2DIM = 16;
+const int ZDIM  = 4;
+const int Q2DIM = 1;
 
-double zbinw = 0.1;
-double zbin[10] = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95}; // hide this?
-double dPt2_values[3][10];
-double dPt2_errors[3][10];
-double RM_values[3][10];
-double RM_errors[3][10];
-double binratios[10] = {0,0,0,0,0,0,0,0,0,0};
+double zbin[ZDIM] = {0.32, 0.53, 0.75, 0.94};
+double binratios[ZDIM] = {0.435211,0.482755,0.291515,0};
 double func_array[2] = {0,0};
 double zzz[6],errorzzz[6],xxx[6];
 
-double fermi(double m_xB, double m_zbinvalue, int inucleus) {
-  // Computes the contribution of fermi momentum broadening to 
-  // pT broadening using Boris's formula
-  double avgFermi;// <(Fermi momentum)**2>
-  //.033 Pb
-  //.028 Fe
-  //.029 C
-  //.023 D
-  // From Taya's study, not completely final: 
-  //0.019 Pb
-  //0.014 Fe
-  //0.015 C
-  //0.002 D
-  avgFermi=-999.;
-  //  if(inucleus==0){avgFermi=0.029-.023;} // Carbon
-  //  if(inucleus==1){avgFermi=0.028-.023;} // Iron
-  //  if(inucleus==2){avgFermi=0.033-.023;} // Lead
-  if (inucleus == 0) avgFermi=0.015-.002; // Carbon
-  if (inucleus == 1) avgFermi=0.014-.002; // Iron
-  if (inucleus == 2) avgFermi=0.019-.002; // Lead
-  if (avgFermi == -999.) {
-    std::cout << "Fermi error" << std::endl;
-  }
-  // x=Q2/2Mnu
-  //  Double_t x = Q2_lo[iQ2nu][iz][0]/2.+Q2_hi[iQ2nu][iz][0]/2.;
-  //x=x/(2.*0.9385);
-  //x=x/(nu_lo[iQ2nu][iz][0]/2.+nu_hi[iQ2nu][iz][0]/2.);
-  // The part below is for the data when it is read in as x, not as nu.
-  double x = m_xB; 
-  double z_h = m_zbinvalue;
-  double result = 0.6666666*x*x*z_h*z_h*avgFermi;
-  return result; 
-}
+double zbinw[ZDIM] = {(0.53-0.32)*2.0,(0.75-0.53)*2.0,(0.94-0.75)*2.0,(0.94-0.75)*2.0}; // Approx.
+
+double dPt2_zbin[3][4] =
+{ {0.32, 0.53, 0.75, 0.94},
+  {0.31, 0.54, 0.75, 0.94},
+  {0.31, 0.54, 0.75, 0.94} };
+
+double dPt2_values[3][4] =
+{ {0.0064, 0.0067, -0.0088, -0.0131},
+  {0.0205, 0.0228, 0.0012, 0.0021},
+  {0.0269, 0.0300, 0.0071, -0.0021} };
+
+double dPt2_errors[3][4] = 
+{ {0.0013, 0.0022, 0.0044, 0.0073},
+  {0.0015, 0.0025, 0.0051, 0.0090},
+  {0.0019, 0.0033, 0.0067, 0.0116}};
+
+double RM_values[3][4] =
+{ {0.870164,0.872621,0.856658,0.788588},
+  {0.736377,0.695501,0.635427,0.539358},
+  {0.668259,0.632413,0.594249,0.459519}};
+
+double RM_errors[3][4] = 
+{ {0.0321384,0.0310056,0.0374072,0.0356487},
+  {0.0313015,0.0273214,0.0327105,0.0269801},
+  {0.0332506,0.0268708,0.0284847,0.0264920} };
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model *m = new Model("default"); 
@@ -100,93 +88,19 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
   m->DoLogBehavior(LOGBEHAVIOR);
   m->DoFermiMotion(FERMIMOTION);
   // This is for Jlab
-  xxx[0]=pow(12.0107,1./3.); // C
-  xxx[1]=pow(55.845,1./3.);  // Fe
-  xxx[2]=pow(207.2,1./3.); // Pb
+  // xxx[0]=pow(12.0107,1./3.); // C
+  // xxx[1]=pow(55.845,1./3.);  // Fe
+  // xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
-  // xxx[0]=pow(20.1797,1./3.); // Ne
-  // xxx[1]=pow(83.798,1./3.);  // Kr
-  // xxx[2]=pow(131.293,1./3.); // Xe
+  xxx[0]=pow(20.1797,1./3.); // Ne
+  xxx[1]=pow(83.798,1./3.);  // Kr
+  xxx[2]=pow(131.293,1./3.); // Xe
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
-  std::cout << "Starting iFit at " << std::endl;
   // Here the rest of the code
   TFile *fout = new TFile("fullfit.root","RECREATE");
-  // Adding the read to multiple Q2 bins
-  std::string line = "";
-  std::string bin_info = "";
-  std::ifstream infile1;
-  std::ifstream infile2;
-  std::ifstream infile3;
-  infile1.open("broadening.txt");
-  infile2.open("multiplicities.txt");
-  infile3.open("binratios.txt");
-  std::vector<std::string> words = {};
-  std::string foo = "";
-  for (int i=1; i<=2; ++i) { // read two dummy lines
-    std::getline(infile1,foo);
-    std::getline(infile2,foo);
-  }
-  for (int iQ2=0; iQ2<Q2DIM; ++iQ2) {
-    // Read 12 lines
-    // L#1      bin ifo
-    // L#2-L#11 data
-    // L#12     blank line
-    std::getline(infile1,line);
-    std::cout << "Bin info <broadening>     " << line << std::endl;
-    bin_info = line;
-    std::getline(infile2,line); // read the bin_info of other file, cross check?
-    std::cout << "Bin info <multiplicities> " << line << std::endl;
-    for (int idx=0; idx<10; ++idx) {
-      // read data
-      std::getline(infile1, line); // broadening
-      boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
-      // Casting string as double:
-      // Alternatives
-      // boost::lexical_cast<double>
-      // std::stod
-      // atof
-      dPt2_values[0][idx] = boost::lexical_cast<double>(words.at(1));
-      dPt2_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
-      dPt2_values[1][idx] = boost::lexical_cast<double>(words.at(3));
-      dPt2_errors[1][idx] = boost::lexical_cast<double>(words.at(4));
-      dPt2_values[2][idx] = boost::lexical_cast<double>(words.at(5));
-      dPt2_errors[2][idx] = boost::lexical_cast<double>(words.at(6));
-      words.clear();
-      std::getline(infile2, line); // multiplicity
-      boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
-      RM_values[0][idx] = boost::lexical_cast<double>(words.at(1));
-      RM_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
-      RM_values[1][idx] = boost::lexical_cast<double>(words.at(3));
-      RM_errors[1][idx] = boost::lexical_cast<double>(words.at(4));
-      RM_values[2][idx] = boost::lexical_cast<double>(words.at(5));
-      RM_errors[2][idx] = boost::lexical_cast<double>(words.at(6));
-      words.clear();
-      std::getline(infile3, line);
-      binratios[idx] = boost::lexical_cast<double>(line);
-    }
-    std::getline(infile1,line); // skip empty line
-    std::getline(infile2,line); // skip empty line
-    // Grab bin info data
-    words.clear();
-    // read bin_info from both files and compare
-    boost::split(words,bin_info,boost::is_any_of("< "),boost::token_compress_on);
-    double Q2lo = std::stod(words.at(0));
-    double Q2hi = std::stod(words.at(2));
-    double xBlo = std::stod(words.at(3));
-    double xBhi = std::stod(words.at(5));
-    double Q2 = (Q2hi+Q2lo)/2.0;
-    double xB = (xBhi+xBlo)/2.0;
-    // Selects an specific Q2,x bin if desired.
-    if ((Q2XBINTOFIT != -1) && ((Q2XBINTOFIT-1) != iQ2)) {
-      std::cout << "Ignoring this bin" << std::endl;
-      continue;
-    }
-    std::cout << bin_info << std::endl;
-    std::cout << "Q2lo = " << Q2lo << "\t Q2hi = " << Q2hi << "\t Q2 = " << Q2 << std::endl;
-    std::cout << "xBlo = " << xBlo << "\t xBhi = " << xBhi << "\t xB = " << xB << std::endl;
-    // Main Loop over z-bins
+  for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
     for (int iz=0; iz<ZDIM; ++iz) {
       // Selects and specific z bin to fit.
       if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) {
@@ -194,15 +108,20 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
         continue;
       }
       std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
-      m->SetBinRatio(iz,zbinw,binratios[iz]); // For energy loss
-      m->SetFermiValues(xB,zbin[iz]);
+      m->SetBinRatio(iz,zbinw[iz],binratios[iz]); // For energy loss
+      // m->SetFermiValues(xB,zbin[iz]);
       // std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
-        zzz[a] = dPt2_values[a][iz]-fermi(xB,zbin[iz],a); // fermi is now returning zero
+        zzz[a] = dPt2_values[a][iz]; // -fermi(xB,zbin[iz],a); // fermi is now returning zero
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
         errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
         errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
+/*        if (zzz[a]+errorzzz[a]<0.0) {
+          // increase error to reach zero
+          float delta = ( 0.0 - (zzz[a]+errorzzz[a]) );
+          errorzzz[a] = errorzzz[a] + delta*1.01; // 1.01 to add more systematic uncert. and become positive.
+        }*/
       }
       TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
       gMinuit->SetFCN(fcn);      
@@ -234,17 +153,76 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       int nvpar,nparx,icstat;
       gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
       gMinuit->mnprin(3,amin);
+      std::string bin_info = "bin_info";
+      double xB = -1;
+      double Q2 = -1;
       modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz]);
       fout->Write();
       delete(gMinuit);
     }
   // End of loop over z-bins
   }
-  infile1.close();
-  infile2.close();
-  infile3.close();
   std::cout << "iFit has finished" << std::endl;
   //return 0;
+}
+
+double fermi(double m_xB, double m_zbinvalue, int inucleus) {
+  // Computes the contribution of fermi momentum broadening to 
+  // pT broadening using Boris's formula
+  double avgFermi;// <(Fermi momentum)**2>
+  //.033 Pb
+  //.028 Fe
+  //.029 C
+  //.023 D
+  // From Taya's study, not completely final: 
+  //0.019 Pb
+  //0.014 Fe
+  //0.015 C
+  //0.002 D
+  avgFermi=-999.;
+  //  if(inucleus==0){avgFermi=0.029-.023;} // Carbon
+  //  if(inucleus==1){avgFermi=0.028-.023;} // Iron
+  //  if(inucleus==2){avgFermi=0.033-.023;} // Lead
+  if (inucleus == 0) avgFermi=0.015-.002; // Carbon
+  if (inucleus == 1) avgFermi=0.014-.002; // Iron
+  if (inucleus == 2) avgFermi=0.019-.002; // Lead
+  if (avgFermi == -999.) {
+    std::cout << "Fermi error" << std::endl;
+  }
+  // x=Q2/2Mnu
+  //  Double_t x = Q2_lo[iQ2nu][iz][0]/2.+Q2_hi[iQ2nu][iz][0]/2.;
+  //x=x/(2.*0.9385);
+  //x=x/(nu_lo[iQ2nu][iz][0]/2.+nu_hi[iQ2nu][iz][0]/2.);
+  // The part below is for the data when it is read in as x, not as nu.
+  double x = m_xB; 
+  double z_h = m_zbinvalue;
+  double result = 0.6666666*x*x*z_h*z_h*avgFermi;
+  return result; 
+}
+
+// For testing only
+int test() {
+  std::vector<std::string> atoms = {"Carbon","Iron","Lead"};
+  std::vector<double> masses = {12.0107,55.845,207.2};
+  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0}; //{ 0.2, 7.,1.0 }
+  Model *m = new Model("default");
+  m->SetParameters(parms);
+  m->Initialization();
+  std::vector<double> foo;
+  double nucleus;
+  double nu[3]={20.1797,83.798,131.293};
+  for (int i=0; i<3; ++i){
+    nucleus = (double) nu[i];
+    m->Compute(nucleus);
+    std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
+  }
+  for (int i=1; i<=6; ++i){
+    nucleus = (double) i*i*i;
+    m->Compute(nucleus);
+    std::cout << i << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
+  }
+  delete(m);
+  return 0;
 }
 
 void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double xB, double z){
@@ -374,29 +352,4 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   c2->Write();
   out_mr << ".pdf";
   c2->Print(out_mr.str().c_str());
-}
-
-// For testing only
-int test() {
-  std::vector<std::string> atoms = {"Carbon","Iron","Lead"};
-  std::vector<double> masses = {12.0107,55.845,207.2};
-  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0}; //{ 0.2, 7.,1.0 }
-  Model *m = new Model("default");
-  m->SetParameters(parms);
-  m->Initialization();
-  std::vector<double> foo;
-  double nucleus;
-  double nu[3]={20.1797,83.798,131.293};
-  for (int i=0; i<3; ++i){
-    nucleus = (double) nu[i];
-    m->Compute(nucleus);
-    std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
-  }
-  for (int i=1; i<=6; ++i){
-    nucleus = (double) i*i*i;
-    m->Compute(nucleus);
-    std::cout << i << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
-  }
-  delete(m);
-  return 0;
 }
