@@ -93,7 +93,7 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
   // xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
   xxx[0]=pow(20.1797,1./3.); // Ne
-  xxx[1]=pow(83.798,1./3.);  // Kr
+  xxx[1]=pow(83.7980,1./3.);  // Kr
   xxx[2]=pow(131.293,1./3.); // Xe
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
@@ -117,11 +117,9 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
         errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
         errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
-/*        if (zzz[a]+errorzzz[a]<0.0) {
-          // increase error to reach zero
-          float delta = ( 0.0 - (zzz[a]+errorzzz[a]) );
-          errorzzz[a] = errorzzz[a] + delta*1.01; // 1.01 to add more systematic uncert. and become positive.
-        }*/
+        while (zzz[a]<0.0) {
+          zzz[a] = zzz[a] + errorzzz[a]/2.0; // 1.01 to add more systematic uncert. and become positive.
+        }
       }
       TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
       gMinuit->SetFCN(fcn);      
@@ -133,9 +131,10 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
       // Set starting values and step sizes for parameters
       double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
-      double step[]   = {0.03,0.8,3.,0.5,0.005};
-      double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration                   
-      double lim_hi[] = {1000.,50.,1000.,1000.0,1000.};
+      double step[]   = {0.01,0.01, 1.,0.5,0.00001};
+      double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration
+      //double lim_lo[] = {0.,0.1,-60.,0.1,0.0}; // negative limit on cross section models inelastic bin migration                   
+      double lim_hi[] = {1.,25.,200.,1000.0,10.};
       gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
       gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
       gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section

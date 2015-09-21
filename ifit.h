@@ -10,6 +10,7 @@
 #include "TString.h"
 #include "TCanvas.h"
 #include "TGraphErrors.h"
+#include "TMultiGraph.h"
 #include "TH1.h"
 
 //

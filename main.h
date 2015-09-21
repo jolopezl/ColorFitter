@@ -3,5 +3,6 @@
 
 #include "model.h"
 #include "ifit.h"
+#include "dataHandler.h"
 
 #endif
