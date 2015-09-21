@@ -1,6 +1,6 @@
 #include "dataHandler.h"
 
-#define DIM 4
+#define DIM 4 // This should be defined somewhere else
 
 myData::myData(std::string name) {
   m_name = name;
@@ -12,24 +12,33 @@ myData::myData(std::string name) {
   m_stat_corrected.clear();
   m_syst_corrected.clear();
   m_err_corrected.clear();
+  for (int i=0; i<=DIM; ++i) {
+    m_value.push_back(0.0);
+    m_stat.push_back(0.0);
+    m_syst.push_back(0.0);
+    m_err.push_back(0.0);
+    m_value_corrected.push_back(0.0);
+    m_stat_corrected.push_back(0.0);
+    m_syst_corrected.push_back(0.0);
+    m_err_corrected.push_back(0.0);
+  }
   std::cout << "Data created for " << m_name << std::endl;
 }
 myData::~myData() {
  std::cout << "Data destructed for " << m_name << std::endl; 
 }
 
-void myData::fill(double val, double stat, double syst) {
-  m_value.push_back(val);
-  m_stat.push_back(stat);
-  m_syst.push_back(syst);
-  m_err.push_back(stat+syst);
+void myData::fill(int i, double val, double stat, double syst) {
+  m_value[i] = val;
+  m_stat[i] = stat;
+  m_syst[i] = syst;
+  m_err[i] = stat+syst;
 }
 
+/*
+  This is the most important part, mixes the errors
+*/
 void myData::applyCorrection(myData* nucl) { // nucl is the bkg
-  m_value_corrected.reserve(m_value.size());
-  m_stat_corrected.reserve(m_stat.size());
-  m_syst_corrected.reserve(m_syst.size());
-  m_err_corrected.reserve(m_err.size());
   for (int i=0; i<=DIM; ++i) {
     m_value_corrected[i] = m_value[i] - nucl->m_value[i];
     m_stat_corrected[i] = m_stat[i] + nucl->m_stat[i];
@@ -96,7 +105,7 @@ void conv2double(std::vector<std::string> words, double &val, double &stat, doub
   syst = std::stod(words.at(4));
 }
 
-void dataHandler() {
+std::vector<myData*> dataHandler() {
   myData *he = new myData("Helium");
   myData *ne = new myData("Neon");
   myData *kr = new myData("Kripton");
@@ -105,47 +114,58 @@ void dataHandler() {
   input.open("hermesData.txt");
   std::string foo, line;
   std::vector<std::string> words = {};
-  std::getline(input,foo);
-  std::getline(input,foo);
   double val,stat,syst;
+  // Read data and fill objects
+  std::getline(input,foo);
+  std::getline(input,foo);
   for (int i=0; i<DIM;++i) {
     std::getline(input,line); // read line of data
     boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
     conv2double(words,val,stat,syst);
-    he->fill(val,stat,syst);
+    he->fill(i,val,stat,syst);
   }
   std::getline(input,foo);
   for (int i=0; i<DIM;++i) {
     std::getline(input,line); // read line of data
     boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
     conv2double(words,val,stat,syst);
-    ne->fill(val,stat,syst);
+    ne->fill(i,val,stat,syst);
   }
   std::getline(input,foo);
   for (int i=0; i<DIM;++i) {
     std::getline(input,line); // read line of data
     boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
     conv2double(words,val,stat,syst);
-    kr->fill(val,stat,syst);
+    kr->fill(i,val,stat,syst);
   }
   std::getline(input,foo);
   for (int i=0; i<DIM;++i) {
     std::getline(input,line); // read line of data
     boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
     conv2double(words,val,stat,syst);
-    xe->fill(val,stat,syst);
+    xe->fill(i,val,stat,syst);
   }
   input.close();
+  // Apply Helium substraction
   he->applyCorrection(he);
   ne->applyCorrection(he);
   kr->applyCorrection(he);
   xe->applyCorrection(he);
+  // Create TGraphErros contained in each object
   he->doTGraphErrors();
   ne->doTGraphErrors();
   kr->doTGraphErrors();
   xe->doTGraphErrors();
+  // Do plots of data
   doDataPlots(he,ne,kr,xe);
+  // Prepare output and finish
+  std::vector<myData*> output;
+  // output.push_back(he); // we don't need to return He.
+  output.push_back(ne);
+  output.push_back(kr);
+  output.push_back(xe);
   std::cout << "dataHandler finished" << std::endl;
+  return output;
 }
 
 void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
@@ -180,16 +200,16 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
     mg[0][i]->Draw("a2");
     mg[0][i]->GetXaxis()->SetTitle("z_h");
     mg[0][i]->GetYaxis()->SetTitle("#DeltaP_{T}");
-    // mg[0][i]->GetYaxis()->SetRangeUser(-0.025,0.025);
+    mg[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
     mg[1][i]->Draw("p");
     c->cd(2*i+2);
     mg_corrected[0][i]->Draw("a2");
     mg_corrected[0][i]->GetXaxis()->SetTitle("z_{h}");
     mg_corrected[0][i]->GetYaxis()->SetTitle("#DeltaP_{T}^{2}");
-    // mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.025,0.025);
+    // mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
     mg_corrected[1][i]->Draw("p");
   }
-  c->Print("test.pdf");
+  c->Print("plot_HermesData.pdf");
   std::cout << "Plots ok" << std::endl;
   for (int i=0;i<4;++i) {
     delete(mg[0][i]);

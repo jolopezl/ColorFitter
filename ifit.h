@@ -19,6 +19,7 @@
 
 // 
 #include "model.h"
+#include "dataHandler.h"
 
 double fermi(double,double,int);
 void callModel(double, double*);

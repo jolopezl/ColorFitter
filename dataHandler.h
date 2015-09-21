@@ -35,11 +35,11 @@ public:
   myData(std::string);
   ~myData();
   void applyCorrection(myData*);
-  void fill(double,double,double);
+  void fill(int,double,double,double);
   void doTGraphErrors();
 };
 
-void dataHandler();
+std::vector<myData*> dataHandler();
 void conv2double(std::vector<std::string>,double&,double&,double&);
 void doDataPlots(myData*,myData*, myData*, myData*);
 
