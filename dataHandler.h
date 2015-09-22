@@ -42,5 +42,6 @@ public:
 std::vector<myData*> dataHandler();
 void conv2double(std::vector<std::string>,double&,double&,double&);
 void doDataPlots(myData*,myData*, myData*, myData*);
+double pow2(double);
 
 #endif

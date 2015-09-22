@@ -119,11 +119,13 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
         zzz[a] = fc[a]->m_value_corrected[iz];
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
         // errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
-        errorzzz[a] = sqrt(pow(fc[a]->m_stat_corrected[iz],2)+pow(fc[a]->m_syst_corrected[iz],2));
+        // errorzzz[a] = sqrt(pow(fc[a]->m_stat_corrected[iz],2)+pow(fc[a]->m_syst_corrected[iz],2));
+        // sqrt(pow2(m_stat_corrected[i])+pow2(m_syst_corrected[i]));
+        errorzzz[a] = fc[a]->m_err_corrected[iz];
         errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
-        while (zzz[a]<0.0) {
-          zzz[a] = zzz[a] + errorzzz[a]/2.0; // 1.01 to add more systematic uncert. and become positive.
-        }
+        // while (zzz[a]<0.0) {
+        //   zzz[a] = zzz[a] + errorzzz[a]/2.0; // 1.01 to add more systematic uncert. and become positive.
+        // }
       }
       TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
       gMinuit->SetFCN(fcn);      

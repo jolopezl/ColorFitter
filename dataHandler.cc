@@ -12,7 +12,7 @@ myData::myData(std::string name) {
   m_stat_corrected.clear();
   m_syst_corrected.clear();
   m_err_corrected.clear();
-  for (int i=0; i<=DIM; ++i) {
+  for (int i=0; i<=DIM; ++i) { // Initialize vectors
     m_value.push_back(0.0);
     m_stat.push_back(0.0);
     m_syst.push_back(0.0);
@@ -37,23 +37,24 @@ void myData::fill(int i, double val, double stat, double syst) {
 
 /*
   This is the most important part, mixes the errors
+  Note that for Z=X-Y, then
+  s2 = s_1^2+s_2^2 - 2*rho*s_1*s_2
 */
+
+const double rho = 0.0; 
+
 void myData::applyCorrection(myData* nucl) { // nucl is the bkg
   for (int i=0; i<=DIM; ++i) {
     m_value_corrected[i] = m_value[i] - nucl->m_value[i];
-    m_stat_corrected[i] = m_stat[i] + nucl->m_stat[i];
-    m_syst_corrected[i] = m_syst[i] + nucl->m_syst[i];
-    m_err_corrected[i] = m_stat_corrected[i]+m_syst_corrected[i];
+    m_stat_corrected[i] = sqrt(pow2(m_stat[i]) + pow2(nucl->m_stat[i]));
+    m_syst_corrected[i] = sqrt(pow2(m_syst[i]) + pow2(nucl->m_syst[i]) + 2*rho*m_syst[i]*nucl->m_syst[i]);
+    m_err_corrected[i] = sqrt(pow2(m_stat_corrected[i])+pow2(m_syst_corrected[i]));
   }
 }
 
+double pow2(double x) {return x*x;} // move this to somewhere else.
+
 void myData::doTGraphErrors() {
-  // m_tge[0] = new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_stat[0]);
-  // m_tge[1] = new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_syst[0]);
-  // m_tge[2] = new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_err[0]);
-  // m_tge[3] = new TGraphErrors(DIM, &m_zbin[0], &m_value_corrected[0], &m_wbin[0], &m_stat_corrected[0]);
-  // m_tge[4] = new TGraphErrors(DIM, &m_zbin[0], &m_value_corrected[0], &m_wbin[0], &m_syst_corrected[0]);
-  // m_tge[5] = new TGraphErrors(DIM, &m_zbin[0], &m_value_corrected[0], &m_wbin[0], &m_err_corrected[0]);
   m_tge.clear();
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_stat[0]));
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_syst[0]));
