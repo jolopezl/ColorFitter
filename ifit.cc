@@ -136,7 +136,8 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       arglist[0] = 3;
       gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
       // Set starting values and step sizes for parameters
-      double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
+      // double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
+      double vstart[] = {0.4775, 1.6, 20.,2.5,0.0};
       double step[]   = {0.01,0.01, 1.,0.5,0.00001};
       double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration
       //double lim_lo[] = {0.,0.1,-60.,0.1,0.0}; // negative limit on cross section models inelastic bin migration                   
@@ -146,7 +147,9 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
       gMinuit->mnparm(3, "a4", vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
       gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss      
-      //gMinuit->FixParameter(0); // Q-HAT
+      // gMinuit->FixParameter(0); // q-hat
+      // gMinuit->FixParameter(2); // production length
+      // gMinuit->FixParameter(3); // prehadron cross section
       if (!LOGBEHAVIOR) gMinuit->FixParameter(3); // Log description
       if (!ENERGYLOSS)  gMinuit->FixParameter(4); // Energy Loss
       // Now ready for minimization step
@@ -316,6 +319,14 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   TGraphErrors *ptfit = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
   TGraphErrors *mult_ratio = new TGraphErrors(3,x2,z2,errorz2,errorz2);
   TGraphErrors *mrfit = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
+
+  TLegend *lpt = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
+  TLegend *lrm = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
+  lpt->AddEntry(pt_broadening,"Data","lep");
+  lpt->AddEntry(ptfit,"Fit","l");
+  lrm->AddEntry(mult_ratio,"Data","lep");
+  lrm->AddEntry(mrfit,"Fit","l");
+
   // pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
   // pt_broadening->GetYaxis()->SetTitle("<#{Delta}P_{T}^{2}>");
   // mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
@@ -329,12 +340,17 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   pt_broadening->SetTitle(out_pt.str().c_str());
   pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
   pt_broadening->GetYaxis()->SetTitle("<#Delta P_{T}^{2}>");
-  pt_broadening->SetMarkerColor(kBlue);
+  pt_broadening->GetYaxis()->SetTitleOffset(1.5);
+  pt_broadening->SetMarkerColor(kRed);
   pt_broadening->SetMarkerStyle(21);
+  pt_broadening->SetLineWidth(2);
   pt_broadening->Draw("APE");
-  ptfit->SetLineColor(kBlue);
+  ptfit->SetLineColor(kRed);
   ptfit->SetMarkerStyle(21);
+  ptfit->SetLineWidth(2);
   ptfit->Draw("L SAME");
+  lpt->Draw();
+  UTFSMLabel(0.125,0.85,"Internal, work on progress");
   c1->Write();
   out_pt << ".pdf";
   c1->Print(out_pt.str().c_str());
@@ -348,12 +364,17 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   mult_ratio->SetTitle(out_mr.str().c_str());
   mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
   mult_ratio->GetYaxis()->SetTitle("R_{m}");
+  mult_ratio->GetYaxis()->SetTitleOffset(1.5);
   mult_ratio->SetMarkerColor(kBlue);
   mult_ratio->SetMarkerStyle(21);
+  mult_ratio->SetLineWidth(2);
   mult_ratio->Draw("APE");
   mrfit->SetLineColor(kBlue);
   mrfit->SetMarkerStyle(21);
+  mrfit->SetLineWidth(2);
   mrfit->Draw("L SAME");
+  UTFSMLabel(0.125,0.85,"Internal, work on progress");
+  lrm->Draw();
   c2->Write();
   out_mr << ".pdf";
   c2->Print(out_mr.str().c_str());

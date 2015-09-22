@@ -29,5 +29,7 @@ int main() {
     Good to put it here so after a fit we can have desired output
   */
 
+  // auto plots = plottingTool();
+
   return 0;
 }

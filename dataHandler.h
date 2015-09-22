@@ -12,10 +12,14 @@
 #include "TGraphErrors.h"
 #include "TMultiGraph.h"
 #include "TH1.h"
+#include "TLegend.h"
+#include "TLatex.h"
 
 //
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include "graphics.h"
 
 class myData {
 private:
@@ -41,7 +45,11 @@ public:
 
 std::vector<myData*> dataHandler();
 void conv2double(std::vector<std::string>,double&,double&,double&);
-void doDataPlots(myData*,myData*, myData*, myData*);
 double pow2(double);
+
+void doDataPlots(myData*,myData*, myData*, myData*);
+
+void UTFSMLabel(double,double,const char*);
+void AddLabel(double,double,const char*);
 
 #endif

@@ -55,6 +55,12 @@ void myData::applyCorrection(myData* nucl) { // nucl is the bkg
 double pow2(double x) {return x*x;} // move this to somewhere else.
 
 void myData::doTGraphErrors() {
+
+  const int markerStyleCode = 20; // circle 20, box 21
+  const int markerColorCode = 1; // black 1, red 2, blue 4
+  const int markerSizeCode = 1;
+  const int makerLineWidthCode = 2;
+
   m_tge.clear();
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_stat[0]));
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_syst[0]));
@@ -64,40 +70,28 @@ void myData::doTGraphErrors() {
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value_corrected[0], &m_wbin[0], &m_err_corrected[0]));
   m_tge[0]->SetName("gg1");
   m_tge[0]->SetTitle("Statistical Errors");
-  m_tge[0]->SetMarkerColor(2);
-  m_tge[0]->SetMarkerSize(0.5);
-  m_tge[0]->SetMarkerStyle(20);
   m_tge[0]->SetFillColorAlpha(2,0.35);
   m_tge[1]->SetName("gg2");
   m_tge[1]->SetTitle("Systematic Errors");
-  m_tge[1]->SetMarkerColor(2);
-  m_tge[1]->SetMarkerSize(0.5);
-  m_tge[1]->SetMarkerStyle(20);
   m_tge[1]->SetFillColorAlpha(3,0.35); 
   m_tge[2]->SetName("gg3");
   m_tge[2]->SetTitle("Total Uncertainties");
-  m_tge[2]->SetMarkerColor(5);
-  m_tge[2]->SetLineWidth(2);
-  m_tge[2]->SetMarkerSize(0.5);
-  m_tge[2]->SetMarkerStyle(24);
+  m_tge[2]->SetMarkerColor(markerColorCode);
+  m_tge[2]->SetLineWidth(makerLineWidthCode);
+  m_tge[2]->SetMarkerSize(markerSizeCode);
+  m_tge[2]->SetMarkerStyle(markerStyleCode);
   m_tge[3]->SetName("gg1_corrected");
   m_tge[3]->SetTitle("Statistical Errors");
-  m_tge[3]->SetMarkerColor(2);
-  m_tge[3]->SetMarkerSize(0.5);
-  m_tge[3]->SetMarkerStyle(20);
   m_tge[3]->SetFillColorAlpha(2,0.35);
   m_tge[4]->SetName("gg2_corrected");
   m_tge[4]->SetTitle("Systematic Errors");
-  m_tge[4]->SetMarkerColor(2);
-  m_tge[4]->SetMarkerSize(0.5);
-  m_tge[4]->SetMarkerStyle(20);
   m_tge[4]->SetFillColorAlpha(3,0.35); 
   m_tge[5]->SetName("gg3_corrected");
   m_tge[5]->SetTitle("Total Uncertainties");
-  m_tge[5]->SetMarkerColor(5);
-  m_tge[5]->SetLineWidth(2);
-  m_tge[5]->SetMarkerSize(0.5);
-  m_tge[5]->SetMarkerStyle(24);
+  m_tge[5]->SetMarkerColor(markerColorCode);
+  m_tge[5]->SetLineWidth(makerLineWidthCode);
+  m_tge[5]->SetMarkerSize(markerSizeCode);
+  m_tge[5]->SetMarkerStyle(markerStyleCode);
 }
 
 void conv2double(std::vector<std::string> words, double &val, double &stat, double &syst) {
@@ -193,24 +187,58 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
   mg[0][3]->Add(xe->m_tge[1]); mg_corrected[0][3]->Add(xe->m_tge[4]);
   mg[1][3]->Add(xe->m_tge[2]); mg_corrected[1][3]->Add(xe->m_tge[5]);
 
-  TCanvas *c = new TCanvas("canvas","canvas title",800*2,600*4);
-  c->Divide(2,4);
+  TLegend *leg[4];
+  leg[0] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
+  leg[1] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
+  leg[2] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
+  leg[3] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
+  leg[0]->AddEntry(he->m_tge[0],"Statistical Uncertainties","f");
+  leg[0]->AddEntry(he->m_tge[1],"Systematic Uncertainties","f");
+  leg[0]->AddEntry(he->m_tge[2],"Total Uncertainties","lep");
+  leg[1]->AddEntry(ne->m_tge[0],"Statistical Uncertainties","f");
+  leg[1]->AddEntry(ne->m_tge[1],"Systematic Uncertainties","f");
+  leg[1]->AddEntry(ne->m_tge[2],"Total Uncertainties","lep");
+  leg[2]->AddEntry(kr->m_tge[0],"Statistical Uncertainties","f");
+  leg[2]->AddEntry(kr->m_tge[1],"Systematic Uncertainties","f");
+  leg[2]->AddEntry(kr->m_tge[2],"Total Uncertainties","lep");
+  leg[3]->AddEntry(xe->m_tge[0],"Statistical Uncertainties","f");
+  leg[3]->AddEntry(xe->m_tge[1],"Systematic Uncertainties","f");
+  leg[3]->AddEntry(xe->m_tge[2],"Total Uncertainties","lep");
+
+  std::vector<std::string> labels = {"HERMES Helium data", "HERMES Neon data", "HERMES Kripton data", "HERMES Xeon data"};
+  std::vector<std::string> labels2 = {"HERMES Helium substracted", "HERMES Neon with Helium substracted", "HERMES Kripton with Helium substracted", "HERMES Xeon with Helium substracted"};
+  std::vector<std::string> files = {"data_he.pdf","data_ne.pdf","data_kr.pdf","data_xe.pdf"};
+  std::vector<std::string> files2 = {"data_he_corr.pdf","data_ne_corr.pdf","data_kr_corr.pdf","data_xe_corr.pdf"};
+
+  TCanvas *c = new TCanvas("canvas","canvas title",800,600);
+  // c->Divide(2,4);
   std::cout << "Creating Canvas" << std::endl;
   for (int i=0; i<4; ++i) {
-    c->cd(2*i+1);
+    // c->cd(2*i+1);
     mg[0][i]->Draw("a2");
-    mg[0][i]->GetXaxis()->SetTitle("z_h");
-    mg[0][i]->GetYaxis()->SetTitle("#DeltaP_{T}");
+    mg[0][i]->GetXaxis()->SetTitle("z_{h}");
+    mg[0][i]->GetYaxis()->SetTitle("<#DeltaP_{T}^{2}> [GeV^{2}]");
+    mg[0][i]->GetYaxis()->SetTitleOffset(1.5);
     mg[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
     mg[1][i]->Draw("p");
-    c->cd(2*i+2);
+    leg[i]->Draw();
+    UTFSMLabel(0.125,0.85,"Internal, work on progress");
+    AddLabel(0.125,0.8,labels[i].c_str());
+    c->Print(files[i].c_str());
+    c->Clear();
+    // c->cd(2*i+2);
     mg_corrected[0][i]->Draw("a2");
     mg_corrected[0][i]->GetXaxis()->SetTitle("z_{h}");
-    mg_corrected[0][i]->GetYaxis()->SetTitle("#DeltaP_{T}^{2}");
-    // mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
+    mg_corrected[0][i]->GetYaxis()->SetTitle("<#DeltaP_{T}^{2}> [GeV^{2}]");
+    mg_corrected[0][i]->GetYaxis()->SetTitleOffset(1.5);
+    mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
     mg_corrected[1][i]->Draw("p");
+    leg[i]->Draw();
+    UTFSMLabel(0.125,0.85,"Internal, work on progress");
+    AddLabel(0.125,0.8,labels2[i].c_str());
+    c->Print(files2[i].c_str());
   }
-  c->Print("plot_HermesData.pdf");
+  // c->Print("plot_HermesData.pdf");
   std::cout << "Plots ok" << std::endl;
   for (int i=0;i<4;++i) {
     delete(mg[0][i]);
@@ -220,4 +248,27 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
   }
   delete(c);
   std::cout << "Plots objects deleted" << std::endl;
+}
+
+void UTFSMLabel(Double_t x,Double_t y,const char* text) {
+  TLatex l; //l.SetTextAlign(12); l.SetTextSize(tsize); 
+  l.SetNDC();
+  l.SetTextFont(72);
+  double delx = 0.115*696*gPad->GetWh()/(472*gPad->GetWw());
+  l.DrawLatex(x,y,"UTFSM");
+  if (text) {
+    TLatex p; 
+    p.SetNDC();
+    p.SetTextFont(42);
+    // p.SetTextColor(color);
+    p.DrawLatex(x+delx,y,text);
+    //    p.DrawLatex(x,y,"#sqrt{s}=900GeV");
+  }
+}
+
+void AddLabel(Double_t x,Double_t y,const char* text) {
+  TLatex l; //l.SetTextAlign(12); l.SetTextSize(tsize); 
+  l.SetNDC();
+  l.SetTextFont(42);
+  l.DrawLatex(x,y,text);
 }
