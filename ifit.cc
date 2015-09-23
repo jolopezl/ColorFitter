@@ -69,41 +69,51 @@ double chisq(double *par){
   double chisq = 0;
   double delta;
   chisq = 0.;
-  std::cout.precision(10);
-  std::cout << "\n";
-  std::cout << "DEBUG - Parameters - " << par[0] << " " << par[1] << " " << par[2] << " " << std::endl;
-  std::cout << "DEBUG - Pt broadening data - " << zzz[0] << " " << zzz[1] << " " << zzz[2] << " " << std::endl;
-  std::cout << "DEBUG - Multiplicity ratio data - " << zzz[3] << " " << zzz[4] << " " << zzz[5] << " " << std::endl;
+  // std::cout.precision(10);
+  // std::cout << "\n";
+  // std::cout << "DEBUG - Parameters - " << par[0] << " " << par[1] << " " << par[2] << " " << std::endl;
+  // std::cout << "DEBUG - Pt broadening data - " << zzz[0] << " " << zzz[1] << " " << zzz[2] << " " << std::endl;
+  // std::cout << "DEBUG - Multiplicity ratio data - " << zzz[3] << " " << zzz[4] << " " << zzz[5] << " " << std::endl;
   callModel(xxx[0],par);
   delta = (zzz[0]-func_array[0])/errorzzz[0];
   chisq += delta*delta;
-  std::cout << "DEBUG - Pt broadening Model values " << func_array[0] << " " ;
+  // std::cout << "DEBUG - Pt broadening Model values " << func_array[0] << " " ;
   callModel(xxx[1],par);
   delta = (zzz[1]-func_array[0])/errorzzz[1];
   chisq += delta*delta;
-  std::cout << func_array[0] << " " ;
+  // std::cout << func_array[0] << " " ;
   callModel(xxx[2],par);
   delta = (zzz[2]-func_array[0])/errorzzz[2];
   chisq += delta*delta;
-  std::cout << func_array[0] << "\n" ;
+  // std::cout << func_array[0] << "\n" ;
   callModel(xxx[3],par);
   delta = (zzz[3]-func_array[1])/errorzzz[3];
   chisq += delta*delta;
-  std::cout << "DEBUG - Multiplicity ratio model values " << func_array[1] << " " ;
+  // std::cout << "DEBUG - Multiplicity ratio model values " << func_array[1] << " " ;
   callModel(xxx[4],par);
   delta = (zzz[4]-func_array[1])/errorzzz[4];
   chisq += delta*delta;
-  std::cout << func_array[1] << " " ;
+  // std::cout << func_array[1] << " " ;
   callModel(xxx[5],par);
   delta = (zzz[5]-func_array[1])/errorzzz[5];
   chisq += delta*delta;
-  std::cout << func_array[1] << " \n" ;
-  std::cout << "DEBUG - chisquared " << chisq << "\n";
+  // std::cout << func_array[1] << " \n" ;
+  // std::cout << "DEBUG - chisquared " << chisq << "\n";
   return chisq;
 }
 
 void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
   f = chisq(par);
+}
+
+std::vector<std::string> parser(std::string line) {
+  std::string s = line;
+  std::stringstream ss(s);
+  std::istream_iterator<std::string> begin(ss);
+  std::istream_iterator<std::string> end;
+  std::vector<std::string> vstrings(begin, end);
+  std::copy(vstrings.begin(), vstrings.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+  return vstrings;
 }
 
 void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT) {
@@ -112,9 +122,12 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
   m->DoLogBehavior(LOGBEHAVIOR);
   m->DoFermiMotion(FERMIMOTION);
   // This is for Jlab
-  xxx[0]=pow(12.0107,1./3.); // C
-  xxx[1]=pow(55.845,1./3.);  // Fe
-  xxx[2]=pow(207.2,1./3.); // Pb
+  xxx[0]=2.289; // I don't understand why these are A^1/3 instead of R. 
+  xxx[1]=3.826; // However, if I change them, I get a crash..... 
+  xxx[2]=5.915; // I must have understood it in the past at some point.... WB 14 May 2011
+  // xxx[0]=pow(12.0107,1./3.); // C
+  // xxx[1]=pow(55.845,1./3.);  // Fe
+  // xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
   // xxx[0]=pow(20.1797,1./3.); // Ne
   // xxx[1]=pow(83.798,1./3.);  // Kr
@@ -154,41 +167,26 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       // read data
       std::getline(infile1, line); // broadening
       boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
-/*    Testing the input/output
-      std::cout.precision(10);
-      std::cout << "DEBUG -- Line read: " << line << std::endl;
-      std::cout << "DEBUG -- Values as string: ";
-      for (const auto &ww : words) std::cout << ww << " ";
-      std::cout << "\n";
-      std::cout << "DEBUG -- Values as double: ";
-      for (int i=1; i<=6; ++i) std::cout << boost::lexical_cast<double>(words.at(i)) << " ";
-      std::cout << "\n";
-      for (int i=1; i<=6; ++i) std::cout << std::stoi(words.at(i)) << " ";
-*/
-/*    Casting string as double:
-      Alternatives
-      boost::lexical_cast<double>
-      std::stod
-      atof
-*/
-      dPt2_values[0][idx] = boost::lexical_cast<double>(words.at(1));
-      dPt2_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
-      dPt2_values[1][idx] = boost::lexical_cast<double>(words.at(3));
-      dPt2_errors[1][idx] = boost::lexical_cast<double>(words.at(4));
-      dPt2_values[2][idx] = boost::lexical_cast<double>(words.at(5));
-      dPt2_errors[2][idx] = boost::lexical_cast<double>(words.at(6));
+      //words = parser(line);
+      dPt2_values[0][idx] = std::stod(words.at(1));
+      dPt2_errors[0][idx] = std::stod(words.at(2));
+      dPt2_values[1][idx] = std::stod(words.at(3));
+      dPt2_errors[1][idx] = std::stod(words.at(4));
+      dPt2_values[2][idx] = std::stod(words.at(5));
+      dPt2_errors[2][idx] = std::stod(words.at(6));
       words.clear();
       std::getline(infile2, line); // multiplicity
       boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
-      RM_values[0][idx] = boost::lexical_cast<double>(words.at(1));
-      RM_errors[0][idx] = boost::lexical_cast<double>(words.at(2));
-      RM_values[1][idx] = boost::lexical_cast<double>(words.at(3));
-      RM_errors[1][idx] = boost::lexical_cast<double>(words.at(4));
-      RM_values[2][idx] = boost::lexical_cast<double>(words.at(5));
-      RM_errors[2][idx] = boost::lexical_cast<double>(words.at(6));
+      //words = parser(line);
+      RM_values[0][idx] = std::stod(words.at(1));
+      RM_errors[0][idx] = std::stod(words.at(2));
+      RM_values[1][idx] = std::stod(words.at(3));
+      RM_errors[1][idx] = std::stod(words.at(4));
+      RM_values[2][idx] = std::stod(words.at(5));
+      RM_errors[2][idx] = std::stod(words.at(6));
       words.clear();
       std::getline(infile3, line);
-      binratios[idx] = boost::lexical_cast<double>(line);
+      binratios[idx] = std::stod(line);
     }
     std::getline(infile1,line); // skip empty line
     std::getline(infile2,line); // skip empty line
@@ -196,6 +194,8 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
     words.clear();
     // read bin_info from both files and compare
     boost::split(words,bin_info,boost::is_any_of("< "),boost::token_compress_on);
+    //words = parser(bin_info);
+    //
     double Q2lo = std::stod(words.at(0));
     double Q2hi = std::stod(words.at(2));
     double xBlo = std::stod(words.at(3));
@@ -223,7 +223,12 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       // std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
-        zzz[a] = dPt2_values[a][iz]-fermi(xB,zbin[iz],a); // fermi is now returning zero
+        if (FERMIMOTION){
+          zzz[a] = dPt2_values[a][iz]-fermi(xB,zbin[iz],a); // fermi is now returning zero  
+        }
+        else {
+          zzz[a] = dPt2_values[a][iz]; //-fermi(xB,zbin[iz],a); // fermi is now returning zero
+        }
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
         errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
         errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));

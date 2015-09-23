@@ -2,9 +2,9 @@ CC         =  g++
 CFLAGS     = -c -g -Wall
 CFLAGS    += -O2
 CFLAGS    += `root-config --cflags`
-CFLAGS    += -I/usr/local/boost/1_57_0/include
+#CFLAGS    += -I/usr/local/boost/1_57_0/include
 LDFLAGS    = `root-config --libs` -lMinuit -lgsl -lMathMore
-LDFLAGS   += -L/usr/local/boost/1_57_0/lib
+#LDFLAGS   += -L/usr/local/boost/1_57_0/lib
 SOURCES    = $(wildcard *.cc)
 DEPS       = $(wildcard *.h)
 OBJECTS    = $(SOURCES:.cc=.o)
