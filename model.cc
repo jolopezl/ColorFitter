@@ -240,16 +240,17 @@ void Model::Compute(double A){
     }
     //      normalize+= 1.;
     normalize+=weight; // weight initial interaction by density  
-    // ADD ENERGY LOSS, From Will's original code:
-    if (m_DoEnergyLoss == true) {
-      if (m_iz > 0) {
-        temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
-      }
-      else {
-        temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
-      }
+  } // End of big loop
+  // ADD ENERGY LOSS, From Will's original code:
+  temp = accumulator2/normalize;
+  if (m_DoEnergyLoss == true) {
+    if (m_iz > 0) {
+      temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+    }
+    else {
+      temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
     }
   }
   m_dPt2=accumulator1/normalize; //  pT broadening
-  m_Rm=accumulator2/normalize; //  Multiplicity
+  m_Rm=temp; //  Multiplicity
 }
