@@ -38,12 +38,12 @@ public:
   std::vector<TGraphErrors*> m_tge; //m_tge[6];
   myData(std::string);
   ~myData();
-  void applyCorrection(myData*);
+  void applyCorrection(myData*,double);
   void fill(int,double,double,double);
   void doTGraphErrors();
 };
 
-std::vector<myData*> dataHandler();
+std::vector<myData*> dataHandler(double);
 void conv2double(std::vector<std::string>,double&,double&,double&);
 double pow2(double);
 

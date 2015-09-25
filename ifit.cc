@@ -82,7 +82,7 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
   f = chisq(par);
 }
 
-void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT) {
+void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT, double correlation) {
   m->Initialization();
   m->DoEnergyLoss(ENERGYLOSS);
   m->DoLogBehavior(LOGBEHAVIOR);
@@ -92,14 +92,14 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
   // xxx[1]=pow(55.845,1./3.);  // Fe
   // xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
-  xxx[0]=pow(20.1797,1./3.); // Ne
-  xxx[1]=pow(83.7980,1./3.);  // Kr
-  xxx[2]=pow(131.293,1./3.); // Xe
+  xxx[0]=1.1*pow(20.1797,1./3.); // Ne
+  xxx[1]=1.1*pow(83.7980,1./3.);  // Kr
+  xxx[2]=1.1*pow(131.293,1./3.); // Xe
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
   // dataHandler called here:
-  auto fc = dataHandler();
+  auto fc = dataHandler(correlation);
   // Here the rest of the code
   TFile *fout = new TFile("fullfit.root","RECREATE");
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
@@ -350,7 +350,7 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   ptfit->SetLineWidth(2);
   ptfit->Draw("L SAME");
   lpt->Draw();
-  UTFSMLabel(0.125,0.85,"Internal, work on progress");
+  UTFSMLabel(0.125,0.85,"Internal, work in progress");
   c1->Write();
   out_pt << ".pdf";
   c1->Print(out_pt.str().c_str());
@@ -373,7 +373,7 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   mrfit->SetMarkerStyle(21);
   mrfit->SetLineWidth(2);
   mrfit->Draw("L SAME");
-  UTFSMLabel(0.125,0.85,"Internal, work on progress");
+  UTFSMLabel(0.125,0.85,"Internal, work in progress");
   lrm->Draw();
   c2->Write();
   out_mr << ".pdf";

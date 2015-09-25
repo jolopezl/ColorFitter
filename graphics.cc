@@ -65,8 +65,8 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
   leg[3]->AddEntry(xe->m_tge[1],"Systematic Uncertainties","f");
   leg[3]->AddEntry(xe->m_tge[2],"Total Uncertainties","lep");
 
-  std::vector<std::string> labels = {"HERMES Helium data", "HERMES Neon data", "HERMES Kripton data", "HERMES Xeon data"};
-  std::vector<std::string> labels2 = {"HERMES Helium substracted", "HERMES Neon with Helium substracted", "HERMES Kripton with Helium substracted", "HERMES Xeon with Helium substracted"};
+  std::vector<std::string> labels = {"HERMES Helium data", "HERMES Neon data", "HERMES Kripton data", "HERMES Xenon data"};
+  std::vector<std::string> labels2 = {"HERMES Helium substracted", "HERMES Neon with Helium substracted", "HERMES Kripton with Helium substracted", "HERMES Xenon with Helium substracted"};
   std::vector<std::string> files = {"data_he.pdf","data_ne.pdf","data_kr.pdf","data_xe.pdf"};
   std::vector<std::string> files2 = {"data_he_corr.pdf","data_ne_corr.pdf","data_kr_corr.pdf","data_xe_corr.pdf"};
 
@@ -82,7 +82,7 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
     mg[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
     mg[1][i]->Draw("p");
     leg[i]->Draw();
-    UTFSMLabel(0.125,0.85,"Internal, work on progress");
+    UTFSMLabel(0.125,0.85,"Internal, work in progress");
     AddLabel(0.125,0.8,labels[i].c_str());
     c->Print(files[i].c_str());
     c->Clear();
@@ -94,7 +94,7 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
     mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
     mg_corrected[1][i]->Draw("p");
     leg[i]->Draw();
-    UTFSMLabel(0.125,0.85,"Internal, work on progress");
+    UTFSMLabel(0.125,0.85,"Internal, work in progress");
     AddLabel(0.125,0.8,labels2[i].c_str());
     c->Print(files2[i].c_str());
   }
@@ -108,4 +108,110 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
   }
   delete(c);
   std::cout << "Plots objects deleted" << std::endl;
+}
+
+void plotFitOutput(std::string filename) {
+  int basecol = 4;
+  //read the input file
+  std::ifstream input;
+  input.open(filename);
+  std::string binfo;
+  std::string line;
+  std::vector<std::string> words;
+  std::vector<double> zbin;
+  std::vector<double> err_zbin = {(0.53-0.32)/2.0,(0.75-0.53)/2.0,(0.94-0.75)/2.0,(0.94-0.75)/2.0};
+  std::vector<double> qhat,lp,sigma,vlog,dz;
+  std::vector<double> err_qhat,err_lp,err_sigma,err_vlog,err_dz;
+  std::vector<double> chisq;
+  std::getline(input,binfo);
+  for (int i=0; i<4; ++i) {
+    std::getline(input,line);
+    boost::split(words, line, boost::is_any_of("\t"), boost::token_compress_on);
+    zbin.push_back(std::stod(words[0+basecol]));
+    qhat.push_back(std::stod(words[1+basecol]));
+    lp.push_back(std::stod(words[2+basecol]));
+    sigma.push_back(std::stod(words[3+basecol]));
+    vlog.push_back(std::stod(words[4+basecol]));
+    dz.push_back(std::stod(words[5+basecol]));
+    err_qhat.push_back(std::stod(words[6+basecol]));
+    err_lp.push_back(std::stod(words[7+basecol]));
+    err_sigma.push_back(std::stod(words[8+basecol]));
+    err_vlog.push_back(std::stod(words[9+basecol]));
+    err_dz.push_back(std::stod(words[10+basecol]));
+    chisq.push_back(std::stod(words[11+basecol]));
+  }
+  //
+  TCanvas *c = new TCanvas("c1","plots",800,600);
+  const int markerStyleCode = 20; // circle 20, box 21
+  const int markerColorCode = 1; // black 1, red 2, blue 4
+  const int markerSizeCode = 1;
+  const int makerLineWidthCode = 2;
+  // q-hats
+  TGraphErrors *tge_qhat = new TGraphErrors(zbin.size(),&zbin[0],&qhat[0],&err_zbin[0],&err_qhat[0]);
+  TLegend *leg_qhat = new TLegend(0.1,0.1,0.5,0.2);//0.1,0.7,0.48,0.9
+  leg_qhat->AddEntry(tge_qhat,"Total Uncertainties","lep");
+  tge_qhat->SetTitle();
+  tge_qhat->SetMarkerColor(markerColorCode);
+  tge_qhat->SetLineWidth(makerLineWidthCode);
+  tge_qhat->SetMarkerSize(markerSizeCode);
+  tge_qhat->SetMarkerStyle(markerStyleCode);
+  tge_qhat->GetYaxis()->SetRangeUser(-0.4,1.4);
+  tge_qhat->GetXaxis()->SetTitle("z_{h}");
+  tge_qhat->GetYaxis()->SetTitle("#hat{q} [GeV/fm^{2}]");
+  tge_qhat->Draw("ap");
+  // leg_qhat->Draw();
+  UTFSMLabel(0.125,0.85,"Internal, work in progress");
+  c->Print("plotFO_qhat.pdf");
+  c->Clear();
+  // Formation length
+  TGraphErrors *tge_lp = new TGraphErrors(zbin.size(),&zbin[0],&lp[0],&err_zbin[0],&err_lp[0]);
+  TLegend *leg_lp = new TLegend(0.1,0.1,0.5,0.2);//0.1,0.7,0.48,0.9
+  leg_lp->AddEntry(tge_lp,"Total Uncertainties","lep");
+  tge_lp->SetTitle();
+  tge_lp->SetMarkerColor(markerColorCode);
+  tge_lp->SetLineWidth(makerLineWidthCode);
+  tge_lp->SetMarkerSize(markerSizeCode);
+  tge_lp->SetMarkerStyle(markerStyleCode);
+  tge_lp->GetYaxis()->SetRangeUser(-2,12);
+  tge_lp->GetXaxis()->SetTitle("z_{h}");
+  tge_lp->GetYaxis()->SetTitle("l_{p} [fm]");
+  tge_lp->Draw("ap");
+  // leg_lp->Draw();
+  UTFSMLabel(0.125,0.85,"Internal, work in progress");
+  c->Print("plotFO_lp.pdf");
+  c->Clear();
+  // pre-hadron cross section
+  TGraphErrors *tge_sigma = new TGraphErrors(zbin.size(),&zbin[0],&sigma[0],&err_zbin[0],&err_sigma[0]);
+  TLegend *leg_sigma = new TLegend(0.1,0.1,0.5,0.2);//0.1,0.7,0.48,0.9
+  leg_sigma->AddEntry(tge_sigma,"Total Uncertainties","lep");
+  tge_sigma->SetTitle();
+  tge_sigma->SetMarkerColor(markerColorCode);
+  tge_sigma->SetLineWidth(makerLineWidthCode);
+  tge_sigma->SetMarkerSize(markerSizeCode);
+  tge_sigma->SetMarkerStyle(markerStyleCode);
+  tge_sigma->GetYaxis()->SetRangeUser(-100,400);
+  tge_sigma->GetXaxis()->SetTitle("z_{h}");
+  tge_sigma->GetYaxis()->SetTitle("#sigma_{pre-hadron} [fm^{2}]");
+  tge_sigma->Draw("ap");
+  // leg_sigma->Draw();
+  UTFSMLabel(0.125,0.85,"Internal, work in progress");
+  c->Print("plotFO_sigma.pdf");
+  c->Clear();
+  // pre-hadron cross section
+  TGraphErrors *tge_dz = new TGraphErrors(zbin.size(),&zbin[0],&dz[0],&err_zbin[0],&err_dz[0]);
+  TLegend *leg_dz = new TLegend(0.1,0.1,0.5,0.2);//0.1,0.7,0.48,0.9
+  leg_dz->AddEntry(tge_dz,"Total Uncertainties","lep");
+  tge_dz->SetTitle();
+  tge_dz->SetMarkerColor(markerColorCode);
+  tge_dz->SetLineWidth(makerLineWidthCode);
+  tge_dz->SetMarkerSize(markerSizeCode);
+  tge_dz->SetMarkerStyle(markerStyleCode);
+  tge_dz->GetYaxis()->SetRangeUser(-0.1,0.5);
+  tge_dz->GetXaxis()->SetTitle("z_{h}");
+  tge_dz->GetYaxis()->SetTitle("#Delta z");
+  tge_dz->Draw("ap");
+  // leg_dz->Draw();
+  UTFSMLabel(0.125,0.85,"Internal, work in progress");
+  c->Print("plotFO_dz.pdf");
+  c->Clear();
 }

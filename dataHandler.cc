@@ -41,9 +41,7 @@ void myData::fill(int i, double val, double stat, double syst) {
   s2 = s_1^2+s_2^2 - 2*rho*s_1*s_2
 */
 
-const double rho = 0.0; 
-
-void myData::applyCorrection(myData* nucl) { // nucl is the bkg
+void myData::applyCorrection(myData* nucl, double rho) { // nucl is the bkg
   for (int i=0; i<=DIM; ++i) {
     m_value_corrected[i] = m_value[i] - nucl->m_value[i];
     m_stat_corrected[i] = sqrt(pow2(m_stat[i]) + pow2(nucl->m_stat[i]));
@@ -100,11 +98,11 @@ void conv2double(std::vector<std::string> words, double &val, double &stat, doub
   syst = std::stod(words.at(4));
 }
 
-std::vector<myData*> dataHandler() {
+std::vector<myData*> dataHandler(double correlation) {
   myData *he = new myData("Helium");
   myData *ne = new myData("Neon");
   myData *kr = new myData("Kripton");
-  myData *xe = new myData("Xeon");
+  myData *xe = new myData("Xenon");
   std::ifstream input;
   input.open("hermesData.txt");
   std::string foo, line;
@@ -142,10 +140,10 @@ std::vector<myData*> dataHandler() {
   }
   input.close();
   // Apply Helium substraction
-  he->applyCorrection(he);
-  ne->applyCorrection(he);
-  kr->applyCorrection(he);
-  xe->applyCorrection(he);
+  he->applyCorrection(he,correlation);
+  ne->applyCorrection(he,correlation);
+  kr->applyCorrection(he,correlation);
+  xe->applyCorrection(he,correlation);
   // Create TGraphErros contained in each object
   he->doTGraphErrors();
   ne->doTGraphErrors();

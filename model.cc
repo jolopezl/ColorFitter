@@ -88,12 +88,23 @@ void Model::Initialization() {
 }
 
 double Model::FindR(double A, double density_threshold){
-  //for (double r=0.; r<10000.; r=r+0.001){
   for (double r=0.; r<100000.; r=r+0.001){
     if (Density(A,0.,0.,r)<density_threshold) return r;
   }
-  std::cout << "Error:never found R" << std::endl;
-  return 0;
+  // std::cerr << "Error:never found R" << std::endl;
+  // std::cout << "Error:never found R" << std::endl;
+  // return 0;
+  // I want to avoid the never found R problem.
+  double r = 0.0;
+  double eps = 1.0e-3;
+  while (Density(A,0.,0.,r)>=density_threshold) {
+    r = r+eps;
+    if ((int)r==100000 || (int)r==1000000) {
+      std::cerr << "Error:never found R - Still trying - r=" << r << std::endl;
+      std::cout << "Error:never found R - Still trying - r=" << r << std::endl;
+    }
+  }
+  return r;
 }
 
 double Model::Density(double A, double xx, double yy, double zz){
@@ -240,16 +251,17 @@ void Model::Compute(double A){
     }
     //      normalize+= 1.;
     normalize+=weight; // weight initial interaction by density  
-    // ADD ENERGY LOSS, From Will's original code:
-    if (m_DoEnergyLoss == true) {
-      if (m_iz > 0) {
-        temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
-      }
-      else {
-        temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
-      }
+  } // End of big loop
+  // ADD ENERGY LOSS, From Will's original code:
+  temp = accumulator2/normalize;
+  if (m_DoEnergyLoss == true) {
+    if (m_iz > 0) {
+      temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+    }
+    else {
+      temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
     }
   }
   m_dPt2=accumulator1/normalize; //  pT broadening
-  m_Rm=accumulator2/normalize; //  Multiplicity
+  m_Rm=temp; //  Multiplicity
 }
