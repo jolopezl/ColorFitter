@@ -16,9 +16,9 @@ int main() {
   */
   // auto fc = dataHandler(correlation); // This is just a test of dataHandler()
   /* Run of main program ifit */
-  std::cout << "Running iFit now" << std::endl;
-  ifit(ENERGYLOSS,LOGBEHAVIOR,FERMIMOTION,Q2XBINTOFIT,ZBINTOFIT,correlation);
-  std::cout << "Running iFit ended" << std::endl;
+  // std::cout << "Running iFit now" << std::endl;
+  // ifit(ENERGYLOSS,LOGBEHAVIOR,FERMIMOTION,Q2XBINTOFIT,ZBINTOFIT,correlation);
+  // std::cout << "Running iFit ended" << std::endl;
   plotFitOutput("Fit_Output");
   return 0;
 }

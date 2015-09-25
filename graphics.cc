@@ -11,7 +11,7 @@ void UTFSMLabel(Double_t x,Double_t y,const char* text) {
     p.SetNDC();
     p.SetTextFont(42);
     // p.SetTextColor(color);
-    p.DrawLatex(x+delx,y,text);
+    p.DrawLatex(x+1.1*delx,y,text);
     //    p.DrawLatex(x,y,"#sqrt{s}=900GeV");
   }
 }
@@ -183,7 +183,7 @@ void plotFitOutput(std::string filename) {
   // pre-hadron cross section
   TGraphErrors *tge_sigma = new TGraphErrors(zbin.size(),&zbin[0],&sigma[0],&err_zbin[0],&err_sigma[0]);
   TLegend *leg_sigma = new TLegend(0.1,0.1,0.5,0.2);//0.1,0.7,0.48,0.9
-  leg_sigma->AddEntry(tge_sigma,"Total Uncertainties","lep");
+  leg_sigma->AddEntry(tge_sigma,"Pre hadron cross section","lep");
   tge_sigma->SetTitle();
   tge_sigma->SetMarkerColor(markerColorCode);
   tge_sigma->SetLineWidth(makerLineWidthCode);
@@ -191,9 +191,16 @@ void plotFitOutput(std::string filename) {
   tge_sigma->SetMarkerStyle(markerStyleCode);
   tge_sigma->GetYaxis()->SetRangeUser(-100,400);
   tge_sigma->GetXaxis()->SetTitle("z_{h}");
-  tge_sigma->GetYaxis()->SetTitle("#sigma_{pre-hadron} [fm^{2}]");
+  tge_sigma->GetYaxis()->SetTitle("#sigma_{pre-hadron} [mbarn]");
+  tge_sigma->GetYaxis()->SetTitleOffset(1.5);
   tge_sigma->Draw("ap");
-  // leg_sigma->Draw();
+  TF1 *line40 = new TF1("40 mbarns line","40",0.0,1.2);
+  line40->SetLineWidth(makerLineWidthCode);
+  line40->SetLineColor(kRed);
+  line40->SetLineStyle(2);
+  line40->Draw("SAME");
+  leg_sigma->AddEntry(line40,"Nominal value for fully formed pions","l");
+  leg_sigma->Draw();
   UTFSMLabel(0.125,0.85,"Internal, work in progress");
   c->Print("plotFO_sigma.pdf");
   c->Clear();
