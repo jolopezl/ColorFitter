@@ -88,9 +88,9 @@ void Model::Initialization() {
 }
 
 double Model::FindR(double A, double density_threshold){
-  for (double r=0.; r<100000.; r=r+0.001){
-    if (Density(A,0.,0.,r)<density_threshold) return r;
-  }
+  // for (double r=0.; r<100000.; r=r+0.001){
+  //   if (Density(A,0.,0.,r)<density_threshold) return r;
+  // }
   // std::cerr << "Error:never found R" << std::endl;
   // std::cout << "Error:never found R" << std::endl;
   // return 0;
