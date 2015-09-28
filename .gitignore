@@ -38,4 +38,9 @@ Thumbs.db
 
 # Others #
 ##########
+fits*
+latex
 *.pdf
+*.root
+Fit_output
+*.txt
