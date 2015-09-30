@@ -82,7 +82,7 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
   f = chisq(par);
 }
 
-void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT, double correlation) {
+void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT, double correlation, std::string filename) {
   m->Initialization();
   m->DoEnergyLoss(ENERGYLOSS);
   m->DoLogBehavior(LOGBEHAVIOR);
@@ -164,7 +164,7 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       std::string bin_info = "bin_info";
       double xB = -1;
       double Q2 = -1;
-      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz]);
+      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],filename);
       fout->Write();
       delete(gMinuit);
     }
@@ -233,7 +233,7 @@ int test() {
   return 0;
 }
 
-void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double xB, double z){
+void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double xB, double z,std::string filename){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -280,7 +280,7 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
   */
   // At this point, we know the parameters, so let's write them out
   std::ofstream fout;
-  fout.open("Fit_output", std::ios::out | std::ios::app);
+  fout.open(filename, std::ios::out | std::ios::app);
   fout.precision(10);
   if (iz == 0) fout << bin_info << "\n";
   fout << iQ2x << "\t" << iz << "\t";

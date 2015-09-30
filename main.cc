@@ -6,9 +6,9 @@ const bool FERMIMOTION  = false; // true or false
 const int  Q2XBINTOFIT  = -1; // someone in between 1 and Q2DIM of Q2,x bins. -1 fits all.
 const int  ZBINTOFIT    = -1; // someone in between 1 and ZDIM of z bins. -1 fits all.
 
-const double correlation = -1.0; // correlation between systematics of A/Helium for data subtraction
+// const double correlation = -1.0; // correlation between systematics of A/Helium for data subtraction
 
-int main() {
+int main(int argc, char *argv[]) {
   // test(); // Test of Model Class
   /*
     Run dataHandler alone allows to see how original data is transformed.
@@ -16,9 +16,11 @@ int main() {
   */
   // auto fc = dataHandler(correlation); // This is just a test of dataHandler()
   /* Run of main program ifit */
+  std::string filename = argv[1];
+  double correlation = std::stod(argv[2]);
   std::cout << "Running iFit now" << std::endl;
-  ifit(ENERGYLOSS,LOGBEHAVIOR,FERMIMOTION,Q2XBINTOFIT,ZBINTOFIT,correlation);
+  ifit(ENERGYLOSS,LOGBEHAVIOR,FERMIMOTION,Q2XBINTOFIT,ZBINTOFIT,correlation,filename);
   std::cout << "Running iFit ended" << std::endl;
-  plotFitOutput("Fit_Output");
+  plotFitOutput(filename);
   return 0;
 }
