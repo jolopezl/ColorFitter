@@ -59,6 +59,12 @@ void myData::doTGraphErrors() {
   const int markerSizeCode = 1;
   const int makerLineWidthCode = 2;
 
+  const int markerColorCodeStat = 2; // red
+  const int markerColorCodeSyst = 4; // blue
+  const float markerAlphaCode = 1.0;
+  const int fillColorCode = 4;
+  const int fillStyleCode = 3144;
+
   m_tge.clear();
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_stat[0]));
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_syst[0]));
@@ -68,10 +74,12 @@ void myData::doTGraphErrors() {
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value_corrected[0], &m_wbin[0], &m_err_corrected[0]));
   m_tge[0]->SetName("gg1");
   m_tge[0]->SetTitle("Statistical Errors");
-  m_tge[0]->SetFillColorAlpha(2,0.35);
+  m_tge[0]->SetFillColorAlpha(markerColorCodeStat,markerAlphaCode);
   m_tge[1]->SetName("gg2");
   m_tge[1]->SetTitle("Systematic Errors");
-  m_tge[1]->SetFillColorAlpha(3,0.35); 
+  m_tge[1]->SetFillColorAlpha(markerColorCodeSyst,0.1*markerAlphaCode);
+  m_tge[1]->SetFillColor(fillColorCode);
+  m_tge[1]->SetFillStyle(fillStyleCode);
   m_tge[2]->SetName("gg3");
   m_tge[2]->SetTitle("Total Uncertainties");
   m_tge[2]->SetMarkerColor(markerColorCode);
@@ -80,10 +88,12 @@ void myData::doTGraphErrors() {
   m_tge[2]->SetMarkerStyle(markerStyleCode);
   m_tge[3]->SetName("gg1_corrected");
   m_tge[3]->SetTitle("Statistical Errors");
-  m_tge[3]->SetFillColorAlpha(2,0.35);
+  m_tge[3]->SetFillColorAlpha(markerColorCodeStat,markerAlphaCode);
   m_tge[4]->SetName("gg2_corrected");
   m_tge[4]->SetTitle("Systematic Errors");
-  m_tge[4]->SetFillColorAlpha(3,0.35); 
+  m_tge[4]->SetFillColorAlpha(markerColorCodeSyst,0.1*markerAlphaCode); 
+  m_tge[4]->SetFillColor(fillColorCode);
+  m_tge[4]->SetFillStyle(fillStyleCode);
   m_tge[5]->SetName("gg3_corrected");
   m_tge[5]->SetTitle("Total Uncertainties");
   m_tge[5]->SetMarkerColor(markerColorCode);

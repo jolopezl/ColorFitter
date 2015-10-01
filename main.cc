@@ -14,8 +14,10 @@ int main(int argc, char *argv[]) {
     Run dataHandler alone allows to see how original data is transformed.
     Also gives plots of original data points.
   */
+  // double correlation = -1.0;
   // auto fc = dataHandler(correlation); // This is just a test of dataHandler()
   /* Run of main program ifit */
+  std::cout << argv[0] << argv[1] << argv[2] << std::endl;
   std::string filename = argv[1];
   double correlation = std::stod(argv[2]);
   std::cout << "Running iFit now" << std::endl;

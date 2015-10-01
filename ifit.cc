@@ -6,12 +6,12 @@ const double SYSTEMATIC_RM = 0.03;
 const int ZDIM  = 4;
 const int Q2DIM = 1;
 
-double zbin[ZDIM] = {0.32, 0.53, 0.75, 0.94};
+double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.94};
+double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16};; // Approx.
 double binratios[ZDIM] = {0.435211,0.482755,0.291515,0};
+
 double func_array[2] = {0,0};
 double zzz[6],errorzzz[6],xxx[6];
-
-double zbinw[ZDIM] = {(0.53-0.32)*2.0,(0.75-0.53)*2.0,(0.94-0.75)*2.0,(0.94-0.75)*2.0}; // Approx.
 
 double dPt2_zbin[3][4] =
 { {0.32, 0.53, 0.75, 0.94},

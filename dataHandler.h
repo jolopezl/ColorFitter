@@ -14,6 +14,7 @@
 #include "TH1.h"
 #include "TLegend.h"
 #include "TLatex.h"
+#include "TStyle.h"
 
 //
 #include <boost/algorithm/string.hpp>
@@ -26,7 +27,7 @@ private:
   std::string m_name;
 public:
   std::vector<double> m_zbin = {0.32, 0.53, 0.75, 0.94};
-  std::vector<double> m_wbin = {(0.53-0.32)/2.0,(0.75-0.53)/2.0,(0.94-0.75)/2.0,(0.94-0.75)/2.0};
+  std::vector<double> m_wbin = {0.20/2.0,0.22/2.0,0.22/2.0,0.16/2.0};
   std::vector<double> m_value; 
   std::vector<double> m_value_corrected;
   std::vector<double> m_stat; 

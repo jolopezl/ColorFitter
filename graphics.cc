@@ -24,6 +24,10 @@ void AddLabel(Double_t x,Double_t y,const char* text) {
 }
 
 void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
+
+  // TStyle *gs = new TStyle("gs", "gs1");
+  // gs->SetHatchesLineWidth(10);
+
   std::cout << "Creating plots" << std::endl;
   TMultiGraph *mg[2][4];
   TMultiGraph *mg_corrected[2][4];
@@ -47,11 +51,15 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
   mg[0][3]->Add(xe->m_tge[1]); mg_corrected[0][3]->Add(xe->m_tge[4]);
   mg[1][3]->Add(xe->m_tge[2]); mg_corrected[1][3]->Add(xe->m_tge[5]);
 
+  const float lx0 = 0.1125;
+  const float ly0 = 0.1125;
+  const float dx0 = 0.4;
+  const float dy0 = 0.15;
   TLegend *leg[4];
-  leg[0] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
-  leg[1] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
-  leg[2] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
-  leg[3] = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
+  leg[0] = new TLegend(lx0,ly0,lx0+dx0,ly0+dy0);//0.1,0.7,0.48,0.9
+  leg[1] = new TLegend(lx0,ly0,lx0+dx0,ly0+dy0);//0.1,0.7,0.48,0.9
+  leg[2] = new TLegend(lx0,ly0,lx0+dx0,ly0+dy0);//0.1,0.7,0.48,0.9
+  leg[3] = new TLegend(lx0,ly0,lx0+dx0,ly0+dy0);//0.1,0.7,0.48,0.9
   leg[0]->AddEntry(he->m_tge[0],"Statistical Uncertainties","f");
   leg[0]->AddEntry(he->m_tge[1],"Systematic Uncertainties","f");
   leg[0]->AddEntry(he->m_tge[2],"Total Uncertainties","lep");
@@ -65,10 +73,21 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
   leg[3]->AddEntry(xe->m_tge[1],"Systematic Uncertainties","f");
   leg[3]->AddEntry(xe->m_tge[2],"Total Uncertainties","lep");
 
+  for (int i=0; i<4; ++i) {
+    leg[i]->SetBorderSize(0.0);
+    leg[i]->SetFillStyle(0);
+  }
+
   std::vector<std::string> labels = {"HERMES Helium data", "HERMES Neon data", "HERMES Kripton data", "HERMES Xenon data"};
   std::vector<std::string> labels2 = {"HERMES Helium substracted", "HERMES Neon with Helium substracted", "HERMES Kripton with Helium substracted", "HERMES Xenon with Helium substracted"};
   std::vector<std::string> files = {"data_he.pdf","data_ne.pdf","data_kr.pdf","data_xe.pdf"};
   std::vector<std::string> files2 = {"data_he_corr.pdf","data_ne_corr.pdf","data_kr_corr.pdf","data_xe_corr.pdf"};
+
+  TF1 *line00 = new TF1("zero line","00",0.0,1.2);
+  line00->SetLineWidth(2);
+  line00->SetLineColor(kRed);
+  line00->SetLineStyle(2);
+  line00->Draw("SAME");
 
   TCanvas *c = new TCanvas("canvas","canvas title",800,600);
   // c->Divide(2,4);
@@ -77,25 +96,29 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
     // c->cd(2*i+1);
     mg[0][i]->Draw("a2");
     mg[0][i]->GetXaxis()->SetTitle("z_{h}");
-    mg[0][i]->GetYaxis()->SetTitle("<#DeltaP_{T}^{2}> [GeV^{2}]");
-    mg[0][i]->GetYaxis()->SetTitleOffset(1.5);
-    mg[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
+    mg[0][i]->GetYaxis()->SetTitle("#LT#DeltaP_{T}^{2}#GT [GeV^{2}]");
+    mg[0][i]->GetYaxis()->SetTitleOffset(1.25);
+    mg[0][i]->GetYaxis()->SetRangeUser(-0.05,0.05);
     mg[1][i]->Draw("p");
+    // line00->Draw("SAME");
     leg[i]->Draw();
     UTFSMLabel(0.125,0.85,"Internal, work in progress");
     AddLabel(0.125,0.8,labels[i].c_str());
+    // c->SetGrid();
     c->Print(files[i].c_str());
     c->Clear();
     // c->cd(2*i+2);
     mg_corrected[0][i]->Draw("a2");
     mg_corrected[0][i]->GetXaxis()->SetTitle("z_{h}");
-    mg_corrected[0][i]->GetYaxis()->SetTitle("<#DeltaP_{T}^{2}> [GeV^{2}]");
-    mg_corrected[0][i]->GetYaxis()->SetTitleOffset(1.5);
-    mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.02,0.05);
+    mg_corrected[0][i]->GetYaxis()->SetTitle("#LT#DeltaP_{T}^{2}#GT [GeV^{2}]");
+    mg_corrected[0][i]->GetYaxis()->SetTitleOffset(1.25);
+    mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.05,0.05);
     mg_corrected[1][i]->Draw("p");
+    // line00->Draw("SAME");
     leg[i]->Draw();
     UTFSMLabel(0.125,0.85,"Internal, work in progress");
     AddLabel(0.125,0.8,labels2[i].c_str());
+    // c->SetGrid();
     c->Print(files2[i].c_str());
   }
   // c->Print("plot_HermesData.pdf");
