@@ -159,7 +159,8 @@ void Model::Compute(double A){
   // Computation of both quantities dPt2 and Rm
   // We are doing an MC average
   TF1 *dtd1 = new TF1("dtd1", "[0]*0.170/(1+exp((sqrt([1]*[1]+[2]*[2]+x*x)-[3])/0.5))", 0.,40.); // pT broadening divided by constant.
-  TF1 *dtd2 = new TF1("dtd2",     "0.170/(1+exp((sqrt([0]*[0]+[1]*[1]+x*x)-[2])/0.5))", 0.,40.); // multiplicity ratio
+  // TF1 *dtd1 = new TF1("dtd1", "0.170/(1+exp((sqrt([0]*[0]+[1]*[1]+x*x)-[2])/0.5))", 0.,40.); // pT broadening divided by constant.
+  TF1 *dtd2 = new TF1("dtd2", "0.170/(1+exp((sqrt([0]*[0]+[1]*[1]+x*x)-[2])/0.5))", 0.,40.); // multiplicity ratio
   ROOT::Math::GSLIntegrator *igdtd1 = new ROOT::Math::GSLIntegrator(ROOT::Math::IntegrationOneDim::kADAPTIVE);
   ROOT::Math::GSLIntegrator *igdtd2 = new ROOT::Math::GSLIntegrator(ROOT::Math::IntegrationOneDim::kADAPTIVE);
   TRandom3 *gRandom = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
@@ -184,6 +185,9 @@ void Model::Compute(double A){
     dtd1->SetParameter(1,x); // starting value of longitudinal coordinate  
     dtd1->SetParameter(2,y); // x
     dtd1->SetParameter(3,m_c_interpolation[(int)A]); // density parameter
+    // dtd1->SetParameter(0,x); // starting value of longitudinal coordinate  
+    // dtd1->SetParameter(1,y); // x
+    // dtd1->SetParameter(2,m_c_interpolation[(int)A]); // density parameter
     dtd2->SetParameter(0,x); // x
     dtd2->SetParameter(1,y); // y
     dtd2->SetParameter(2,m_c_interpolation[(int)A]); // density parameter
@@ -222,7 +226,8 @@ void Model::Compute(double A){
       zrange1=1.; // dummy value
     }
     if(zrange1>0){
-      accumulator1+= zrange1*temp*weight; 
+      accumulator1+=zrange1*temp*weight; 
+      // accumulator1+=m_qhat*zrange1*temp*weight; 
     }
     else{
       std::cout << "zrange1 of length zero or negative encountered: " << zrange1 << " \n";

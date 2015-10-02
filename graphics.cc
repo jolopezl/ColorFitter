@@ -96,7 +96,7 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
     // c->cd(2*i+1);
     mg[0][i]->Draw("a2");
     mg[0][i]->GetXaxis()->SetTitle("z_{h}");
-    mg[0][i]->GetYaxis()->SetTitle("#LT#DeltaP_{T}^{2}#GT [GeV^{2}]");
+    mg[0][i]->GetYaxis()->SetTitle("#Delta#LTp_{t}^{2}#GT [GeV^{2}]");
     mg[0][i]->GetYaxis()->SetTitleOffset(1.25);
     mg[0][i]->GetYaxis()->SetRangeUser(-0.05,0.05);
     mg[1][i]->Draw("p");
@@ -110,7 +110,7 @@ void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
     // c->cd(2*i+2);
     mg_corrected[0][i]->Draw("a2");
     mg_corrected[0][i]->GetXaxis()->SetTitle("z_{h}");
-    mg_corrected[0][i]->GetYaxis()->SetTitle("#LT#DeltaP_{T}^{2}#GT [GeV^{2}]");
+    mg_corrected[0][i]->GetYaxis()->SetTitle("#Delta#LTp_{t}^{2}#GT [GeV^{2}]");
     mg_corrected[0][i]->GetYaxis()->SetTitleOffset(1.25);
     mg_corrected[0][i]->GetYaxis()->SetRangeUser(-0.05,0.05);
     mg_corrected[1][i]->Draw("p");

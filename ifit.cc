@@ -8,7 +8,8 @@ const int Q2DIM = 1;
 
 double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.94};
 double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16};; // Approx.
-double binratios[ZDIM] = {0.435211,0.482755,0.291515,0};
+// double binratios[ZDIM] = {0.435211,0.482755,0.291515,0};
+double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
 
 double func_array[2] = {0,0};
 double zzz[6],errorzzz[6],xxx[6];
@@ -116,11 +117,13 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
         // zzz[a] = dPt2_values[a][iz]; // -fermi(xB,zbin[iz],a); // fermi is now returning zero
+        // zzz[a] = fc[a]->m_value[iz];
         zzz[a] = fc[a]->m_value_corrected[iz];
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
         // errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
         // errorzzz[a] = sqrt(pow(fc[a]->m_stat_corrected[iz],2)+pow(fc[a]->m_syst_corrected[iz],2));
         // sqrt(pow2(m_stat_corrected[i])+pow2(m_syst_corrected[i]));
+        // errorzzz[a] = fc[a]->m_err[iz];
         errorzzz[a] = fc[a]->m_err_corrected[iz];
         errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
         // while (zzz[a]<0.0) {
