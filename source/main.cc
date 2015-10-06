@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   std::cout << argv[0] << argv[1] << argv[2] << std::endl;
   std::string filename = argv[1];
   double correlation = std::stod(argv[2]);
-  std::cout << "Running iFit now" << std::endl;
+  std::cout << "Running iFit now:" << std::endl;
   ifit(ENERGYLOSS,LOGBEHAVIOR,FERMIMOTION,Q2XBINTOFIT,ZBINTOFIT,correlation,filename);
   std::cout << "Running iFit ended" << std::endl;
   plotFitOutput(filename);

@@ -12,19 +12,19 @@ SOURCES  = $(wildcard ./source/*.cc)
 DEPS    = $(wildcard ./include/*.h)
 EXE     = ./bin/ifitx.exe
 
-BIN_DIR = bin
-
 #CCOBJS    = $(SOURCES:%.cc=%.o)
 CCOBJS    = $(patsubst ./source/%.cc,build/%.o,$(SOURCES))
 
+OBJDIR = build
+BINDIR = bin
+
 all: $(SOURCES) $(DEPS) $(EXE)
 
-$(EXE): $(CCOBJS)
-	mkdir -p $(@D)
+$(EXE): $(CCOBJS) | $(BINDIR)
 	$(CXX) $(LDFLAGS) $(CCOBJS) -o $@
 
 #.cc.o :
-build/%.o: source/%.cc $(DEPS)
+build/%.o: source/%.cc $(DEPS) | $(OBJDIR)
 	@echo Compiling $@
 	@$(CXX) $(CCFLAGS) -c $< -o $@
 
@@ -33,6 +33,12 @@ clean:
 
 print:
 	@echo $(DEPS)
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
 
 # $(CCOBJS): $(SOURCES) $(DEPS)
 # 	$(CXX) $(CFLAGS) $(SOURCES)
