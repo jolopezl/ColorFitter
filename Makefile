@@ -8,19 +8,23 @@ CCFLAGS  += -I./include -I/usr/local/include/
 LDFLAGS   = `root-config --libs` -lMinuit -lgsl -lMathMore
 LDFLAGS  += -L/usr/local/lib
 
-CCSRCS  = $(wildcard ./source/*.cc)
+SOURCES  = $(wildcard ./source/*.cc)
 DEPS    = $(wildcard ./include/*.h)
 EXE     = ./bin/ifitx.exe
 
-CCOBJS    = $(CCSRCS:%.cc=%.o)
+BIN_DIR = bin
 
-all: $(CCSRCS) $(DEPS) $(EXE)
+#CCOBJS    = $(SOURCES:%.cc=%.o)
+CCOBJS    = $(patsubst ./source/%.cc,build/%.o,$(SOURCES))
+
+all: $(SOURCES) $(DEPS) $(EXE)
 
 $(EXE): $(CCOBJS)
+	mkdir -p $(@D)
 	$(CXX) $(LDFLAGS) $(CCOBJS) -o $@
 
 #.cc.o :
-%.o: %.cc $(DEPS)
+build/%.o: source/%.cc $(DEPS)
 	@echo Compiling $@
 	@$(CXX) $(CCFLAGS) -c $< -o $@
 
@@ -30,5 +34,5 @@ clean:
 print:
 	@echo $(DEPS)
 
-# $(CCOBJS): $(CCSRCS) $(DEPS)
-# 	$(CXX) $(CFLAGS) $(CCSRCS)
+# $(CCOBJS): $(SOURCES) $(DEPS)
+# 	$(CXX) $(CFLAGS) $(SOURCES)
