@@ -45,5 +45,4 @@ latex
 Fit_output
 *.txt
 test
-doc
-
+build

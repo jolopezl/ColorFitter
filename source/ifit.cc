@@ -5,29 +5,14 @@ const double SYSTEMATIC_RM = 0.03;
 
 const int ZDIM  = 4;
 const int Q2DIM = 1;
-
 double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.94};
 double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16};; // Approx.
-// double binratios[ZDIM] = {0.435211,0.482755,0.291515,0};
 double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
 
 double func_array[2] = {0,0};
-double zzz[6],errorzzz[6],xxx[6];
-
-// double dPt2_zbin[3][4] =
-// { {0.32, 0.53, 0.75, 0.94},
-//   {0.31, 0.54, 0.75, 0.94},
-//   {0.31, 0.54, 0.75, 0.94} };
-
-// double dPt2_values[3][4] =
-// { {0.0064, 0.0067, -0.0088, -0.0131},
-//   {0.0205, 0.0228, 0.0012, 0.0021},
-//   {0.0269, 0.0300, 0.0071, -0.0021} };
-
-// double dPt2_errors[3][4] = 
-// { {0.0013, 0.0022, 0.0044, 0.0073},
-//   {0.0015, 0.0025, 0.0051, 0.0090},
-//   {0.0019, 0.0033, 0.0067, 0.0116}};
+double zzz[6];
+double errorzzz[6];
+double xxx[6];
 
 double RM_values[3][4] =
 { {0.870164,0.872621,0.856658,0.788588},
@@ -54,10 +39,8 @@ void callModel(double A,double *par){
 
 // I will write the Chi-Squared and some other functions here
 double chisq(double *par){
-  //calculate chisquare
-  double chisq = 0;
-  double delta;
-  chisq = 0.;
+  double chisq = 0.0;
+  double delta = 0.0;
   callModel(xxx[0],par);
   delta = (zzz[0]-func_array[0])/errorzzz[0];
   chisq += delta*delta;
@@ -83,11 +66,12 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
   f = chisq(par);
 }
 
-void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT, double correlation, std::string filename) {
+// void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT, double correlation, std::string filename) {
+void ifit(myConfig *config) {
   m->Initialization();
-  m->DoEnergyLoss(ENERGYLOSS);
-  m->DoLogBehavior(LOGBEHAVIOR);
-  m->DoFermiMotion(FERMIMOTION);
+  m->DoEnergyLoss(config->m_energyloss);
+  m->DoLogBehavior(config->m_logbehavior);
+  // m->DoFermiMotion(config->m_fermimotion);
   // This is for Jlab
   // xxx[0]=pow(12.0107,1./3.); // C
   // xxx[1]=pow(55.845,1./3.);  // Fe
@@ -100,13 +84,13 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
   // dataHandler called here:
-  auto fc = dataHandler(correlation);
+  auto fc = dataHandler(config->m_correlation);
   // Here the rest of the code
   TFile *fout = new TFile("fullfit.root","RECREATE");
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
     for (int iz=0; iz<ZDIM; ++iz) {
       // Selects and specific z bin to fit.
-      if ((ZBINTOFIT != -1) && ((ZBINTOFIT-1) != iz)) {
+      if ((config->m_zBinOfInterest != -1) && ((config->m_zBinOfInterest-1) != iz)) {
         std::cout << "Ignoring this bin" << std::endl;
         continue;
       }
@@ -117,18 +101,16 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
         // zzz[a] = dPt2_values[a][iz]; // -fermi(xB,zbin[iz],a); // fermi is now returning zero
-        // zzz[a] = fc[a]->m_value[iz];
-        zzz[a] = fc[a]->m_value_corrected[iz];
+        if (config->m_subtraction) {
+          zzz[a] = fc[a]->m_value_corrected[iz];
+          errorzzz[a] = fc[a]->m_err_corrected[iz];
+        }
+        else {
+          zzz[a] = fc[a]->m_value[iz];
+          errorzzz[a] = fc[a]->m_err[iz];
+        }
         zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
-        // errorzzz[a] = sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
-        // errorzzz[a] = sqrt(pow(fc[a]->m_stat_corrected[iz],2)+pow(fc[a]->m_syst_corrected[iz],2));
-        // sqrt(pow2(m_stat_corrected[i])+pow2(m_syst_corrected[i]));
-        // errorzzz[a] = fc[a]->m_err[iz];
-        errorzzz[a] = fc[a]->m_err_corrected[iz];
         errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
-        // while (zzz[a]<0.0) {
-        //   zzz[a] = zzz[a] + errorzzz[a]/2.0; // 1.01 to add more systematic uncert. and become positive.
-        // }
       }
       TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
       gMinuit->SetFCN(fcn);      
@@ -153,8 +135,8 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       // gMinuit->FixParameter(0); // q-hat
       // gMinuit->FixParameter(2); // production length
       // gMinuit->FixParameter(3); // prehadron cross section
-      if (!LOGBEHAVIOR) gMinuit->FixParameter(3); // Log description
-      if (!ENERGYLOSS)  gMinuit->FixParameter(4); // Energy Loss
+      if (!config->m_logbehavior) gMinuit->FixParameter(3); // Log description
+      if (!config->m_energyloss)  gMinuit->FixParameter(4); // Energy Loss
       // Now ready for minimization step
       arglist[0] = 500;
       arglist[1] = 1.;
@@ -167,7 +149,7 @@ void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, 
       std::string bin_info = "bin_info";
       double xB = -1;
       double Q2 = -1;
-      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],filename);
+      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output);
       fout->Write();
       delete(gMinuit);
     }
@@ -236,6 +218,7 @@ int test() {
   return 0;
 }
 
+// this will be moved away someday to graphics.cc
 void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double xB, double z,std::string filename){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
@@ -263,24 +246,6 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
     par_errors[parNo]=err;
   }
   double chisquared = chisq(par);
-  /* I don't know what this piece of code is does
-  // Now make the plots of lpA for C, Fe, and Pb, with the final parameters, only for the first bin:
-  if(doC_lpA_plot==0){
-    doC_lpA_plot=1; // turn it on
-    callModel(xxx[0],par);
-    doC_lpA_plot=-1; // turn it off and keep it off (or could set it to 2 to accumulate, and change "if" to include 2 as a possibility)
-  }
-  if(doFe_lpA_plot==0){
-    doFe_lpA_plot=1; // turn it on
-    callModel(xxx[1],par);
-    doFe_lpA_plot=-1; // turn it off and keep it off
-  }
-  if(doPb_lpA_plot==0){
-    doPb_lpA_plot=1; // turn it on
-    callModel(xxx[2],par);
-    doPb_lpA_plot=-1; // turn it off and keep it off
-  }
-  */
   // At this point, we know the parameters, so let's write them out
   std::ofstream fout;
   fout.open(filename, std::ios::out | std::ios::app);

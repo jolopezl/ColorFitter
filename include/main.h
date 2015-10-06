@@ -4,5 +4,6 @@
 #include "model.h"
 #include "ifit.h"
 #include "dataHandler.h"
+#include "configuration.h"
 
 #endif

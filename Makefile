@@ -1,6 +1,6 @@
-CC        = clang++
+CC        = g++
 CCFLAGS   = -c -g -Wall
-# CCFLAGS += -fPIC -Wno-deprecated
+CCFLAGS  += -fPIC -Wno-deprecated
 CCFLAGS  += -O2
 CCFLAGS  += `root-config --cflags`
 CCFLAGS  += -I./include -I/usr/local/include/
