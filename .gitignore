@@ -44,3 +44,6 @@ latex
 *.root
 Fit_output
 *.txt
+test
+doc
+

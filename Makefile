@@ -1,23 +1,23 @@
-CC         =  clang++
-CFLAGS     = -c -g -Wall
-CFLAGS    += -O2
-CFLAGS    += `root-config --cflags`
-CFLAGS    += -I/usr/local/include/
-#CFLAGS    += -isystem /usr/local/include/
-LDFLAGS    = `root-config --libs` -lMinuit -lgsl -lMathMore
-LDFLAGS   += -L/usr/local/lib
-SOURCES    = $(wildcard *.cc)
-DEPS       = $(wildcard *.h)
-OBJECTS    = $(SOURCES:.cc=.o)
-EXECUTABLE = ifitx.exe
+CC        = clang++
+CCFLAGS   = -c -g -Wall
+# CCFLAGS += -fPIC -Wno-deprecated
+CCFLAGS  += -O2
+CCFLAGS  += `root-config --cflags`
+CCFLAGS  += -I./include -I/usr/local/include/
 
-all: $(SOURCES) $(DEPS) $(EXECUTABLE)
+LDFLAGS   = `root-config --libs` -lMinuit -lgsl -lMathMore
+LDFLAGS  += -L/usr/local/lib
 
-$(OBJECTS): $(SOURCES) $(DEPS)
-	$(CC) $(CFLAGS) $(SOURCES)
+CCSRCS  = $(wildcard ./source/*.cc)
+DEPS    = $(wildcard ./include/*.h)
+EXE     = ./bin/ifitx.exe
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+CCOBJS    = $(CCSRCS:%.cc=%.o)
+
+all: $(CCSRCS) $(DEPS) $(EXE)
+
+$(EXE): $(CCOBJS)
+	$(CXX) $(LDFLAGS) $(CCOBJS) -o $@
 
 #.cc.o :
 %.o: %.cc $(DEPS)
@@ -25,7 +25,10 @@ $(EXECUTABLE): $(OBJECTS)
 	@$(CXX) $(CCFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(EXECUTABLE) $(OBJECTS)
+	rm -f $(EXE) $(CCOBJS)
 
 print:
 	@echo $(DEPS)
+
+# $(CCOBJS): $(CCSRCS) $(DEPS)
+# 	$(CXX) $(CFLAGS) $(CCSRCS)
