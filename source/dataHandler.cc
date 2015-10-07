@@ -108,7 +108,8 @@ void conv2double(std::vector<std::string> words, double &val, double &stat, doub
   syst = std::stod(words.at(4));
 }
 
-std::vector<myData*> dataHandler(double correlation) {
+std::vector<myData*> dataHandler(myConfig *config) {
+  double correlation = config->m_correlation;
   myData *he = new myData("Helium");
   myData *ne = new myData("Neon");
   myData *kr = new myData("Kripton");

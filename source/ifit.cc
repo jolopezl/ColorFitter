@@ -5,8 +5,10 @@ const double SYSTEMATIC_RM = 0.03;
 
 const int ZDIM  = 4;
 const int Q2DIM = 1;
-double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.94};
+double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.94}; // pi+
 double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16};; // Approx.
+// double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.95}; // pi-
+// double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05};; // Approx.
 double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
 
 double func_array[2] = {0,0};
@@ -84,7 +86,7 @@ void ifit(myConfig *config) {
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
   // dataHandler called here:
-  auto fc = dataHandler(config->m_correlation);
+  auto fc = dataHandler(config);
   // Here the rest of the code
   TFile *fout = new TFile("fullfit.root","RECREATE");
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES

@@ -21,6 +21,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "graphics.h"
+#include "configuration.h"
 
 class myData {
 private:
@@ -44,7 +45,7 @@ public:
   void doTGraphErrors();
 };
 
-std::vector<myData*> dataHandler(double);
+std::vector<myData*> dataHandler(myConfig*);
 void conv2double(std::vector<std::string>,double&,double&,double&);
 double pow2(double);
 

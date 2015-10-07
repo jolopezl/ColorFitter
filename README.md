@@ -14,12 +14,14 @@ To download, compile and run the code, create a work directory and then type:
 
 `$ make`
 
+Put input data in the same folder and type:
+
 `$ ./ifitx.exe`
 
 ## Note 
 
-Code under constant development.
+Under development.
 
-## More info
+## Contact
 
-See the Twiki: <a> https://github.com/jorgext/iFit/wiki </a>
+jorge.lopezl@usm.cl
