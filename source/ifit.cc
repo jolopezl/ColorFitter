@@ -6,9 +6,9 @@ const double SYSTEMATIC_RM = 0.03;
 const int ZDIM  = 4;
 const int Q2DIM = 1;
 double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.94}; // pi+
-double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16};; // Approx.
+double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
 // double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.95}; // pi-
-// double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05};; // Approx.
+// double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05}; // Approx.
 double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
 
 double func_array[2] = {0,0};
@@ -134,9 +134,9 @@ void ifit(myConfig *config) {
       gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
       gMinuit->mnparm(3, "a4", vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
       gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss      
-      // gMinuit->FixParameter(0); // q-hat
-      // gMinuit->FixParameter(2); // production length
-      // gMinuit->FixParameter(3); // prehadron cross section
+      if (!config->m_qhat)        gMinuit->FixParameter(0); // q-hat
+      if (!config->m_lp)          gMinuit->FixParameter(2); // production length
+      if (!config->m_preh)        gMinuit->FixParameter(3); // prehadron cross section
       if (!config->m_logbehavior) gMinuit->FixParameter(3); // Log description
       if (!config->m_energyloss)  gMinuit->FixParameter(4); // Energy Loss
       // Now ready for minimization step
@@ -151,7 +151,7 @@ void ifit(myConfig *config) {
       std::string bin_info = "bin_info";
       double xB = -1;
       double Q2 = -1;
-      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output);
+      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit);
       fout->Write();
       delete(gMinuit);
     }
@@ -221,7 +221,11 @@ int test() {
 }
 
 // this will be moved away someday to graphics.cc
-void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, double xB, double z,std::string filename){
+void modelplot(TMinuit *g,
+               std::string bin_info,
+               int iQ2x, int iz, double Q2,
+               double xB, double z, 
+               std::string filename){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -275,12 +279,13 @@ void modelplot(TMinuit *g, std::string bin_info, int iQ2x, int iz, double Q2, do
     mr_fiterr[i]=0.;
     mr_x[i] = i/6.;
   }
+  std::string basename = filename;
   std::string mrname;
   std::string ptname;
   std::ostringstream out_mr, out_pt;
-  out_mr << "mr_" << iQ2x << "_" << iz;
+  out_mr << basename << "_plot_" << "mr_" << iQ2x << "_" << iz;
   mrname = out_mr.str();
-  out_pt << "pt_" << iQ2x << "_" << iz;
+  out_pt << basename << "_plot_" << "pt_" << iQ2x << "_" << iz;
   ptname = out_pt.str();
   TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
   TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);

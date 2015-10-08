@@ -24,6 +24,7 @@ myData::myData(std::string name) {
   }
   std::cout << "Data created for " << m_name << std::endl;
 }
+
 myData::~myData() {
  std::cout << "Data destructed for " << m_name << std::endl; 
 }
@@ -115,7 +116,7 @@ std::vector<myData*> dataHandler(myConfig *config) {
   myData *kr = new myData("Kripton");
   myData *xe = new myData("Xenon");
   std::ifstream input;
-  input.open("hermesData.txt");
+  input.open(config->m_input_pt);
   std::string foo, line;
   std::vector<std::string> words = {};
   double val,stat,syst;
@@ -128,21 +129,21 @@ std::vector<myData*> dataHandler(myConfig *config) {
     conv2double(words,val,stat,syst);
     he->fill(i,val,stat,syst);
   }
-  std::getline(input,foo);
+  std::getline(input,foo); // dummy line to ignore
   for (int i=0; i<DIM;++i) {
     std::getline(input,line); // read line of data
     boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
     conv2double(words,val,stat,syst);
     ne->fill(i,val,stat,syst);
   }
-  std::getline(input,foo);
+  std::getline(input,foo); // dummy line to ignore
   for (int i=0; i<DIM;++i) {
     std::getline(input,line); // read line of data
     boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
     conv2double(words,val,stat,syst);
     kr->fill(i,val,stat,syst);
   }
-  std::getline(input,foo);
+  std::getline(input,foo); // dummy line to ignore
   for (int i=0; i<DIM;++i) {
     std::getline(input,line); // read line of data
     boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
@@ -161,7 +162,7 @@ std::vector<myData*> dataHandler(myConfig *config) {
   kr->doTGraphErrors();
   xe->doTGraphErrors();
   // Do plots of data
-  doDataPlots(he,ne,kr,xe);
+  doDataPlots(config,he,ne,kr,xe);
   // Prepare output and finish
   std::vector<myData*> output;
   // output.push_back(he); // we don't need to return He.

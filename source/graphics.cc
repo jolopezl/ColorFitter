@@ -23,11 +23,11 @@ void AddLabel(Double_t x,Double_t y,const char* text) {
   l.DrawLatex(x,y,text);
 }
 
-void doDataPlots(myData* he, myData* ne, myData* kr, myData* xe) {
+void doDataPlots(myConfig* config, myData* he, myData* ne, myData* kr, myData* xe) {
 
   // TStyle *gs = new TStyle("gs", "gs1");
   // gs->SetHatchesLineWidth(10);
-
+// 
   std::cout << "Creating plots" << std::endl;
   TMultiGraph *mg[2][4];
   TMultiGraph *mg_corrected[2][4];
