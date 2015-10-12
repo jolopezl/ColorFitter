@@ -1,7 +1,7 @@
 #include "ifit.h"
 
 // const double SYSTEMATIC_DPT2 = 0.04;
-const double SYSTEMATIC_RM = 0.03;
+
 
 const int ZDIM  = 4;
 const int Q2DIM = 1;
@@ -16,15 +16,27 @@ double zzz[6];
 double errorzzz[6];
 double xxx[6];
 
-double RM_values[3][4] =
-{ {0.870164,0.872621,0.856658,0.788588},
-  {0.736377,0.695501,0.635427,0.539358},
-  {0.668259,0.632413,0.594249,0.459519}};
+/* This comes from the old interpolation */
+// const double SYSTEMATIC_RM = 0.03;
+// double rm[3][4] =
+// { {0.870164,0.872621,0.856658,0.788588},
+//   {0.736377,0.695501,0.635427,0.539358},
+//   {0.668259,0.632413,0.594249,0.459519}};
 
-double RM_errors[3][4] = 
-{ {0.0321384,0.0310056,0.0374072,0.0356487},
-  {0.0313015,0.0273214,0.0327105,0.0269801},
-  {0.0332506,0.0268708,0.0284847,0.0264920} };
+// double rmerr[3][4] = 
+// { {0.0321384,0.0310056,0.0374072,0.0356487},
+//   {0.0313015,0.0273214,0.0327105,0.0269801},
+//   {0.0332506,0.0268708,0.0284847,0.0264920} };
+
+/* new values from python/interpolate.py */
+double rm[3][4] = 
+{ {0.893189114368,0.885454096825,0.880935853275,0.798520384419},
+  {0.78747612087,0.744660997913,0.679028679486,0.551673817154},
+  {0.736762500635,0.684223383665,0.619689942725,0.498076090992} };
+double rmerr[3][4] =
+{ {0.0594409344724,0.0515307622582,0.0634878265064,0.0682394907588},
+  {0.0542930099596,0.0447182315218,0.05222907333,0.0527700155986},
+  {0.0535218789044,0.0411665583174,0.0503850083386,0.0529182285411} };
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model *m = new Model("default"); 
@@ -111,8 +123,11 @@ void ifit(myConfig *config) {
           zzz[a] = fc[a]->m_value[iz];
           errorzzz[a] = fc[a]->m_err[iz];
         }
-        zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
-        errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
+        // zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
+        // errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
+        zzz[a+3] = rm[a][iz];
+        errorzzz[a+3] = rmerr[a][iz];
+        // errorzzz[a+3] = sqrt(pow(rmerr[a][iz],2)+pow(SYSTEMATIC_RM*rm[a][iz],2));
       }
       TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
       gMinuit->SetFCN(fcn);      
@@ -283,6 +298,7 @@ void modelplot(TMinuit *g,
     mr_x[i] = i/6.;
   }
   std::string basename = filename;
+  basename.erase(basename.find_last_of("."), std::string::npos);
   std::string mrname;
   std::string ptname;
   std::ostringstream out_mr, out_pt;
