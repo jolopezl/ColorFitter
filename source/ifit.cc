@@ -148,9 +148,9 @@ void ifit(myConfig *config) {
       int nvpar,nparx,icstat;
       gMinuit->mnstat(amin,edm,errdef,nvpar,nparx,icstat);
       gMinuit->mnprin(3,amin);
-      std::string bin_info = "bin_info";
-      double xB = -1;
-      double Q2 = -1;
+      std::string bin_info = config->m_comment; // dummy value for HERMES
+      double xB = -1; // dummy value for HERMES
+      double Q2 = -1; // dummy value for HERMES
       modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit);
       fout->Write();
       delete(gMinuit);
@@ -257,8 +257,11 @@ void modelplot(TMinuit *g,
   fout.open(filename, std::ios::out | std::ios::app);
   fout.precision(10);
   if (iz == 0) fout << bin_info << "\n";
-  fout << iQ2x << "\t" << iz << "\t";
-  fout << Q2 << "\t" << xB << "\t" << z << "\t";
+  if (Q2!=-1 && xB!=-1) {
+    fout << iQ2x << "\t" << iz << "\t";
+    fout << Q2 << "\t" << xB << "\t";
+  }
+  fout << z << "\t";
   fout <<par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
   fout <<par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t"<<chisquared<<"\n"; 
   //fout<<C_deltaE<<" "<<Fe_deltaE<<" "<<Pb_deltaE<<" \n";

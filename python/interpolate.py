@@ -1,5 +1,4 @@
 # Interpolate multiplicity data
-
 import ROOT
 ROOT.gROOT.SetStyle("Plain")
 from array import array

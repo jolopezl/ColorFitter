@@ -19,6 +19,10 @@ private:
   double m_sigma_ph; // prehadron cross section
   double m_dlog; // log description?
   double m_dz; // energy loss parameter
+  // for the nuclear density
+  double m_rho0 = 0.170; // nucleons/fm^3
+  double m_a = 0.54; //fm
+  double m_c = 0.0; // to be solved
   // some assistance for the energy loss part
   int m_iz;
   double m_zbinwidth;
@@ -32,7 +36,7 @@ private:
   // tools
   std::vector<double> m_c_interpolation;
   // Other parameters
-  int m_maxmcsteps = 100000; // number of mc steps in the calculation
+  int m_maxmcSteps = 100000; // number of mc steps in the calculation
   double m_density_threshold = 0.005;
   // private methods
   double Density(double, double, double, double);

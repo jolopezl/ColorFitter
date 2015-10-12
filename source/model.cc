@@ -109,14 +109,11 @@ double Model::FindR(double A, double density_threshold){
 
 double Model::Density(double A, double xx, double yy, double zz){
   // Ref. Henk Blok article, Phys Rev. C73, 038201 (2006)
+  double rho0 = m_rho0;
+  double a = m_a;
+  double c = m_c_interpolation[(int) A]; // Change to m_c?
   double r = sqrt(xx*xx+yy*yy+zz*zz);
-  double rho=0.170/(1.+exp((r-m_c_interpolation[(int) A])/0.5));
-  //Hard sphere approximation with C: 
-  //if(r<c[A]){rho=0.170;}
-  //else{rho=0.0;};
-  //Hard sphere approximation with A**1/3: 
-  //if(r<1.2*A**(1./3.)){rho=0.170;}
-  //else{rho=0.0;};
+  double rho = rho0/(1.0+exp((r-c)/a));
   return rho;
 }
 
@@ -173,7 +170,7 @@ void Model::Compute(double A){
   double temp, accumulator1=0.0, accumulator2=0.0, zrange1, zrange2;
   double constant = 0.1*3./(4.*3.141592); // alpha_s * N_c / 4pi, the prefix of the formula for delta pT^2 = 0.02387
   double normalize = 0.0;
-  for (int mcStep=0; mcStep<m_maxmcsteps; ++mcStep){
+  for (int mcStep=0; mcStep<m_maxmcSteps; ++mcStep){
     while(1){// only consider points inside the integration sphere
       x = gRandom->Uniform(-R,R);
       y = gRandom->Uniform(-R,R);
