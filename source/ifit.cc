@@ -10,28 +10,14 @@ double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
 // double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.95}; // pi-
 // double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05}; // Approx.
 // double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
-double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
-// double binratios[ZDIM] = {0.359961,0.320395,0.0869321,0}; // PI- no cuts
-
 double func_array[2] = {0,0};
 double zzz[6];
 double errorzzz[6];
 double xxx[6];
 
-/* This comes from the old interpolation */
-// const double SYSTEMATIC_RM = 0.03;
-// double rm[3][4] =
-// { {0.870164,0.872621,0.856658,0.788588},
-//   {0.736377,0.695501,0.635427,0.539358},
-//   {0.668259,0.632413,0.594249,0.459519}};
-
-// double rmerr[3][4] = 
-// { {0.0321384,0.0310056,0.0374072,0.0356487},
-//   {0.0313015,0.0273214,0.0327105,0.0269801},
-//   {0.0332506,0.0268708,0.0284847,0.0264920} };
-
-/* new values from python/interpolate.py */
+/* values from python/interpolate.py */
 // PI+
+double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
 double rm[3][4] = 
 { {0.893189114368,0.885454096825,0.880935853275,0.798520384419},
   {0.78747612087,0.744660997913,0.679028679486,0.551673817154},
@@ -40,16 +26,27 @@ double rmerr[3][4] =
 { {0.0594409344724,0.0515307622582,0.0634878265064,0.0682394907588},
   {0.0542930099596,0.0447182315218,0.05222907333,0.0527700155986},
   {0.0535218789044,0.0411665583174,0.0503850083386,0.0529182285411} };
+double rmerrstat[3][4] =
+{ {0.00854270357306,0.0130038108586,0.0205705417395,0.0297430417983},
+  {0.00720625779696,0.011650000993,0.0172864610215,0.0235603208711},
+  {0.00912856753222,0.0140599568342,0.0205578877811,0.027635417296}};
 
 // PI-
-// double rm[3][4] = 
-// { {0.885935982744,0.875522790678,0.885865846771,0.801608365614},
-//   {0.778946938187,0.736093541044,0.71029494015,0.591222317512},
-//   {0.733427597524,0.693235411861,0.638260246474,0.542999201533}};
-// double rmerr[3][4] = 
-// { {0.0705191510151,0.0524430996896,0.0849834597638,0.0958307524956},
-//   {0.0681263662457,0.0445115353199,0.0743614206518,0.0806936013706},
-//   {0.066787550373,0.0450438092897,0.0741953749576,0.0821750839267}};
+/*
+double binratios[ZDIM] = {0.359961,0.320395,0.0869321,0}; // PI- no cuts
+double rm[3][4] = 
+{ {0.885935982744,0.875522790678,0.885865846771,0.801608365614},
+  {0.778946938187,0.736093541044,0.71029494015,0.591222317512},
+  {0.733427597524,0.693235411861,0.638260246474,0.542999201533}};
+double rmerr[3][4] = 
+{ {0.0705191510151,0.0524430996896,0.0849834597638,0.0958307524956},
+  {0.0681263662457,0.0445115353199,0.0743614206518,0.0806936013706},
+  {0.066787550373,0.0450438092897,0.0741953749576,0.0821750839267}};
+double rmerrstat[3][4] =
+{ {0.00926217293666,0.0149677556729,0.0245997184635,0.0336987437848},
+  {0.00840692796654,0.0139179331634,0.0204641850967,0.0275495017666},
+  {0.010502759355,0.0165367281117,0.0247813693329,0.0336919619725}};
+*/
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model *m = new Model("default"); 
@@ -127,20 +124,30 @@ void ifit(myConfig *config) {
       // std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       for (int a=0; a<3; ++a) {
-        // zzz[a] = dPt2_values[a][iz]; // -fermi(xB,zbin[iz],a); // fermi is now returning zero
-        if (config->m_subtraction) {
-          zzz[a] = fc[a]->m_value_corrected[iz];
-          errorzzz[a] = fc[a]->m_err_corrected[iz];
+        if (config->m_stat_only) {
+          if (config->m_subtraction) {
+            zzz[a] = fc[a]->m_value_corrected[iz];
+            errorzzz[a] = fc[a]->m_stat_corrected[iz];
+          }
+          else {
+            zzz[a] = fc[a]->m_value[iz];
+            errorzzz[a] = fc[a]->m_err[iz];
+          }
+          zzz[a+3] = rm[a][iz];
+          errorzzz[a+3] = rmerrstat[a][iz];
         }
         else {
-          zzz[a] = fc[a]->m_value[iz];
-          errorzzz[a] = fc[a]->m_err[iz];
+          if (config->m_subtraction) {
+            zzz[a] = fc[a]->m_value_corrected[iz];
+            errorzzz[a] = fc[a]->m_err_corrected[iz];
+          }
+          else {
+            zzz[a] = fc[a]->m_value[iz];
+            errorzzz[a] = fc[a]->m_err[iz];
+          }
+          zzz[a+3] = rm[a][iz];
+          errorzzz[a+3] = rmerr[a][iz];
         }
-        // zzz[a+3] = RM_values[a][iz]; // this ones need interpolation
-        // errorzzz[a+3] = sqrt(pow(RM_errors[a][iz],2)+pow(SYSTEMATIC_RM*RM_values[a][iz],2));
-        zzz[a+3] = rm[a][iz];
-        errorzzz[a+3] = rmerr[a][iz];
-        // errorzzz[a+3] = sqrt(pow(rmerr[a][iz],2)+pow(SYSTEMATIC_RM*rm[a][iz],2));
       }
       TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
       gMinuit->SetFCN(fcn);      

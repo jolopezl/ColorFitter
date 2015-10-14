@@ -5,6 +5,7 @@
 
 class myConfig {
 public:
+  bool m_stat_only    = false;
   bool m_energyloss   = false; // true or false
   bool m_logbehavior  = false; // true or false
   bool m_fermimotion  = false; // true or false

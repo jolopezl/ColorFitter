@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
   double input_subtraction = std::stoi(argv[2]);
   double input_correlation = std::stod(argv[3]);
 
+  config->m_stat_only         = true;
   config->m_energyloss        = input_energyloss; // false;
   config->m_logbehavior       = false;
   config->m_fermimotion       = false;
