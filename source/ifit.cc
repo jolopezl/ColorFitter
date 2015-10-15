@@ -131,7 +131,7 @@ void ifit(myConfig *config) {
           }
           else {
             zzz[a] = fc[a]->m_value[iz];
-            errorzzz[a] = fc[a]->m_err[iz];
+            errorzzz[a] = fc[a]->m_stat[iz];
           }
           zzz[a+3] = rm[a][iz];
           errorzzz[a+3] = rmerrstat[a][iz];
