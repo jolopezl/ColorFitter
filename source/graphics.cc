@@ -78,8 +78,22 @@ void doDataPlots(myConfig* config, myData* he, myData* ne, myData* kr, myData* x
     leg[i]->SetFillStyle(0);
   }
 
-  std::vector<std::string> labels = {"HERMES Helium data", "HERMES Neon data", "HERMES Kripton data", "HERMES Xenon data"};
-  std::vector<std::string> labels2 = {"HERMES Helium substracted", "HERMES Neon with Helium substracted", "HERMES Kripton with Helium substracted", "HERMES Xenon with Helium substracted"};
+  std::vector<std::string> labels = 
+  {"HERMES Helium data",
+   "HERMES Neon data",
+   "HERMES Krypton data",
+   "HERMES Xenon data"};
+  std::vector<std::string> labels2 = 
+  {"HERMES Helium subtracted #rho=",
+   "HERMES Neon with Helium subtracted #rho=",
+   "HERMES Krypton with Helium subtracted #rho=",
+   "HERMES Xenon with Helium subtracted #rho="};
+  std::ostringstream out;
+  out << std::setprecision(3) << config->m_correlation;
+  std::string foolabel = out.str();
+  for (auto &label : labels2) {
+    label = label + foolabel;
+  }
   std::vector<std::string> files = {"data_he.pdf","data_ne.pdf","data_kr.pdf","data_xe.pdf"};
   std::vector<std::string> files2 = {"data_he_corr.pdf","data_ne_corr.pdf","data_kr_corr.pdf","data_xe_corr.pdf"};
 

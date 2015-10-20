@@ -13,6 +13,8 @@
 #include "TMultiGraph.h"
 #include "TH1.h"
 
+// #include "root.h"
+
 //
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -27,7 +29,7 @@ void callModel(double, double*);
 double chisq(double*);
 void fcn(int&, double*, double&, double*, int);
 // void ifit(bool,bool,bool,int,int,double,std::string);
-void ifit(myConfig*);
+std::vector<myResult*> ifit(myConfig*);
 void modelplot(TMinuit*, std::string, int, int, double, double, double,std::string);
 int test();
 

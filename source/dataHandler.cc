@@ -2,6 +2,26 @@
 
 #define DIM 4 // This should be defined somewhere else
 
+myResult::myResult() {
+  m_name = "default result";
+  // set dummy values
+  m_zbin = -1.0;
+  m_qhat = -1.0;
+  m_lp = -1.0;
+  m_sigma_ph = -1.0;
+  m_dz = -1.0;
+  m_qhat_err = -1.0;
+  m_lp_err = -1.0;
+  m_sigma_ph_err = -1.0;
+  m_dz_err = -1.0;
+  //
+  std::cout << "myResult:: Result created for " << m_name << std::endl;
+}
+
+myResult::~myResult() {
+  std::cout << "myResult:: Result destructed for " << m_name << std::endl;
+}
+
 myData::myData(std::string name) {
   m_name = name;
   m_value.clear();
@@ -22,11 +42,11 @@ myData::myData(std::string name) {
     m_syst_corrected.push_back(0.0);
     m_err_corrected.push_back(0.0);
   }
-  std::cout << "Data created for " << m_name << std::endl;
+  std::cout << "myData:: Data created for " << m_name << std::endl;
 }
 
 myData::~myData() {
- std::cout << "Data destructed for " << m_name << std::endl; 
+ std::cout << "myData:: Data destructed for " << m_name << std::endl; 
 }
 
 void myData::fill(int i, double val, double stat, double syst) {
@@ -169,6 +189,7 @@ std::vector<myData*> dataHandler(myConfig *config) {
   output.push_back(ne);
   output.push_back(kr);
   output.push_back(xe);
+  // output.push_back(he);
   std::cout << "dataHandler finished" << std::endl;
   return output;
 }

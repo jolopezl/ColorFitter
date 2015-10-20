@@ -23,6 +23,28 @@
 #include "graphics.h"
 #include "configuration.h"
 
+class myResult {
+  /*
+  Class storing the resulting parameters of the fit
+  This shoudl come out from ifit(), and be built from the minuit object
+  */
+private:
+  std::string m_name = "default result";
+public:
+  double m_zbin;
+  double m_qhat;
+  double m_lp;
+  double m_sigma_ph;
+  double m_dz;
+  double m_qhat_err;
+  double m_lp_err;
+  double m_sigma_ph_err;
+  double m_dz_err;
+  // constructor
+  myResult();
+  ~myResult();
+};
+
 class myData {
 private:
   std::string m_name;

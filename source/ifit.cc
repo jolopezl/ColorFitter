@@ -90,11 +90,16 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
   f = chisq(par);
 }
 
-// void ifit(bool ENERGYLOSS, bool LOGBEHAVIOR, bool FERMIMOTION, int Q2XBINTOFIT, int ZBINTOFIT, double correlation, std::string filename) {
-void ifit(myConfig *config) {
+std::vector<myResult*> ifit(myConfig *config) {
+
+  std::vector<myResult*> res;
+  myResult *temp_result = new myResult();
+  // then push back a temp myResult
+
   m->Initialization();
   m->DoEnergyLoss(config->m_energyloss);
   m->DoLogBehavior(config->m_logbehavior);
+  
   // m->DoFermiMotion(config->m_fermimotion);
   // This is for Jlab
   // xxx[0]=pow(12.0107,1./3.); // C
@@ -123,8 +128,18 @@ void ifit(myConfig *config) {
       // m->SetFermiValues(xB,zbin[iz]);
       // std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
+      TRandom3 r;
+      // generate a gaussian distributed number with mu=0, sigma=1 (default values)
+      double x1 = r.Gaus();
+      double x2 = r.Gaus(10,3);    // use mu = 10, sigma = 3;
       for (int a=0; a<3; ++a) {
-        if (config->m_stat_only) {
+        if (config->m_special_run) {
+          zzz[a] = r.Gaus(fc[a]->m_value[iz],fc[a]->m_stat[iz]);
+          errorzzz[a] = fc[a]->m_stat[iz];
+          zzz[a+3] = r.Gaus(rm[a][iz],rmerrstat[a][iz]);
+          errorzzz[a+3] = rmerrstat[a][iz];
+        }
+        else if (config->m_stat_only) {
           if (config->m_subtraction) {
             zzz[a] = fc[a]->m_value_corrected[iz];
             errorzzz[a] = fc[a]->m_stat_corrected[iz];
@@ -136,7 +151,7 @@ void ifit(myConfig *config) {
           zzz[a+3] = rm[a][iz];
           errorzzz[a+3] = rmerrstat[a][iz];
         }
-        else {
+        else { // normal run
           if (config->m_subtraction) {
             zzz[a] = fc[a]->m_value_corrected[iz];
             errorzzz[a] = fc[a]->m_err_corrected[iz];
@@ -193,7 +208,7 @@ void ifit(myConfig *config) {
   // End of loop over z-bins
   }
   std::cout << "iFit has finished" << std::endl;
-  //return 0;
+  return res;
 }
 
 double fermi(double m_xB, double m_zbinvalue, int inucleus) {
@@ -259,7 +274,7 @@ int test() {
 void modelplot(TMinuit *g,
                std::string bin_info,
                int iQ2x, int iz, double Q2,
-               double xB, double z, 
+               double xB, double z,  
                std::string filename){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
@@ -299,7 +314,6 @@ void modelplot(TMinuit *g,
   fout << z << "\t";
   fout <<par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
   fout <<par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t"<<chisquared<<"\n"; 
-  //fout<<C_deltaE<<" "<<Fe_deltaE<<" "<<Pb_deltaE<<" \n";
   fout.close();
   int nbins = 40;
   double pt_fit[40];
@@ -333,48 +347,34 @@ void modelplot(TMinuit *g,
   TGraphErrors *ptfit = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
   TGraphErrors *mult_ratio = new TGraphErrors(3,x2,z2,errorz2,errorz2);
   TGraphErrors *mrfit = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
-
-  TLegend *lpt = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
-  TLegend *lrm = new TLegend(0.1,0.1,0.5,0.25);//0.1,0.7,0.48,0.9
-  lpt->AddEntry(pt_broadening,"Data","lep");
-  lpt->AddEntry(ptfit,"Fit","l");
-  lrm->AddEntry(mult_ratio,"Data","lep");
-  lrm->AddEntry(mrfit,"Fit","l");
-
-  // pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
-  // pt_broadening->GetYaxis()->SetTitle("<#{Delta}P_{T}^{2}>");
-  // mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
-  // mult_ratio->GetYaxis()->SetTitle("R_{m}");
   c1->cd();
-  // TH1 *frame1 = c1->DrawFrame(2.,0.,6.2,0.065);
-  // frame1->SetTitle(out_pt.str().c_str());
-  // frame1->GetXaxis()->SetTitle("A^{1/3}");
-  // frame1->GetYaxis()->SetTitle("<#Delta P_{T}^{2}>");
-  // c1->Update();
   pt_broadening->SetTitle(out_pt.str().c_str());
   pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
-  pt_broadening->GetYaxis()->SetTitle("<#Delta P_{T}^{2}>");
+  pt_broadening->GetYaxis()->SetTitle("#Delta #LT p_{t}^{2} #GT");
   pt_broadening->GetYaxis()->SetTitleOffset(1.5);
   pt_broadening->SetMarkerColor(kRed);
   pt_broadening->SetMarkerStyle(21);
   pt_broadening->SetLineWidth(2);
+  const int fontAxesSize = 28;
+  const int fontAxesCode = 43;
+  pt_broadening->GetXaxis()->SetTitleFont(fontAxesCode);
+  pt_broadening->GetXaxis()->SetTitleSize(fontAxesSize);
+  pt_broadening->GetXaxis()->SetLabelFont(fontAxesCode);
+  pt_broadening->GetXaxis()->SetLabelSize(fontAxesSize);
+  pt_broadening->GetYaxis()->SetTitleFont(fontAxesCode);
+  pt_broadening->GetYaxis()->SetTitleSize(fontAxesSize);
+  pt_broadening->GetYaxis()->SetLabelFont(fontAxesCode);
+  pt_broadening->GetYaxis()->SetLabelSize(fontAxesSize);
   pt_broadening->Draw("APE");
   ptfit->SetLineColor(kRed);
   ptfit->SetMarkerStyle(21);
   ptfit->SetLineWidth(2);
   ptfit->Draw("L SAME");
-  lpt->Draw();
-  UTFSMLabel(0.125,0.85,"Internal, work in progress");
   c1->Write();
-  out_pt << ".pdf";
+  out_pt << ".C";
   c1->Print(out_pt.str().c_str());
   // Now do multiplicity ratio plot
   c2->cd();
-  // TH1 *frame2 = c2->DrawFrame(2.,0.,6.2,1.2);
-  // frame2->SetTitle(out_mr.str().c_str());
-  // frame2->GetXaxis()->SetTitle("A^{1/3}");
-  // frame2->GetYaxis()->SetTitle("R_{m}");
-  // c2->Update();
   mult_ratio->SetTitle(out_mr.str().c_str());
   mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
   mult_ratio->GetYaxis()->SetTitle("R_{m}");
@@ -382,14 +382,20 @@ void modelplot(TMinuit *g,
   mult_ratio->SetMarkerColor(kBlue);
   mult_ratio->SetMarkerStyle(21);
   mult_ratio->SetLineWidth(2);
+  mult_ratio->GetXaxis()->SetTitleFont(fontAxesCode);
+  mult_ratio->GetXaxis()->SetTitleSize(fontAxesSize);
+  mult_ratio->GetXaxis()->SetLabelFont(fontAxesCode);
+  mult_ratio->GetXaxis()->SetLabelSize(fontAxesSize);
+  mult_ratio->GetYaxis()->SetTitleFont(fontAxesCode);
+  mult_ratio->GetYaxis()->SetTitleSize(fontAxesSize);
+  mult_ratio->GetYaxis()->SetLabelFont(fontAxesCode);
+  mult_ratio->GetYaxis()->SetLabelSize(fontAxesSize);
   mult_ratio->Draw("APE");
   mrfit->SetLineColor(kBlue);
   mrfit->SetMarkerStyle(21);
   mrfit->SetLineWidth(2);
   mrfit->Draw("L SAME");
-  UTFSMLabel(0.125,0.85,"Internal, work in progress");
-  lrm->Draw();
   c2->Write();
-  out_mr << ".pdf";
+  out_mr << ".C";
   c2->Print(out_mr.str().c_str());
 }

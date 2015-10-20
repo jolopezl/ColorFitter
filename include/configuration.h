@@ -5,6 +5,7 @@
 
 class myConfig {
 public:
+  bool m_special_run  = false;
   bool m_stat_only    = false;
   bool m_energyloss   = false; // true or false
   bool m_logbehavior  = false; // true or false
@@ -21,6 +22,7 @@ public:
   std::string m_comment = "bin_info comment";
   myConfig();
   ~myConfig();
+  // void Update();
 };
 
 #endif
