@@ -57,6 +57,7 @@ public:
   void Compute(double);
   double Get1();
   double Get2();
+  double GetC(int);
   std::vector<double> GetResult();
   double Fermi(int inucleus);
 };

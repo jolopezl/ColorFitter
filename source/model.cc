@@ -25,6 +25,10 @@ double Model::Get2(){
   return m_Rm; 
 }
 
+double Model::GetC(int A) {
+  return m_c_interpolation[A];
+}
+
 void Model::SetParameters(std::vector<double> parms) {
   m_qhat = parms.at(0);
   m_lp = parms.at(1);
@@ -223,7 +227,8 @@ void Model::Compute(double A){
       zrange1=1.; // dummy value
     }
     if(zrange1>0){
-      accumulator1+=zrange1*temp*weight; 
+      // accumulator1+=zrange1*temp*weight;
+      accumulator1+=temp*weight;
       // accumulator1+=m_qhat*zrange1*temp*weight; 
     }
     else{

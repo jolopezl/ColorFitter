@@ -112,6 +112,10 @@ std::vector<myResult*> ifit(myConfig *config) {
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
+  for (int i=0; i<3; ++i) {
+    double A = pow(xxx[i],3.0);
+    std::cout << "Value of c " << m->GetC((int) A) << " for A " << (int) A << std::endl;
+  }
   // dataHandler called here:
   auto fc = dataHandler(config);
   // Here the rest of the code
