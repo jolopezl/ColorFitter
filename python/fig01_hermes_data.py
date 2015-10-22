@@ -49,7 +49,7 @@ g_pt_ne.SetLineWidth(2)
 g_pt_kr.SetLineWidth(2)
 g_pt_xe.SetLineWidth(2)
 
-g_pt_xe.GetYaxis().SetTitle("#Delta #LT p_{t}^{2} #GT")#_{A}^{#pi^{+}}")
+g_pt_xe.GetYaxis().SetTitle("#Delta #LT p_{t}^{2} #GT [GeV^{2}]")#_{A}^{#pi^{+}}")
 g_pt_xe.GetYaxis().SetRangeUser(-0.035,0.045)
 g_pt_xe.GetXaxis().SetLimits(0.1,1.0)
 

@@ -3,6 +3,11 @@ from numpy import loadtxt
 from array import array
 import sys, os, ROOT
 
+# Scale to alpha_a*N_c/8*pi = 0.02844
+# factor = 0.02844
+factor=1
+
+
 basepath = "data/fitPIplus/"
 
 folders3P = ["test3P/","test3P-0.0/","test3P-0.5/","test3P-1.0/"]
@@ -37,9 +42,9 @@ def retrieveTGraphErrors(i,par,nop):
     ichi2 =  11
   xtemp,ytemp,yerrtemp,chi2temp = loadtxt(filepath,unpack=True,skiprows=1,usecols=[ix,iy,iyerr,ichi2])
   xval = array("f",[xtemp[0],xtemp[1],xtemp[2],xtemp[3]])
-  yval = array("f",[ytemp[0],ytemp[1],ytemp[2],ytemp[3]])
+  yval = array("f",[ytemp[0]*factor,ytemp[1]*factor,ytemp[2]*factor,ytemp[3]*factor])
   xerr = array("f",[0,0,0,0])
-  yerr = array("f",[yerrtemp[0],yerrtemp[1],yerrtemp[2],yerrtemp[3]])
+  yerr = array("f",[yerrtemp[0]*factor,yerrtemp[1]*factor,yerrtemp[2]*factor,yerrtemp[3]*factor])
   gg = ROOT.TGraphErrors(4,xval,yval,xerr,yerr)
   return gg
 
@@ -57,16 +62,18 @@ ROOT.gStyle.SetEndErrorSize(7.5)
 # Configuration
 xlabel = "z"
 # Q-HAT configuration
-ylabel_up = "#hat{q} [GeV/fm^{2}]_{3P} /q_{0}"
-ylabel_down = "#hat{q} [GeV/fm^{2}]_{4P} /q_{0}"
+ylabel_up = "#hat{q} [GeV^{2}/fm]_{3P}"
+ylabel_down = "#hat{q} [GeV^{2}/fm]_{4P}"
 parameter = "qhat"
 fileout = "fig04a.pdf"
 x0 = 0.15
 y0 = 0.25
 x1 = 0.5
 y1 = 0.5
-ylo = -1.15
-yhi = 1.15
+ylo = -1.15*factor
+yhi = 1.15*factor
+# ylo = -0.029
+# yhi = 0.029
 
 # L_P configuration
 # ylabel_up = "l_{p} [fm]_{3P}"
@@ -108,71 +115,77 @@ legends = ["Uncorrected","He subtracted #rho =  0.0","He subtracted #rho = -0.5"
 ############# code
 c = ROOT.TCanvas("canvas","canvas",800,800)
 color = [1,2,4,8]
-qhat3P = []
-qhat4P = []
+plt3P = []
+plt4P = []
 for i in range(4):
-  qhat3P.append(retrieveTGraphErrors(i,parameter,"3P"))
-  qhat3P[i].SetMarkerStyle(20+i)
-  qhat3P[i].SetMarkerSize(1.5)
-  qhat3P[i].SetMarkerColor(color[i]) 
-  qhat3P[i].SetLineColor(color[i])
-  qhat3P[i].SetLineWidth(2)
-  qhat3P[i].GetXaxis().SetTitle(xlabel)
-  qhat3P[i].GetYaxis().SetTitle(ylabel_up)
-  qhat3P[i].GetYaxis().SetTitleOffset(1.5)
-  qhat4P.append(retrieveTGraphErrors(i,parameter,"4P"))
-  qhat4P[i].SetMarkerStyle(20+i)
-  qhat4P[i].SetMarkerSize(1.5)
-  qhat4P[i].SetMarkerColor(color[i]) 
-  qhat4P[i].SetLineColor(color[i])
-  qhat4P[i].SetLineWidth(2)
-  qhat4P[i].GetXaxis().SetTitle(xlabel)
-  qhat4P[i].GetYaxis().SetTitle(ylabel_down)
-  qhat4P[i].GetYaxis().SetTitleOffset(1.5)
+  plt3P.append(retrieveTGraphErrors(i,parameter,"3P"))
+  plt3P[i].SetMarkerStyle(20+i)
+  plt3P[i].SetMarkerSize(1.5)
+  plt3P[i].SetMarkerColor(color[i]) 
+  plt3P[i].SetLineColor(color[i])
+  plt3P[i].SetLineWidth(2)
+  plt3P[i].GetXaxis().SetTitle(xlabel)
+  plt3P[i].GetYaxis().SetTitle(ylabel_up)
+  plt3P[i].GetYaxis().SetTitleOffset(1.5)
+  plt4P.append(retrieveTGraphErrors(i,parameter,"4P"))
+  plt4P[i].SetMarkerStyle(20+i)
+  plt4P[i].SetMarkerSize(1.5)
+  plt4P[i].SetMarkerColor(color[i]) 
+  plt4P[i].SetLineColor(color[i])
+  plt4P[i].SetLineWidth(2)
+  plt4P[i].GetXaxis().SetTitle(xlabel)
+  plt4P[i].GetYaxis().SetTitle(ylabel_down)
+  plt4P[i].GetYaxis().SetTitleOffset(1.5)
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetTextFont(43)
 leg.SetTextSize(28)
 leg.SetBorderSize(0)
 for i in range(4):
-  leg.AddEntry(qhat3P[i],legends[i],"ep")
+  leg.AddEntry(plt3P[i],legends[i],"ep")
 fontAxesSize = 28
 fontAxesCode = 43
-qhat3P[0].GetXaxis().SetTitleFont(fontAxesCode)
-qhat3P[0].GetXaxis().SetTitleSize(fontAxesSize)
-qhat3P[0].GetXaxis().SetLabelFont(fontAxesCode)
-qhat3P[0].GetXaxis().SetLabelSize(fontAxesSize)
-qhat3P[0].GetYaxis().SetTitleFont(fontAxesCode)
-qhat3P[0].GetYaxis().SetTitleSize(fontAxesSize)
-qhat3P[0].GetYaxis().SetLabelFont(fontAxesCode)
-qhat3P[0].GetYaxis().SetLabelSize(fontAxesSize)
-qhat4P[0].GetXaxis().SetTitleFont(fontAxesCode)
-qhat4P[0].GetXaxis().SetTitleSize(fontAxesSize)
-qhat4P[0].GetXaxis().SetLabelFont(fontAxesCode)
-qhat4P[0].GetXaxis().SetLabelSize(fontAxesSize)
-qhat4P[0].GetYaxis().SetTitleFont(fontAxesCode)
-qhat4P[0].GetYaxis().SetTitleSize(fontAxesSize)
-qhat4P[0].GetYaxis().SetLabelFont(fontAxesCode)
-qhat4P[0].GetYaxis().SetLabelSize(fontAxesSize)
+plt3P[0].GetXaxis().SetTitleFont(fontAxesCode)
+plt3P[0].GetXaxis().SetTitleSize(fontAxesSize)
+plt3P[0].GetXaxis().SetLabelFont(fontAxesCode)
+plt3P[0].GetXaxis().SetLabelSize(fontAxesSize)
+plt3P[0].GetYaxis().SetTitleFont(fontAxesCode)
+plt3P[0].GetYaxis().SetTitleSize(fontAxesSize)
+plt3P[0].GetYaxis().SetLabelFont(fontAxesCode)
+plt3P[0].GetYaxis().SetLabelSize(fontAxesSize)
+plt4P[0].GetXaxis().SetTitleFont(fontAxesCode)
+plt4P[0].GetXaxis().SetTitleSize(fontAxesSize)
+plt4P[0].GetXaxis().SetLabelFont(fontAxesCode)
+plt4P[0].GetXaxis().SetLabelSize(fontAxesSize)
+plt4P[0].GetYaxis().SetTitleFont(fontAxesCode)
+plt4P[0].GetYaxis().SetTitleSize(fontAxesSize)
+plt4P[0].GetYaxis().SetLabelFont(fontAxesCode)
+plt4P[0].GetYaxis().SetLabelSize(fontAxesSize)
 # axes range
-qhat3P[0].GetYaxis().SetRangeUser(ylo,yhi)
-qhat4P[0].GetYaxis().SetRangeUser(ylo,yhi)
-qhat4P[0].GetXaxis().SetTitleOffset(1.5)
+plt3P[0].GetYaxis().SetRangeUser(ylo,yhi)
+plt4P[0].GetYaxis().SetRangeUser(ylo,yhi)
+plt3P[0].GetYaxis().SetTitleOffset(1.75)
+plt4P[0].GetYaxis().SetTitleOffset(1.75)
+plt4P[0].GetXaxis().SetTitleOffset(1.5)
 #
 c.Divide(1,2,0,0)
 c.cd(1)
 ROOT.gPad.SetBottomMargin(0.001)
 ROOT.gPad.SetTopMargin(0.01)
 ROOT.gPad.SetRightMargin(0.01)
-qhat3P[0].Draw("AP")
-qhat3P[1].Draw("P SAME")
-qhat3P[2].Draw("P SAME")
-qhat3P[3].Draw("P SAME")
+plt3P[0].Draw("AP")
+plt3P[1].Draw("P SAME")
+plt3P[2].Draw("P SAME")
+plt3P[3].Draw("P SAME")
+for i in range(4):
+  plt3P[i].Fit("pol0","N0")
 c.cd(2)
 ROOT.gPad.SetTopMargin(0.001)
 ROOT.gPad.SetRightMargin(0.01)
-qhat4P[0].Draw("AP")
-qhat4P[1].Draw("P SAME")
-qhat4P[2].Draw("P SAME")
-qhat4P[3].Draw("P SAME")
+plt4P[0].Draw("AP")
+plt4P[1].Draw("P SAME")
+plt4P[2].Draw("P SAME")
+plt4P[3].Draw("P SAME")
+for i in range(4):
+  plt4P[i].Fit("pol0","N0")
 leg.Draw()
 c.Print(fileout)
