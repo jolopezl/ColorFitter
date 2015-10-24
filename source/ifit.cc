@@ -14,6 +14,7 @@ double func_array[2] = {0,0};
 double zzz[6];
 double errorzzz[6];
 double xxx[6];
+double pT2[3];
 
 /* values from python/interpolate.py */
 // PI+
@@ -66,12 +67,15 @@ double chisq(double *par){
   double chisq = 0.0;
   double delta = 0.0;
   callModel(xxx[0],par);
+  pT2[0] = func_array[0];
   delta = (zzz[0]-func_array[0])/errorzzz[0];
   chisq += delta*delta;
   callModel(xxx[1],par);
+  pT2[1] = func_array[0];
   delta = (zzz[1]-func_array[0])/errorzzz[1];
   chisq += delta*delta;
   callModel(xxx[2],par);
+  pT2[2] = func_array[0];
   delta = (zzz[2]-func_array[0])/errorzzz[2];
   chisq += delta*delta;
   callModel(xxx[3],par);
@@ -274,6 +278,22 @@ int test() {
   return 0;
 }
 
+// function to compite the model given a set of parameters and print the output to the screen
+void justCompute(myConfig* config) {
+  Model* model = new Model("toy");
+  m->Initialization();
+  m->DoEnergyLoss(config->m_energyloss);
+  m->DoLogBehavior(config->m_logbehavior);
+  double A_Ne = 1.1*pow(20.1797,1./3.); // Ne
+  double A_Kr = 1.1*pow(83.7980,1./3.); // Kr
+  double A_Xe = 1.1*pow(131.293,1./3.); // Xe
+  double foo = 0.0;
+  foo = pow(A_Ne,3.0);
+  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0};
+  m->SetParameters(parms);
+  m->Compute(foo);
+}
+
 // this will be moved away someday to graphics.cc
 void modelplot(TMinuit *g,
                std::string bin_info,
@@ -316,8 +336,9 @@ void modelplot(TMinuit *g,
     fout << Q2 << "\t" << xB << "\t";
   }
   fout << z << "\t";
-  fout <<par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
-  fout <<par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t"<<chisquared<<"\n"; 
+  fout << par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
+  fout << par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t";
+  fout << chisquared << "\t" << pT2[0] << pT2[1] << pT2[2] << "\n"; 
   fout.close();
   int nbins = 40;
   double pt_fit[40];
