@@ -186,7 +186,7 @@ std::vector<myResult*> ifit(myConfig *config) {
       double step[]   = {0.01,0.01, 1.,0.5,0.00001};
       double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration
       //double lim_lo[] = {0.,0.1,-60.,0.1,0.0}; // negative limit on cross section models inelastic bin migration                   
-      double lim_hi[] = {1.,25.,200.,1000.0,10.};
+      double lim_hi[] = {10.,50.,500.,1000.0,10.};
       gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
       gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
       gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
