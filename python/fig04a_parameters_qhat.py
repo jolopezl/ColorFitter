@@ -19,7 +19,7 @@ def retrieveTGraphErrors(i,par,nop):
     filepath = basepath+folders3P[i]+filaname
   elif (nop=="4P"):
     filepath = basepath+folders4P[i]+filaname
-  ztemp,qhat,lp,sigma,dlog,dz,err_qhat,err_lp,err_sigma,err_dlog,err_dz,chi2 = loadtxt(filepath,unpack=True,skiprows=1)
+  # ztemp,qhat,lp,sigma,dlog,dz,err_qhat,err_lp,err_sigma,err_dlog,err_dz,chi2 = loadtxt(filepath,unpack=True,skiprows=1)
   if (par == "qhat"):
     ix = 0
     iy = 1
@@ -62,16 +62,18 @@ ROOT.gStyle.SetEndErrorSize(7.5)
 # Configuration
 xlabel = "z"
 # Q-HAT configuration
-ylabel_up = "#hat{q} [GeV^{2}/fm]_{3P}"
-ylabel_down = "#hat{q} [GeV^{2}/fm]_{4P}"
+# ylabel_up = "#hat{q}_{0} [GeV^{2}/fm^{2}]_{3P}"
+# ylabel_down = "#hat{q}_{0} [GeV^{2}/fm^{2}]_{4P}"
+ylabel_up = "#hat{q}_{0} [GeV^{2}fm]_{3P}"
+ylabel_down = "#hat{q}_{0} [GeV^{2}fm]_{4P}"
 parameter = "qhat"
 fileout = "fig04a.pdf"
 x0 = 0.15
 y0 = 0.25
 x1 = 0.5
 y1 = 0.5
-ylo = -1.15*factor
-yhi = 1.15*factor
+ylo = -9.15*factor
+yhi = 9.15*factor
 # ylo = -0.029
 # yhi = 0.029
 

@@ -14,7 +14,7 @@ def retrieveTGraphErrors(i,par,nop):
     filepath = basepath+folders3P[i]+filaname
   elif (nop=="4P"):
     filepath = basepath+folders4P[i]+filaname
-  ztemp,qhat,lp,sigma,dlog,dz,err_qhat,err_lp,err_sigma,err_dlog,err_dz,chi2 = loadtxt(filepath,unpack=True,skiprows=1)
+  # ztemp,qhat,lp,sigma,dlog,dz,err_qhat,err_lp,err_sigma,err_dlog,err_dz,chi2 = loadtxt(filepath,unpack=True,skiprows=1)
   if (par == "qhat"):
     ix = 0
     iy = 1

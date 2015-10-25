@@ -14,7 +14,7 @@ def retrieveTGraphErrors(i,par,nop):
     filepath = basepath+folders3P[i]+filaname
   elif (nop=="4P"):
     filepath = basepath+folders4P[i]+filaname
-  ztemp,qhat,lp,sigma,dlog,dz,err_qhat,err_lp,err_sigma,err_dlog,err_dz,chi2 = loadtxt(filepath,unpack=True,skiprows=1)
+  # ztemp,qhat,lp,sigma,dlog,dz,err_qhat,err_lp,err_sigma,err_dlog,err_dz,chi2 = loadtxt(filepath,unpack=True,skiprows=1)
   if (par == "qhat"):
     ix = 0
     iy = 1
@@ -56,30 +56,6 @@ ROOT.gStyle.SetEndErrorSize(7.5)
 
 # Configuration
 xlabel = "z"
-# Q-HAT configuration
-# ylabel_up = "#hat{q} [GeV/fm^{2}]_{3P} /q_{0}"
-# ylabel_down = "#hat{q} [GeV/fm^{2}]_{4P} /q_{0}"
-# parameter = "qhat"
-# fileout = "fig04a.pdf"
-# x0 = 0.15
-# y0 = 0.25
-# x1 = 0.5
-# y1 = 0.5
-# ylo = -1.15
-# yhi = 1.15
-
-# L_P configuration
-# ylabel_up = "l_{p} [fm]_{3P}"
-# ylabel_down = "l_{p} [fm]_{4P}"
-# parameter = "lp"
-# fileout = "fig04b.pdf" #sys.argv[3]
-# x0 = 0.5
-# y0 = 0.6
-# x1 = 0.9
-# y1 = 0.85
-# ylo = -10
-# yhi = 32.5
-
 # Cross section
 ylabel_up = "#sigma_{pre-hadron} [mbarn]_{3P}"
 ylabel_down = "#sigma_{pre-hadron} [mbarn]_{4P}"
@@ -89,21 +65,8 @@ x0 = 0.5
 y0 = 0.6
 x1 = 0.9
 y1 = 0.85
-ylo = -140
-yhi = 490
-
-# dz energy loss
-# ylabel_up = "#Delta z_{3P}"
-# ylabel_down = "#Delta z_{4P}"
-# parameter = "dz"
-# fileout = "fig04d.pdf" #sys.argv[3]
-# x0 = 0.5
-# y0 = 0.6+0.1
-# x1 = 0.9
-# y1 = 0.85+0.1
-# ylo = -0.125
-# yhi = 0.175
-
+ylo = -250
+yhi = 900
 
 legends = ["Uncorrected","He subtracted #rho =  0.0","He subtracted #rho = -0.5","He subtracted #rho = -1.0"]
 ############# code
