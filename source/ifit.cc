@@ -15,6 +15,7 @@ double zzz[6];
 double errorzzz[6];
 double xxx[6];
 double pT2[3];
+double Rm[3];
 
 /* values from python/interpolate.py */
 // PI+
@@ -68,24 +69,24 @@ double chisq(double *par){
   double delta = 0.0;
   callModel(xxx[0],par);
   pT2[0] = func_array[0];
-  delta = (zzz[0]-func_array[0])/errorzzz[0];
-  chisq += delta*delta;
+  Rm[0] = func_array[1];
   callModel(xxx[1],par);
   pT2[1] = func_array[0];
-  delta = (zzz[1]-func_array[0])/errorzzz[1];
-  chisq += delta*delta;
+  Rm[1] = func_array[1];
   callModel(xxx[2],par);
   pT2[2] = func_array[0];
-  delta = (zzz[2]-func_array[0])/errorzzz[2];
+  Rm[2] = func_array[1];
+  delta = (zzz[0]-pT2[0])/errorzzz[0];
   chisq += delta*delta;
-  callModel(xxx[3],par);
-  delta = (zzz[3]-func_array[1])/errorzzz[3];
+  delta = (zzz[1]-pT2[1])/errorzzz[1];
   chisq += delta*delta;
-  callModel(xxx[4],par);
-  delta = (zzz[4]-func_array[1])/errorzzz[4];
+  delta = (zzz[2]-pT2[2])/errorzzz[2];
   chisq += delta*delta;
-  callModel(xxx[5],par);
-  delta = (zzz[5]-func_array[1])/errorzzz[5];
+  delta = (zzz[3]-Rm[0])/errorzzz[3];
+  chisq += delta*delta;
+  delta = (zzz[4]-Rm[1])/errorzzz[4];
+  chisq += delta*delta;
+  delta = (zzz[5]-Rm[2])/errorzzz[5];
   chisq += delta*delta;
   return chisq;
 }
@@ -99,11 +100,9 @@ std::vector<myResult*> ifit(myConfig *config) {
   std::vector<myResult*> res;
   myResult *temp_result = new myResult();
   // then push back a temp myResult
-
   m->Initialization();
   m->DoEnergyLoss(config->m_energyloss);
   m->DoLogBehavior(config->m_logbehavior);
-  
   // m->DoFermiMotion(config->m_fermimotion);
   // This is for Jlab
   // xxx[0]=pow(12.0107,1./3.); // C
@@ -138,8 +137,8 @@ std::vector<myResult*> ifit(myConfig *config) {
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       TRandom3 r;
       // generate a gaussian distributed number with mu=0, sigma=1 (default values)
-      double x1 = r.Gaus();
-      double x2 = r.Gaus(10,3);    // use mu = 10, sigma = 3;
+      // double x1 = r.Gaus();
+      // double x2 = r.Gaus(10,3);    // use mu = 10, sigma = 3;
       for (int a=0; a<3; ++a) {
         if (config->m_special_run) {
           zzz[a] = r.Gaus(fc[a]->m_value[iz],fc[a]->m_stat[iz]);
@@ -336,9 +335,15 @@ void modelplot(TMinuit *g,
     fout << Q2 << "\t" << xB << "\t";
   }
   fout << z << "\t";
-  fout << par[0]<<"\t"<<par[1]<<"\t"<<par[2]<<"\t"<<par[3]<<"\t"<<par[4]<<"\t";
-  fout << par_errors[0]<<"\t"<<par_errors[1]<<"\t"<<par_errors[2]<<"\t"<<par_errors[3]<<"\t"<<par_errors[4]<<"\t";
-  fout << chisquared << "\t" << pT2[0] << pT2[1] << pT2[2] << "\n"; 
+  for (int i=0; i<5; ++i){
+    fout << par[i] << "\t";
+  }
+  for (int i=0; i<5; ++i){
+    fout << par_errors[i] << "\t";
+  }
+  fout << chisquared << "\t";
+  fout << pT2[0] << "\t" << pT2[1] << "\t" << pT2[2] << "\t";
+  fout << Rm[0] << "\t" << Rm[1] << "\t" << Rm[2] << "\n"; 
   fout.close();
   int nbins = 40;
   double pt_fit[40];
