@@ -1,5 +1,7 @@
 #include "ifit.h"
 
+#include <time.h>
+
 // const double SYSTEMATIC_DPT2 = 0.04;
 
 
@@ -96,10 +98,8 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
 }
 
 std::vector<myResult*> ifit(myConfig *config) {
-
-  std::vector<myResult*> res;
-  myResult *temp_result = new myResult();
-  // then push back a temp myResult
+  std::vector<myResult*> vResult;
+  myResult *result = new myResult();
   m->Initialization();
   m->DoEnergyLoss(config->m_energyloss);
   m->DoLogBehavior(config->m_logbehavior);
@@ -115,6 +115,8 @@ std::vector<myResult*> ifit(myConfig *config) {
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];
+  double input_value=0;
+  double input_error=0;
   for (int i=0; i<3; ++i) {
     double A = pow(xxx[i],3.0);
     std::cout << "Value of c " << m->GetC((int) A) << " for A " << (int) A << std::endl;
@@ -136,13 +138,21 @@ std::vector<myResult*> ifit(myConfig *config) {
       // std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
       // std::cout << "Progress is " << 100*(iQ2+1)*(iz+1)/((double)(Q2DIM*ZDIM)) << "%" << std::endl;
       TRandom3 r;
-      // generate a gaussian distributed number with mu=0, sigma=1 (default values)
-      // double x1 = r.Gaus();
-      // double x2 = r.Gaus(10,3);    // use mu = 10, sigma = 3;
+      r.SetSeed(std::time(0));
       for (int a=0; a<3; ++a) {
         if (config->m_special_run) {
-          zzz[a] = r.Gaus(fc[a]->m_value[iz],fc[a]->m_stat[iz]);
-          errorzzz[a] = fc[a]->m_stat[iz];
+          if (config->m_subtraction) {
+            input_value = fc[a]->m_value_corrected[iz];
+            // input_error = fc[a]->m_stat_corrected[iz];
+            input_error = fc[a]->m_err_corrected[iz];
+          }
+          else {
+            input_value = fc[a]->m_value[iz];
+            // input_error = fc[a]->m_stat[iz];
+            input_error = fc[a]->m_err[iz];
+          }
+          zzz[a] = r.Gaus(input_value,input_error);
+          errorzzz[a] = input_error;
           zzz[a+3] = r.Gaus(rm[a][iz],rmerrstat[a][iz]);
           errorzzz[a+3] = rmerrstat[a][iz];
         }
@@ -208,14 +218,15 @@ std::vector<myResult*> ifit(myConfig *config) {
       std::string bin_info = config->m_comment; // dummy value for HERMES
       double xB = -1; // dummy value for HERMES
       double Q2 = -1; // dummy value for HERMES
-      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit);
+      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit,result);
+      vResult.push_back(result);
       fout->Write();
       delete(gMinuit);
     }
   // End of loop over z-bins
   }
   std::cout << "iFit has finished" << std::endl;
-  return res;
+  return vResult;
 }
 
 double fermi(double m_xB, double m_zbinvalue, int inucleus) {
@@ -298,7 +309,8 @@ void modelplot(TMinuit *g,
                std::string bin_info,
                int iQ2x, int iz, double Q2,
                double xB, double z,  
-               std::string filename){
+               std::string filename,
+               myResult *result){
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -325,6 +337,19 @@ void modelplot(TMinuit *g,
     par_errors[parNo]=err;
   }
   double chisquared = chisq(par);
+  // add values to result obj
+  result->m_zbin = z;
+  result->m_qhat = par[0];
+  result->m_lp = par[1];
+  result->m_sigma_ph = par[2];
+  result->m_dz = par[3];
+  // par[4] log parm
+  result->m_qhat_err = par_errors[0];
+  result->m_lp_err = par_errors[1];
+  result->m_sigma_ph_err = par_errors[2];
+  result->m_dz_err = par_errors[3];
+  // par_errors[4] log parm err
+  result->m_chi2 = chisquared;
   // At this point, we know the parameters, so let's write them out
   std::ofstream fout;
   fout.open(filename, std::ios::out | std::ios::app);

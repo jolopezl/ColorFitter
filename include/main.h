@@ -6,4 +6,7 @@
 #include "dataHandler.h"
 #include "configuration.h"
 
+#include "TFile.h"
+#include "TTree.h"
+
 #endif

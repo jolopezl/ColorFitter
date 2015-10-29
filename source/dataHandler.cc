@@ -5,16 +5,17 @@
 myResult::myResult() {
   m_name = "default result";
   // set dummy values
-  m_zbin = -1.0;
-  m_qhat = -1.0;
-  m_lp = -1.0;
-  m_sigma_ph = -1.0;
-  m_dz = -1.0;
-  m_qhat_err = -1.0;
-  m_lp_err = -1.0;
-  m_sigma_ph_err = -1.0;
-  m_dz_err = -1.0;
-  //
+  float dummy = -100.0;
+  m_zbin = dummy;
+  m_qhat = dummy;
+  m_lp = dummy;
+  m_sigma_ph = dummy;
+  m_dz = dummy;
+  m_qhat_err = dummy;
+  m_lp_err = dummy;
+  m_sigma_ph_err = dummy;
+  m_dz_err = dummy;
+  m_chi2 = dummy;
   std::cout << "myResult:: Result created for " << m_name << std::endl;
 }
 
