@@ -39,8 +39,8 @@ private:
   int m_maxmcSteps = 100000; // number of mc steps in the calculation
   double m_density_threshold = 0.005;
   // private methods
-  double Density(double, double, double, double);
-  double FindR(double, double);
+  double Density(const double, const double, const double, const double);
+  double FindR(const double, const double);
 public:
   // public members
   Model(std::string);
@@ -54,7 +54,7 @@ public:
   void DoLogBehavior(bool);
   void DoFermiMotion(bool);
   void Initialization();
-  void Compute(double);
+  void Compute(const double);
   double Get1();
   double Get2();
   double GetC(int);

@@ -91,27 +91,27 @@ void Model::Initialization() {
     6.8353, 6.84539, 6.85547, 6.86554, 6.8756, 6.88566, 6.89571, 6.90576, 6.9158, 6.92584, 6.93588, 6.94591, 6.95594, 6.96597, 6.976};
 }
 
-double Model::FindR(double A, double density_threshold){
-  // for (double r=0.; r<100000.; r=r+0.001){
-  //   if (Density(A,0.,0.,r)<density_threshold) return r;
-  // }
-  // std::cerr << "Error:never found R" << std::endl;
-  // std::cout << "Error:never found R" << std::endl;
-  // return 0;
-  // I want to avoid the never found R problem.
+double Model::FindR(double A, const double density_threshold){
   double r = 0.0;
   double eps = 1.0e-3;
   while (Density(A,0.,0.,r)>=density_threshold) {
+    // std::cout << "Computing for A = " << A
+    //           << "\t rho(r) = " << Density(A,0.,0.,r) 
+    //           << "\t threshold = " << density_threshold << std::endl;
     r = r+eps;
-    if ((int)r==100000 || (int)r==1000000) {
-      std::cerr << "Error:never found R - Still trying - r=" << r << std::endl;
-      std::cout << "Error:never found R - Still trying - r=" << r << std::endl;
+    if (r > 10) {
+      eps = eps*10;
+      std::cerr << "Error:never found R - Still trying - r = " << r
+                << "\t density = " << Density(A,0.,0.,r)
+                << "\t threshold = " << density_threshold
+                << "\t computing for A = " << A
+                << std::endl;
     }
   }
   return r;
 }
 
-double Model::Density(double A, double xx, double yy, double zz){
+double Model::Density(const double A, const double xx, const double yy, const double zz){
   // Ref. Henk Blok article, Phys Rev. C73, 038201 (2006)
   double rho0 = m_rho0;
   double a = m_a;
@@ -156,7 +156,7 @@ double Model::Fermi(int inucleus){
   return result; 
 }
 
-void Model::Compute(double A){
+void Model::Compute(const double A){
   // Computation of both quantities dPt2 and Rm
   // We are doing an MC average
   TF1 *dtd1 = new TF1("dtd1", "[0]*0.170/(1+exp((sqrt([1]*[1]+[2]*[2]+x*x)-[3])/0.5))", 0.,40.); // pT broadening divided by constant.
@@ -167,6 +167,7 @@ void Model::Compute(double A){
   TRandom3 *gRandom = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
   gRandom->SetSeed(2053);
   double R=FindR(A,m_density_threshold); // this has to be done somewhere else since it takes time
+  // std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << std::endl;
   double max_density=Density(A,0.,0.,0.);
   double x,y,z;
   double L;

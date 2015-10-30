@@ -13,11 +13,11 @@ double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
 // double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05}; // Approx.
 // double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
 double func_array[2] = {0,0};
-double zzz[6];
-double errorzzz[6];
-double xxx[6];
-double pT2[3];
-double Rm[3];
+double zzz[6] = {0,0,0,0,0,0};
+double errorzzz[6] = {0,0,0,0,0,0};
+double xxx[6] = {0,0,0,0,0,0};
+double pT2[3] = {0,0,0};
+double Rm[3] = {0,0,0};
 
 /* values from python/interpolate.py */
 // PI+
@@ -55,7 +55,7 @@ double rmerrstat[3][4] =
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model *m = new Model("default"); 
 
-void callModel(double A,double *par){
+void callModel(const double A,double *par){
   // qhat, lp, pre-hadron cross-section, log behaviour, energy loss
   std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4]};
   double nucleus = (double) A*A*A;
@@ -377,7 +377,7 @@ void modelplot(TMinuit *g,
   double mr_fit[40];
   double mr_fiterr[40];
   double mr_x[40];
-  for (int i=0;i<nbins; ++i) {
+  for (int i=11;i<nbins; ++i) {
     callModel(i/6.,par);
     pt_fit[i]=func_array[0];
     pt_fiterr[i]=0.;

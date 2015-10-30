@@ -39,16 +39,16 @@ int main(int argc, char *argv[]) {
   myResult f;
   TFile *out_file = TFile::Open("output.root","RECREATE");
   TTree* tt = new TTree("tree","tree");
-  tt->Branch("zbin",         &f.m_zbin,         "zbin/F");
-  tt->Branch("qhat",         &f.m_qhat,         "q-hat/F");
-  tt->Branch("lp",           &f.m_lp,           "lp/F");
-  tt->Branch("sigma_ph",     &f.m_sigma_ph,     "sigma_ph/F");
-  tt->Branch("dz",           &f.m_dz,           "dz/F");
-  tt->Branch("qhat_err",     &f.m_qhat_err,     "qhat_err/F");
-  tt->Branch("lp_err",       &f.m_lp_err,       "lp_err/F");
-  tt->Branch("sigma_ph_err", &f.m_sigma_ph_err, "sigma_ph_err/F");
-  tt->Branch("dz_err",       &f.m_dz_err,       "dz_err/F");
-  tt->Branch("chi2",         &f.m_chi2,         "chi2/F");
+  tt->Branch("zbin",         &f.m_zbin,         "zbin/D");
+  tt->Branch("qhat",         &f.m_qhat,         "q-hat/D");
+  tt->Branch("lp",           &f.m_lp,           "lp/D");
+  tt->Branch("sigma_ph",     &f.m_sigma_ph,     "sigma_ph/D");
+  tt->Branch("dz",           &f.m_dz,           "dz/D");
+  tt->Branch("qhat_err",     &f.m_qhat_err,     "qhat_err/D");
+  tt->Branch("lp_err",       &f.m_lp_err,       "lp_err/D");
+  tt->Branch("sigma_ph_err", &f.m_sigma_ph_err, "sigma_ph_err/D");
+  tt->Branch("dz_err",       &f.m_dz_err,       "dz_err/D");
+  tt->Branch("chi2",         &f.m_chi2,         "chi2/D");
   for (int mc=1; mc<=mcMax; mc++) {
     auto fitOutput = ifit(config);
     int count = 1;
@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
       count++;
     }
   }
+  tt->Print();
   out_file->Write();
   out_file->Close();
   std::cout << "Running iFit ended" << std::endl;
