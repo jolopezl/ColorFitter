@@ -1,10 +1,22 @@
 #include "model.h"
 
-Model::Model(): m_ModelName("Default"), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false), m_DoFermiMotion(false) {
+Model::Model(): 
+  m_ModelName("Default"),
+  m_dPt2(0.0), 
+  m_Rm(0.0),
+  m_DoEnergyLoss(false),
+  m_DoLogBehavior(false),
+  m_DoFermiMotion(false) {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
-Model::Model(std::string name): m_ModelName(name), m_dPt2(0.0), m_Rm(0.0), m_DoEnergyLoss(false), m_DoLogBehavior(false), m_DoFermiMotion(false) {
+Model::Model(std::string name): 
+  m_ModelName(name), 
+  m_dPt2(0.0), 
+  m_Rm(0.0), 
+  m_DoEnergyLoss(false), 
+  m_DoLogBehavior(false), 
+  m_DoFermiMotion(false) {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
@@ -30,19 +42,19 @@ double Model::GetC(int A) {
 }
 
 void Model::SetParameters(std::vector<double> parms) {
-  m_qhat = parms.at(0);
-  m_lp = parms.at(1);
+  m_qhat     = parms.at(0);
+  m_lp       = parms.at(1);
   m_sigma_ph = parms.at(2);
-  m_dlog = parms.at(3);
-  m_dz = parms.at(4);
+  m_dlog     = parms.at(3);
+  m_dz       = parms.at(4);
 }
 
 void Model::SetParameters(std::string parameter, double value) {
-  if (parameter == "qhat") m_qhat = value;
-  else if (parameter == "lp") m_lp = value;
-  else if (parameter == "sigma_ph") m_sigma_ph = value;
-  else if (parameter == "dlog") m_dlog = value;
-  else if (parameter == "dz") m_dz = value;
+  if      (parameter == "qhat")              m_qhat = value;
+  else if (parameter == "lp")                m_lp = value;
+  else if (parameter == "sigma_ph")          m_sigma_ph = value;
+  else if (parameter == "dlog")              m_dlog = value;
+  else if (parameter == "dz")                m_dz = value;
   else if (parameter == "density threshold") m_density_threshold = value;
   else std::cout << "Not a valid parameter name" << std::endl;
 }
@@ -58,15 +70,15 @@ void Model::SetFermiValues(double xb, double z) {
   m_zbinvalue = z;
 }
 
-void Model::DoEnergyLoss(bool foo){
+void Model::DoEnergyLoss(bool foo) {
   m_DoEnergyLoss = foo;
 }
 
-void Model::DoLogBehavior(bool foo){
+void Model::DoLogBehavior(bool foo) {
   m_DoLogBehavior = foo;
 }
 
-void Model::DoFermiMotion(bool foo){
+void Model::DoFermiMotion(bool foo) {
   m_DoFermiMotion = foo;
 }
 
@@ -259,7 +271,7 @@ void Model::Compute(const double A){
     }
     //      normalize+= 1.;
     normalize+=weight; // weight initial interaction by density  
-  } // End of big loop
+  } // End of big loop     energy loss down here ------------*
   // ADD ENERGY LOSS, From Will's original code:
   temp = accumulator2/normalize;
   if (m_DoEnergyLoss == true) {

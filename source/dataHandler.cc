@@ -183,7 +183,7 @@ std::vector<myData*> dataHandler(myConfig *config) {
   kr->doTGraphErrors();
   xe->doTGraphErrors();
   // Do plots of data
-  doDataPlots(config,he,ne,kr,xe);
+  // doDataPlots(config,he,ne,kr,xe);
   // Prepare output and finish
   std::vector<myData*> output;
   // output.push_back(he); // we don't need to return He.

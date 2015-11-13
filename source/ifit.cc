@@ -124,7 +124,7 @@ std::vector<myResult*> ifit(myConfig *config) {
   // dataHandler called here:
   auto fc = dataHandler(config);
   // Here the rest of the code
-  TFile *fout = new TFile("fullfit.root","RECREATE");
+  // TFile *fout = new TFile("fullfit.root","RECREATE");
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
     for (int iz=0; iz<ZDIM; ++iz) {
       // Selects and specific z bin to fit.
@@ -220,7 +220,7 @@ std::vector<myResult*> ifit(myConfig *config) {
       double Q2 = -1; // dummy value for HERMES
       modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit,result);
       vResult.push_back(result);
-      fout->Write();
+      // fout->Write();
       delete(gMinuit);
     }
   // End of loop over z-bins
@@ -370,87 +370,87 @@ void modelplot(TMinuit *g,
   fout << pT2[0] << "\t" << pT2[1] << "\t" << pT2[2] << "\t";
   fout << Rm[0] << "\t" << Rm[1] << "\t" << Rm[2] << "\n"; 
   fout.close();
-  int nbins = 40;
-  double pt_fit[40];
-  double pt_fiterr[40];
-  double pt_x[40];
-  double mr_fit[40];
-  double mr_fiterr[40];
-  double mr_x[40];
-  for (int i=11;i<nbins; ++i) {
-    callModel(i/6.,par);
-    pt_fit[i]=func_array[0];
-    pt_fiterr[i]=0.;
-    pt_x[i] = i/6.;
-    mr_fit[i]=func_array[1];
-    mr_fiterr[i]=0.;
-    mr_x[i] = i/6.;
-  }
-  std::string basename = filename;
-  basename.erase(basename.find_last_of("."), std::string::npos);
-  std::string mrname;
-  std::string ptname;
-  std::ostringstream out_mr, out_pt;
-  out_mr << basename << "_plot_" << "mr_" << iQ2x << "_" << iz;
-  mrname = out_mr.str();
-  out_pt << basename << "_plot_" << "pt_" << iQ2x << "_" << iz;
-  ptname = out_pt.str();
-  TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
-  TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
-  c1->SetGrid();c2->SetGrid();
-  TGraphErrors *pt_broadening = new TGraphErrors(3,x1,z1,errorz1,errorz1);
-  TGraphErrors *ptfit = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
-  TGraphErrors *mult_ratio = new TGraphErrors(3,x2,z2,errorz2,errorz2);
-  TGraphErrors *mrfit = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
-  c1->cd();
-  pt_broadening->SetTitle(out_pt.str().c_str());
-  pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
-  pt_broadening->GetYaxis()->SetTitle("#Delta #LT p_{t}^{2} #GT");
-  pt_broadening->GetYaxis()->SetTitleOffset(1.5);
-  pt_broadening->SetMarkerColor(kRed);
-  pt_broadening->SetMarkerStyle(21);
-  pt_broadening->SetLineWidth(2);
-  const int fontAxesSize = 28;
-  const int fontAxesCode = 43;
-  pt_broadening->GetXaxis()->SetTitleFont(fontAxesCode);
-  pt_broadening->GetXaxis()->SetTitleSize(fontAxesSize);
-  pt_broadening->GetXaxis()->SetLabelFont(fontAxesCode);
-  pt_broadening->GetXaxis()->SetLabelSize(fontAxesSize);
-  pt_broadening->GetYaxis()->SetTitleFont(fontAxesCode);
-  pt_broadening->GetYaxis()->SetTitleSize(fontAxesSize);
-  pt_broadening->GetYaxis()->SetLabelFont(fontAxesCode);
-  pt_broadening->GetYaxis()->SetLabelSize(fontAxesSize);
-  pt_broadening->Draw("APE");
-  ptfit->SetLineColor(kRed);
-  ptfit->SetMarkerStyle(21);
-  ptfit->SetLineWidth(2);
-  ptfit->Draw("L SAME");
-  c1->Write();
-  out_pt << ".C";
-  c1->Print(out_pt.str().c_str());
-  // Now do multiplicity ratio plot
-  c2->cd();
-  mult_ratio->SetTitle(out_mr.str().c_str());
-  mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
-  mult_ratio->GetYaxis()->SetTitle("R_{m}");
-  mult_ratio->GetYaxis()->SetTitleOffset(1.5);
-  mult_ratio->SetMarkerColor(kBlue);
-  mult_ratio->SetMarkerStyle(21);
-  mult_ratio->SetLineWidth(2);
-  mult_ratio->GetXaxis()->SetTitleFont(fontAxesCode);
-  mult_ratio->GetXaxis()->SetTitleSize(fontAxesSize);
-  mult_ratio->GetXaxis()->SetLabelFont(fontAxesCode);
-  mult_ratio->GetXaxis()->SetLabelSize(fontAxesSize);
-  mult_ratio->GetYaxis()->SetTitleFont(fontAxesCode);
-  mult_ratio->GetYaxis()->SetTitleSize(fontAxesSize);
-  mult_ratio->GetYaxis()->SetLabelFont(fontAxesCode);
-  mult_ratio->GetYaxis()->SetLabelSize(fontAxesSize);
-  mult_ratio->Draw("APE");
-  mrfit->SetLineColor(kBlue);
-  mrfit->SetMarkerStyle(21);
-  mrfit->SetLineWidth(2);
-  mrfit->Draw("L SAME");
-  c2->Write();
-  out_mr << ".C";
-  c2->Print(out_mr.str().c_str());
+  // int nbins = 40;
+  // double pt_fit[40];
+  // double pt_fiterr[40];
+  // double pt_x[40];
+  // double mr_fit[40];
+  // double mr_fiterr[40];
+  // double mr_x[40];
+  // for (int i=11;i<nbins; ++i) {
+  //   callModel(i/6.,par);
+  //   pt_fit[i]=func_array[0];
+  //   pt_fiterr[i]=0.;
+  //   pt_x[i] = i/6.;
+  //   mr_fit[i]=func_array[1];
+  //   mr_fiterr[i]=0.;
+  //   mr_x[i] = i/6.;
+  // }
+  // std::string basename = filename;
+  // basename.erase(basename.find_last_of("."), std::string::npos);
+  // std::string mrname;
+  // std::string ptname;
+  // std::ostringstream out_mr, out_pt;
+  // out_mr << basename << "_plot_" << "mr_" << iQ2x << "_" << iz;
+  // mrname = out_mr.str();
+  // out_pt << basename << "_plot_" << "pt_" << iQ2x << "_" << iz;
+  // ptname = out_pt.str();
+  // TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
+  // TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
+  // c1->SetGrid();c2->SetGrid();
+  // TGraphErrors *pt_broadening = new TGraphErrors(3,x1,z1,errorz1,errorz1);
+  // TGraphErrors *ptfit = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
+  // TGraphErrors *mult_ratio = new TGraphErrors(3,x2,z2,errorz2,errorz2);
+  // TGraphErrors *mrfit = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
+  // c1->cd();
+  // pt_broadening->SetTitle(out_pt.str().c_str());
+  // pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
+  // pt_broadening->GetYaxis()->SetTitle("#Delta #LT p_{t}^{2} #GT");
+  // pt_broadening->GetYaxis()->SetTitleOffset(1.5);
+  // pt_broadening->SetMarkerColor(kRed);
+  // pt_broadening->SetMarkerStyle(21);
+  // pt_broadening->SetLineWidth(2);
+  // const int fontAxesSize = 28;
+  // const int fontAxesCode = 43;
+  // pt_broadening->GetXaxis()->SetTitleFont(fontAxesCode);
+  // pt_broadening->GetXaxis()->SetTitleSize(fontAxesSize);
+  // pt_broadening->GetXaxis()->SetLabelFont(fontAxesCode);
+  // pt_broadening->GetXaxis()->SetLabelSize(fontAxesSize);
+  // pt_broadening->GetYaxis()->SetTitleFont(fontAxesCode);
+  // pt_broadening->GetYaxis()->SetTitleSize(fontAxesSize);
+  // pt_broadening->GetYaxis()->SetLabelFont(fontAxesCode);
+  // pt_broadening->GetYaxis()->SetLabelSize(fontAxesSize);
+  // pt_broadening->Draw("APE");
+  // ptfit->SetLineColor(kRed);
+  // ptfit->SetMarkerStyle(21);
+  // ptfit->SetLineWidth(2);
+  // ptfit->Draw("L SAME");
+  // c1->Write();
+  // out_pt << ".C";
+  // c1->Print(out_pt.str().c_str());
+  // // Now do multiplicity ratio plot
+  // c2->cd();
+  // mult_ratio->SetTitle(out_mr.str().c_str());
+  // mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
+  // mult_ratio->GetYaxis()->SetTitle("R_{m}");
+  // mult_ratio->GetYaxis()->SetTitleOffset(1.5);
+  // mult_ratio->SetMarkerColor(kBlue);
+  // mult_ratio->SetMarkerStyle(21);
+  // mult_ratio->SetLineWidth(2);
+  // mult_ratio->GetXaxis()->SetTitleFont(fontAxesCode);
+  // mult_ratio->GetXaxis()->SetTitleSize(fontAxesSize);
+  // mult_ratio->GetXaxis()->SetLabelFont(fontAxesCode);
+  // mult_ratio->GetXaxis()->SetLabelSize(fontAxesSize);
+  // mult_ratio->GetYaxis()->SetTitleFont(fontAxesCode);
+  // mult_ratio->GetYaxis()->SetTitleSize(fontAxesSize);
+  // mult_ratio->GetYaxis()->SetLabelFont(fontAxesCode);
+  // mult_ratio->GetYaxis()->SetLabelSize(fontAxesSize);
+  // mult_ratio->Draw("APE");
+  // mrfit->SetLineColor(kBlue);
+  // mrfit->SetMarkerStyle(21);
+  // mrfit->SetLineWidth(2);
+  // mrfit->Draw("L SAME");
+  // c2->Write();
+  // out_mr << ".C";
+  // c2->Print(out_mr.str().c_str());
 }

@@ -22,7 +22,7 @@ private:
   // for the nuclear density
   double m_rho0 = 0.170; // nucleons/fm^3
   double m_a = 0.5; //fm should be 0.54 fm
-  double m_c = 0.0; // to be solved
+  // double m_c = 0.0; // to be solved
   // some assistance for the energy loss part
   int m_iz;
   double m_zbinwidth;
