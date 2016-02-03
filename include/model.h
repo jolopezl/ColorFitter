@@ -30,6 +30,7 @@ private:
   bool m_DoEnergyLoss;
   bool m_DoLogBehavior;
   bool m_DoFermiMotion;
+  bool m_doFixedLp;
   // For Fermi momentum
   double m_xB;
   double m_zbinvalue;
@@ -53,8 +54,11 @@ public:
   void DoEnergyLoss(bool);
   void DoLogBehavior(bool);
   void DoFermiMotion(bool);
+  void DoFixedLp(bool);
   void Initialization();
   void Compute(const double);
+  void InteractionPoint(double &, double &, double &, const double);
+  double GetR(const double, const double);
   double Get1();
   double Get2();
   double GetC(int);

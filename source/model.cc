@@ -6,17 +6,26 @@ Model::Model():
   m_Rm(0.0),
   m_DoEnergyLoss(false),
   m_DoLogBehavior(false),
-  m_DoFermiMotion(false) {
+  m_DoFermiMotion(false),
+  m_doFixedLp(false) 
+{
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
 Model::Model(std::string name): 
   m_ModelName(name), 
   m_dPt2(0.0), 
-  m_Rm(0.0), 
+  m_Rm(0.0),
+  m_qhat(1.5),
+  m_lp(3.5),
+  m_sigma_ph(40.0), // prehadron cross section
+  m_dlog(0.0),      // log description?
+  m_dz(0.0),        // energy loss parameter
   m_DoEnergyLoss(false), 
   m_DoLogBehavior(false), 
-  m_DoFermiMotion(false) {
+  m_DoFermiMotion(false),
+  m_doFixedLp(false) 
+{
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
 
@@ -82,6 +91,10 @@ void Model::DoFermiMotion(bool foo) {
   m_DoFermiMotion = foo;
 }
 
+void Model::DoFixedLp(bool foo) {
+  m_doFixedLp = foo;
+}
+
 void Model::Initialization() {
   // This will do the interpolation in the future
   m_c_interpolation = {0, 0, 0, 0, 1.321, 1.46802, 1.61163, 1.74843, 1.875, 1.98877, 2.09042, 2.18148, 2.26346, 2.33789, 2.40628, \
@@ -103,15 +116,15 @@ void Model::Initialization() {
     6.8353, 6.84539, 6.85547, 6.86554, 6.8756, 6.88566, 6.89571, 6.90576, 6.9158, 6.92584, 6.93588, 6.94591, 6.95594, 6.96597, 6.976};
 }
 
-double Model::FindR(double A, const double density_threshold){
+double Model::FindR(const double A, const double density_threshold){
   double r = 0.0;
-  double eps = 1.0e-3;
-  while (Density(A,0.,0.,r)>=density_threshold) {
+  double eps = 1.0e-4;
+  while (Density(A,0.,0.,r) >= density_threshold) {
     // std::cout << "Computing for A = " << A
     //           << "\t rho(r) = " << Density(A,0.,0.,r) 
     //           << "\t threshold = " << density_threshold << std::endl;
-    r = r+eps;
-    if (r > 10) {
+    r = r + eps;
+    if (r > 100) {
       eps = eps*10;
       std::cerr << "Error:never found R - Still trying - r = " << r
                 << "\t density = " << Density(A,0.,0.,r)
@@ -123,16 +136,20 @@ double Model::FindR(double A, const double density_threshold){
   return r;
 }
 
+double Model::GetR(const double A, const double density_threshold) {
+  const double R = FindR(A, density_threshold);
+  return R;
+}
+
 double Model::Density(const double A, const double xx, const double yy, const double zz){
   // Ref. Henk Blok article, Phys Rev. C73, 038201 (2006)
-  double rho0 = m_rho0;
-  double a = m_a;
+  double rho0 = m_rho0; // 0.170
+  double a = m_a; // 0.5
   double c = m_c_interpolation[(int) A]; // Change to m_c?
   double r = sqrt(xx*xx+yy*yy+zz*zz);
   double rho = rho0/(1.0+exp((r-c)/a));
   return rho;
 }
-
 
 double Model::Fermi(int inucleus){
   // Computes the contribution of fermi momentum broadening to 
@@ -168,6 +185,15 @@ double Model::Fermi(int inucleus){
   return result; 
 }
 
+void Model::InteractionPoint(double &x, double &y, double &z, const double R){
+  while (1) {
+    x = gRandom->Uniform(-R,R);
+    y = gRandom->Uniform(-R,R);
+    z = gRandom->Uniform(-R,R);
+    if(x*x+y*y+z*z<R*R) break;
+  }
+}
+
 void Model::Compute(const double A){
   // Computation of both quantities dPt2 and Rm
   // We are doing an MC average
@@ -194,7 +220,12 @@ void Model::Compute(const double A){
       z = gRandom->Uniform(-R,R);
       if(x*x+y*y+z*z<R*R) break;
     }
-    L = gRandom->Exp(m_lp); // exponentially distributed production length
+    if (m_doFixedLp) {
+      L = m_lp;
+    }
+    else {
+      L = gRandom->Exp(m_lp); // exponentially distributed production length      **************
+    }
     dtd1->SetParameter(0,m_qhat); // qhat parameter  
     dtd1->SetParameter(1,x); // starting value of longitudinal coordinate  
     dtd1->SetParameter(2,y); // x
