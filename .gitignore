@@ -44,5 +44,6 @@ latex
 *.root
 Fit_output
 *.txt
+*.png
 test
 build
