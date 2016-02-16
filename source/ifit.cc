@@ -383,7 +383,7 @@ void modelplot(TMinuit *g,
   fout << pT2[0] << "\t" << pT2[1] << "\t" << pT2[2] << "\t";
   fout << Rm[0] << "\t" << Rm[1] << "\t" << Rm[2] << "\n"; 
   fout.close();
-  if (true) { // plots 
+  if (false) { // plots 
     int nbins = 40;
     double pt_fit[40];
     double pt_fiterr[40];
