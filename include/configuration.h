@@ -10,6 +10,7 @@ public:
   bool m_energyloss   = false; // true or false
   bool m_logbehavior  = false; // true or false
   bool m_fermimotion  = false; // true or false
+  bool m_cascade      = false;
   bool m_qhat         = true;
   bool m_lp           = true;
   bool m_preh         = true;

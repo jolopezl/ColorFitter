@@ -4,10 +4,17 @@ Model::Model():
   m_ModelName("Default"),
   m_dPt2(0.0), 
   m_Rm(0.0),
-  m_DoEnergyLoss(false),
-  m_DoLogBehavior(false),
+  m_qhat(1.5),
+  m_lp(3.5),
+  m_sigma_ph(40.0), // prehadron cross section
+  m_dlog(0.0),      // log description?
+  m_dz(0.0),        // energy loss parameter
+  m_cascade(0.0),
+  m_DoEnergyLoss(false), 
+  m_DoLogBehavior(false), 
   m_DoFermiMotion(false),
-  m_doFixedLp(false) 
+  m_doCascade(false),
+  m_doFixedLp(false)
 {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
@@ -21,10 +28,12 @@ Model::Model(std::string name):
   m_sigma_ph(40.0), // prehadron cross section
   m_dlog(0.0),      // log description?
   m_dz(0.0),        // energy loss parameter
+  m_cascade(0.0),
   m_DoEnergyLoss(false), 
   m_DoLogBehavior(false), 
   m_DoFermiMotion(false),
-  m_doFixedLp(false) 
+  m_doCascade(false),
+  m_doFixedLp(false)
 {
   std::cout << "Model created: " << m_ModelName << std::endl;
 }
@@ -36,6 +45,11 @@ Model::~Model() {
 std::vector<double> Model::GetResult() {
   std::vector<double> output = {m_dPt2, m_Rm};
   return output;
+}
+
+void Model::GetResult(double &dPT2,double &Rm) {
+  dPT2 = m_dPt2;
+  Rm   = m_Rm;
 }
 
 double Model::Get1(){
@@ -56,6 +70,7 @@ void Model::SetParameters(std::vector<double> parms) {
   m_sigma_ph = parms.at(2);
   m_dlog     = parms.at(3);
   m_dz       = parms.at(4);
+  m_cascade  = parms.at(5);
 }
 
 void Model::SetParameters(std::string parameter, double value) {
@@ -64,6 +79,7 @@ void Model::SetParameters(std::string parameter, double value) {
   else if (parameter == "sigma_ph")          m_sigma_ph = value;
   else if (parameter == "dlog")              m_dlog = value;
   else if (parameter == "dz")                m_dz = value;
+  else if (parameter == "cascade")           m_cascade = value;
   else if (parameter == "density threshold") m_density_threshold = value;
   else std::cout << "Not a valid parameter name" << std::endl;
 }
@@ -93,6 +109,10 @@ void Model::DoFermiMotion(bool foo) {
 
 void Model::DoFixedLp(bool foo) {
   m_doFixedLp = foo;
+}
+
+void Model::DoCascade(bool foo) {
+  m_doCascade = foo;
 }
 
 void Model::Initialization() {
@@ -245,7 +265,7 @@ void Model::Compute(const double A){
     weight=Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
     ul = sqrt(R*R-x*x-y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
     // Next, integrate from the starting vertex up to the end of the production length
-    if(z+L<ul){// endpoint of quark path is within the sphere of integration
+    if(z+L<ul) {// endpoint of quark path is within the sphere of integration
       temp=constant*igdtd1->Integral(z,z+L) ; // find partonic lengths
       zrange1=L;
       if(m_DoLogBehavior == true) {
@@ -292,7 +312,12 @@ void Model::Compute(const double A){
       std::cout << "igdtd2 is negative!! Error!! \n";
     }
     if(zrange2>0){
-      accumulator2+= exp(-temp*m_sigma_ph/10.)*weight;
+      if (!m_doCascade) {
+        accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
+      }
+      else {
+        accumulator2 += exp(-temp*m_sigma_ph/10.)*weight + 1 - exp(temp*m_cascade/10.)*weight;
+      }
     }
     if(zrange2==0){
       std::cout<<"Info: zrange2 = 0 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";

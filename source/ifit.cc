@@ -56,8 +56,8 @@ double rmerrstat[3][4] =
 Model *m = new Model("default"); 
 
 void callModel(const double A,double *par){
-  // qhat, lp, pre-hadron cross-section, log behaviour, energy loss
-  std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4]};
+  // qhat, lp, pre-hadron cross-section, log behaviour, energy loss, cascade
+  std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4],par[5]};
   double nucleus = (double) A*A*A;
   m->SetParameters(my_pars);
   m->Compute(nucleus);
@@ -103,6 +103,7 @@ std::vector<myResult*> ifit(myConfig *config) {
   m->Initialization();
   m->DoEnergyLoss(config->m_energyloss);
   m->DoLogBehavior(config->m_logbehavior);
+  m->DoCascade(config->m_cascade);
   // m->DoFermiMotion(config->m_fermimotion);
   // This is for Jlab
   // xxx[0]=pow(12.0107,1./3.); // C
@@ -128,11 +129,11 @@ std::vector<myResult*> ifit(myConfig *config) {
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
     for (int iz=0; iz<ZDIM; ++iz) {
       // Selects and specific z bin to fit.
+      std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
       if ((config->m_zBinOfInterest != -1) && ((config->m_zBinOfInterest-1) != iz)) {
         std::cout << "Ignoring this bin" << std::endl;
         continue;
       }
-      std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
       m->SetBinRatio(iz,zbinw[iz],binratios[iz]); // For energy loss
       // m->SetFermiValues(xB,zbin[iz]);
       // std::cout << "Working Q^2-bin #" << iQ2+1 << "/" << Q2DIM << " and z-bin #" << iz+1 << "/" << ZDIM << std::endl;
@@ -181,7 +182,7 @@ std::vector<myResult*> ifit(myConfig *config) {
           errorzzz[a+3] = rmerr[a][iz];
         }
       }
-      TMinuit *gMinuit = new TMinuit(5);  //initialize TMinuit with a maximum of 5 params
+      TMinuit *gMinuit = new TMinuit(6);  //initialize TMinuit with a maximum of 5 params
       gMinuit->SetFCN(fcn);      
       double arglist[10];
       int ierflg = 0;      
@@ -190,26 +191,34 @@ std::vector<myResult*> ifit(myConfig *config) {
       arglist[0] = 3;
       gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
       // Set starting values and step sizes for parameters
-      // double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
-      double vstart[] = {0.4775, 1.6, 20.,2.5,0.0};
-      double step[]   = {0.01,0.01, 1.,0.5,0.00001};
-      double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration
-      //double lim_lo[] = {0.,0.1,-60.,0.1,0.0}; // negative limit on cross section models inelastic bin migration                   
-      double lim_hi[] = {10.,50.,500.,1000.0,10.};
+      // if (false) {
+      //   // double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
+      //   double vstart[] = {0.4775, 1.6, 20.,2.5,0.0};
+      //   double step[]   = {0.01,0.01, 1.,0.5,0.00001};
+      //   double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration
+      //   //double lim_lo[] = {0.,0.1,-60.,0.1,0.0}; // negative limit on cross section models inelastic bin migration                   
+      //   double lim_hi[] = {10.,50.,500.,1000.0,10.};
+      // }
+      double vstart[] = {0.4775, 1.6,     20.,  2.5,    0.0,     0.0};
+      double step[]   = {0.01,   0.01,    1.0,  0.5,    0.00001, 1.0};
+      double lim_lo[] = {0.,     0.0001, -60.,  0.1,   -0.001,  -120.};
+      double lim_hi[] = {10.,    50.,     1000., 1000.0, 10.,    2000.0}; 
       gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
       gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
       gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
       gMinuit->mnparm(3, "a4", vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
-      gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss      
+      gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
+      gMinuit->mnparm(5, "a6", vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
       if (!config->m_qhat)        gMinuit->FixParameter(0); // q-hat
-      if (!config->m_lp)          gMinuit->FixParameter(2); // production length
-      if (!config->m_preh)        gMinuit->FixParameter(3); // prehadron cross section
+      if (!config->m_lp)          gMinuit->FixParameter(1); // production length
+      if (!config->m_preh)        gMinuit->FixParameter(2); // prehadron cross section
       if (!config->m_logbehavior) gMinuit->FixParameter(3); // Log description
       if (!config->m_energyloss)  gMinuit->FixParameter(4); // Energy Loss
+      if (!config->m_cascade)     gMinuit->FixParameter(5); // Cascade Parameter
       // Now ready for minimization step
       arglist[0] = 500;
       arglist[1] = 1.;
-      gMinuit->mnexcm("MIGRAD", arglist, 5,ierflg);      
+      gMinuit->mnexcm("MIGRAD", arglist, 6,ierflg);
       // Print results
       double amin,edm,errdef;
       int nvpar,nparx,icstat;
@@ -299,7 +308,7 @@ void justCompute(myConfig* config) {
   double A_Xe = 1.1*pow(131.293,1./3.); // Xe
   double foo = 0.0;
   foo = pow(A_Ne,3.0);
-  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0};
+  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0,0.0};
   m->SetParameters(parms);
   m->Compute(foo);
 }
@@ -324,7 +333,7 @@ void modelplot(TMinuit *g,
   double xlolim=0; 
   double xuplim=0; 
   int iuint=0;
-  int NPAR=5;
+  int NPAR = 6;
   TString chnam;
   double par[NPAR], par_errors[NPAR];
   std::ostringstream out;
@@ -333,23 +342,27 @@ void modelplot(TMinuit *g,
     chnam = (TString) out.str();
     out.flush();
     g->mnpout(parNo, chnam, val, err, xlolim, xuplim, iuint);
-    par[parNo]=val;
-    par_errors[parNo]=err;
+    par[parNo] = val;
+    par_errors[parNo] = err;
   }
   double chisquared = chisq(par);
   // add values to result obj
-  result->m_zbin = z;
-  result->m_qhat = par[0];
-  result->m_lp = par[1];
-  result->m_sigma_ph = par[2];
-  result->m_dz = par[3];
-  // par[4] log parm
-  result->m_qhat_err = par_errors[0];
-  result->m_lp_err = par_errors[1];
+  result->m_zbin         = z;
+  // Parameters
+  result->m_qhat         = par[0];
+  result->m_lp           = par[1];
+  result->m_sigma_ph     = par[2];
+  result->m_log          = par[3];
+  result->m_dz           = par[4];
+  result->m_cascade      = par[5];
+  // Parameters Errors
+  result->m_qhat_err     = par_errors[0];
+  result->m_lp_err       = par_errors[1];
   result->m_sigma_ph_err = par_errors[2];
-  result->m_dz_err = par_errors[3];
-  // par_errors[4] log parm err
-  result->m_chi2 = chisquared;
+  result->m_log_err      = par_errors[3];
+  result->m_dz_err       = par_errors[4];
+  result->m_cascade      = par_errors[5];
+  result->m_chi2         = chisquared;
   // At this point, we know the parameters, so let's write them out
   std::ofstream fout;
   fout.open(filename, std::ios::out | std::ios::app);
@@ -360,97 +373,99 @@ void modelplot(TMinuit *g,
     fout << Q2 << "\t" << xB << "\t";
   }
   fout << z << "\t";
-  for (int i=0; i<5; ++i){
+  for (int i=0; i<NPAR; ++i){
     fout << par[i] << "\t";
   }
-  for (int i=0; i<5; ++i){
+  for (int i=0; i<NPAR; ++i){
     fout << par_errors[i] << "\t";
   }
   fout << chisquared << "\t";
   fout << pT2[0] << "\t" << pT2[1] << "\t" << pT2[2] << "\t";
   fout << Rm[0] << "\t" << Rm[1] << "\t" << Rm[2] << "\n"; 
   fout.close();
-  // int nbins = 40;
-  // double pt_fit[40];
-  // double pt_fiterr[40];
-  // double pt_x[40];
-  // double mr_fit[40];
-  // double mr_fiterr[40];
-  // double mr_x[40];
-  // for (int i=11;i<nbins; ++i) {
-  //   callModel(i/6.,par);
-  //   pt_fit[i]=func_array[0];
-  //   pt_fiterr[i]=0.;
-  //   pt_x[i] = i/6.;
-  //   mr_fit[i]=func_array[1];
-  //   mr_fiterr[i]=0.;
-  //   mr_x[i] = i/6.;
-  // }
-  // std::string basename = filename;
-  // basename.erase(basename.find_last_of("."), std::string::npos);
-  // std::string mrname;
-  // std::string ptname;
-  // std::ostringstream out_mr, out_pt;
-  // out_mr << basename << "_plot_" << "mr_" << iQ2x << "_" << iz;
-  // mrname = out_mr.str();
-  // out_pt << basename << "_plot_" << "pt_" << iQ2x << "_" << iz;
-  // ptname = out_pt.str();
-  // TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
-  // TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
-  // c1->SetGrid();c2->SetGrid();
-  // TGraphErrors *pt_broadening = new TGraphErrors(3,x1,z1,errorz1,errorz1);
-  // TGraphErrors *ptfit = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
-  // TGraphErrors *mult_ratio = new TGraphErrors(3,x2,z2,errorz2,errorz2);
-  // TGraphErrors *mrfit = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
-  // c1->cd();
-  // pt_broadening->SetTitle(out_pt.str().c_str());
-  // pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
-  // pt_broadening->GetYaxis()->SetTitle("#Delta #LT p_{t}^{2} #GT");
-  // pt_broadening->GetYaxis()->SetTitleOffset(1.5);
-  // pt_broadening->SetMarkerColor(kRed);
-  // pt_broadening->SetMarkerStyle(21);
-  // pt_broadening->SetLineWidth(2);
-  // const int fontAxesSize = 28;
-  // const int fontAxesCode = 43;
-  // pt_broadening->GetXaxis()->SetTitleFont(fontAxesCode);
-  // pt_broadening->GetXaxis()->SetTitleSize(fontAxesSize);
-  // pt_broadening->GetXaxis()->SetLabelFont(fontAxesCode);
-  // pt_broadening->GetXaxis()->SetLabelSize(fontAxesSize);
-  // pt_broadening->GetYaxis()->SetTitleFont(fontAxesCode);
-  // pt_broadening->GetYaxis()->SetTitleSize(fontAxesSize);
-  // pt_broadening->GetYaxis()->SetLabelFont(fontAxesCode);
-  // pt_broadening->GetYaxis()->SetLabelSize(fontAxesSize);
-  // pt_broadening->Draw("APE");
-  // ptfit->SetLineColor(kRed);
-  // ptfit->SetMarkerStyle(21);
-  // ptfit->SetLineWidth(2);
-  // ptfit->Draw("L SAME");
-  // c1->Write();
-  // out_pt << ".C";
-  // c1->Print(out_pt.str().c_str());
-  // // Now do multiplicity ratio plot
-  // c2->cd();
-  // mult_ratio->SetTitle(out_mr.str().c_str());
-  // mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
-  // mult_ratio->GetYaxis()->SetTitle("R_{m}");
-  // mult_ratio->GetYaxis()->SetTitleOffset(1.5);
-  // mult_ratio->SetMarkerColor(kBlue);
-  // mult_ratio->SetMarkerStyle(21);
-  // mult_ratio->SetLineWidth(2);
-  // mult_ratio->GetXaxis()->SetTitleFont(fontAxesCode);
-  // mult_ratio->GetXaxis()->SetTitleSize(fontAxesSize);
-  // mult_ratio->GetXaxis()->SetLabelFont(fontAxesCode);
-  // mult_ratio->GetXaxis()->SetLabelSize(fontAxesSize);
-  // mult_ratio->GetYaxis()->SetTitleFont(fontAxesCode);
-  // mult_ratio->GetYaxis()->SetTitleSize(fontAxesSize);
-  // mult_ratio->GetYaxis()->SetLabelFont(fontAxesCode);
-  // mult_ratio->GetYaxis()->SetLabelSize(fontAxesSize);
-  // mult_ratio->Draw("APE");
-  // mrfit->SetLineColor(kBlue);
-  // mrfit->SetMarkerStyle(21);
-  // mrfit->SetLineWidth(2);
-  // mrfit->Draw("L SAME");
-  // c2->Write();
-  // out_mr << ".C";
-  // c2->Print(out_mr.str().c_str());
+  if (true) {
+    int nbins = 40;
+    double pt_fit[40];
+    double pt_fiterr[40];
+    double pt_x[40];
+    double mr_fit[40];
+    double mr_fiterr[40];
+    double mr_x[40];
+    for (int i=11;i<nbins; ++i) {
+      callModel(i/6.,par);
+      pt_fit[i]=func_array[0];
+      pt_fiterr[i]=0.;
+      pt_x[i] = i/6.;
+      mr_fit[i]=func_array[1];
+      mr_fiterr[i]=0.;
+      mr_x[i] = i/6.;
+    }
+    std::string basename = filename;
+    basename.erase(basename.find_last_of("."), std::string::npos);
+    std::string mrname;
+    std::string ptname;
+    std::ostringstream out_mr, out_pt;
+    out_mr << basename << "_plot_" << "mr_" << iQ2x << "_" << iz;
+    mrname = out_mr.str();
+    out_pt << basename << "_plot_" << "pt_" << iQ2x << "_" << iz;
+    ptname = out_pt.str();
+    TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
+    TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
+    c1->SetGrid();c2->SetGrid();
+    TGraphErrors *pt_broadening = new TGraphErrors(3,x1,z1,errorz1,errorz1);
+    TGraphErrors *ptfit = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
+    TGraphErrors *mult_ratio = new TGraphErrors(3,x2,z2,errorz2,errorz2);
+    TGraphErrors *mrfit = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
+    c1->cd();
+    pt_broadening->SetTitle(out_pt.str().c_str());
+    pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
+    pt_broadening->GetYaxis()->SetTitle("#Delta #LT p_{t}^{2} #GT");
+    pt_broadening->GetYaxis()->SetTitleOffset(1.5);
+    pt_broadening->SetMarkerColor(kRed);
+    pt_broadening->SetMarkerStyle(21);
+    pt_broadening->SetLineWidth(2);
+    const int fontAxesSize = 28;
+    const int fontAxesCode = 43;
+    pt_broadening->GetXaxis()->SetTitleFont(fontAxesCode);
+    pt_broadening->GetXaxis()->SetTitleSize(fontAxesSize);
+    pt_broadening->GetXaxis()->SetLabelFont(fontAxesCode);
+    pt_broadening->GetXaxis()->SetLabelSize(fontAxesSize);
+    pt_broadening->GetYaxis()->SetTitleFont(fontAxesCode);
+    pt_broadening->GetYaxis()->SetTitleSize(fontAxesSize);
+    pt_broadening->GetYaxis()->SetLabelFont(fontAxesCode);
+    pt_broadening->GetYaxis()->SetLabelSize(fontAxesSize);
+    pt_broadening->Draw("APE");
+    ptfit->SetLineColor(kRed);
+    ptfit->SetMarkerStyle(21);
+    ptfit->SetLineWidth(2);
+    ptfit->Draw("L SAME");
+    c1->Write();
+    out_pt << ".pdf";
+    c1->Print(out_pt.str().c_str());
+    // Now do multiplicity ratio plot
+    c2->cd();
+    mult_ratio->SetTitle(out_mr.str().c_str());
+    mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
+    mult_ratio->GetYaxis()->SetTitle("R_{m}");
+    mult_ratio->GetYaxis()->SetTitleOffset(1.5);
+    mult_ratio->SetMarkerColor(kBlue);
+    mult_ratio->SetMarkerStyle(21);
+    mult_ratio->SetLineWidth(2);
+    mult_ratio->GetXaxis()->SetTitleFont(fontAxesCode);
+    mult_ratio->GetXaxis()->SetTitleSize(fontAxesSize);
+    mult_ratio->GetXaxis()->SetLabelFont(fontAxesCode);
+    mult_ratio->GetXaxis()->SetLabelSize(fontAxesSize);
+    mult_ratio->GetYaxis()->SetTitleFont(fontAxesCode);
+    mult_ratio->GetYaxis()->SetTitleSize(fontAxesSize);
+    mult_ratio->GetYaxis()->SetLabelFont(fontAxesCode);
+    mult_ratio->GetYaxis()->SetLabelSize(fontAxesSize);
+    mult_ratio->Draw("APE");
+    mrfit->SetLineColor(kBlue);
+    mrfit->SetMarkerStyle(21);
+    mrfit->SetLineWidth(2);
+    mrfit->Draw("L SAME");
+    c2->Write();
+    out_mr << ".pdf";
+    c2->Print(out_mr.str().c_str());
+  }
 }

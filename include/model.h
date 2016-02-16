@@ -19,6 +19,7 @@ private:
   double m_sigma_ph; // prehadron cross section
   double m_dlog; // log description?
   double m_dz; // energy loss parameter
+  double m_cascade;
   // for the nuclear density
   double m_rho0 = 0.170; // nucleons/fm^3
   double m_a = 0.5; //fm should be 0.54 fm
@@ -30,6 +31,7 @@ private:
   bool m_DoEnergyLoss;
   bool m_DoLogBehavior;
   bool m_DoFermiMotion;
+  bool m_doCascade;
   bool m_doFixedLp;
   // For Fermi momentum
   double m_xB;
@@ -55,6 +57,7 @@ public:
   void DoLogBehavior(bool);
   void DoFermiMotion(bool);
   void DoFixedLp(bool);
+  void DoCascade(bool);
   void Initialization();
   void Compute(const double);
   void InteractionPoint(double &, double &, double &, const double);
@@ -63,6 +66,7 @@ public:
   double Get2();
   double GetC(int);
   std::vector<double> GetResult();
+  void GetResult(double&,double&);
   double Fermi(int inucleus);
 };
 

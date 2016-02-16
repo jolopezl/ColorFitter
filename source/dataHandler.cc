@@ -15,6 +15,10 @@ myResult::myResult() {
   m_lp_err       = dummy;
   m_sigma_ph_err = dummy;
   m_dz_err       = dummy;
+  m_log          = dummy;
+  m_log_err      = dummy;
+  m_cascade      = dummy;
+  m_cascade_err  = dummy;
   m_chi2         = dummy;
   std::cout << "myResult:: Result created for " << m_name << std::endl;
 }

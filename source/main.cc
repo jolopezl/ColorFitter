@@ -11,8 +11,42 @@ int printInteractionPoints();
 
 // ************ main function ************ //
 int main(int argc, char *argv[]) {
-  demoPlots();
+  // demoPlots();
   // printInteractionPoints();
+  computeSimpleFit();
+}
+
+// **************** Compute a Simple Fit **************** //
+int computeSimpleFit() {
+  myConfig *config = new myConfig();
+  // bins of interest
+  int Q2Int = -1;
+  int izInt = -1;
+  // defauls
+  int input_energyloss     = 0;
+  int input_subtraction    = 1;
+  double input_correlation = 0.0;
+  config->m_stat_only         = false;
+  config->m_energyloss        = input_energyloss; // false;
+  config->m_logbehavior       = false;
+  config->m_fermimotion       = false;
+  config->m_cascade           = false;
+  config->m_subtraction       = input_subtraction; // false;
+  config->m_correlation       = input_correlation; // -1.0; // for physics -1.0 < rho < 0.0
+  config->m_Q2BinOfInterest   = Q2Int;   // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
+  config->m_zBinOfInterest    = izInt;   // value in between 1 and ZDIM of z bins. -1 fits all.
+  config->m_output_fit        = "testFit.txt";
+  config->m_input_pt          = "hermesData.txt";
+  // config->Update();
+  // Write configuration to file
+  std::ostringstream foo;
+  foo << "iFit Info: Energy Loss: " << config->m_energyloss;
+  foo << " - He subtraction: "      << config->m_subtraction;
+  foo << " with correlation = "     << config->m_correlation;
+  config->m_comment = foo.str();
+  std::cout << "Running iFit now:" << std::endl;
+  auto fitOutput = ifit(config);
+  return 0;
 }
 
 // *** prints interaction points *** //
@@ -74,38 +108,6 @@ int demoPlots2D() {
       std::cout << pow(nucleus,1./3.) << '\t' << lp << '\t' << model->Get1() << std::endl;
     }
   }
-  return 0;
-}
-
-// **************** Compute a Simple Fit **************** //
-int computeSimpleFit() {
-  myConfig *config = new myConfig();
-  // bins of interest
-  int Q2Int = -1;
-  int izInt = -1;
-  // defauls
-  int input_energyloss     = 0;
-  int input_subtraction    = 1;
-  double input_correlation = 0.0;
-  config->m_stat_only         = false;
-  config->m_energyloss        = input_energyloss; // false;
-  config->m_logbehavior       = false;
-  config->m_fermimotion       = false;
-  config->m_subtraction       = input_subtraction; // false;
-  config->m_correlation       = input_correlation; // -1.0; // for physics -1.0 < rho < 0.0
-  config->m_Q2BinOfInterest   = Q2Int;   // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
-  config->m_zBinOfInterest    = izInt;   // value in between 1 and ZDIM of z bins. -1 fits all.
-  config->m_output_fit        = "testFit.txt";
-  config->m_input_pt          = "hermesData.txt";
-  // config->Update();
-  // Write configuration to file
-  std::ostringstream foo;
-  foo << "iFit Info: Energy Loss: " << config->m_energyloss;
-  foo << " - He subtraction: "      << config->m_subtraction;
-  foo << " with correlation = "     << config->m_correlation;
-  config->m_comment = foo.str();
-  std::cout << "Running iFit now:" << std::endl;
-  auto fitOutput = ifit(config);
   return 0;
 }
 

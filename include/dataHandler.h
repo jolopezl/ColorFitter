@@ -40,6 +40,10 @@ public:
   double m_lp_err;
   double m_sigma_ph_err;
   double m_dz_err;
+  double m_log;
+  double m_log_err;
+  double m_cascade;
+  double m_cascade_err;
   double m_chi2;
   // constructor
   myResult();
