@@ -30,7 +30,7 @@ int computeSimpleFit() {
   config->m_energyloss        = input_energyloss; // false;
   config->m_logbehavior       = false;
   config->m_fermimotion       = false;
-  config->m_cascade           = false;
+  config->m_cascade           = true;
   config->m_subtraction       = input_subtraction; // false;
   config->m_correlation       = input_correlation; // -1.0; // for physics -1.0 < rho < 0.0
   config->m_Q2BinOfInterest   = Q2Int;   // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
@@ -115,8 +115,8 @@ int demoPlots2D() {
 int computeComplexFit(int argc, char *argv[]) {
   myConfig *config = new myConfig();
   // bins to fit
-  int Q2Int  = -1;
-  int izInt  =  3;
+  int Q2Int  = 1;
+  int izInt  = 3;
   // defaults
   int input_energyloss  = 0;
   int input_subtraction = 1;

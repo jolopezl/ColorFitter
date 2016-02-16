@@ -316,7 +316,7 @@ void Model::Compute(const double A){
         accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
       }
       else {
-        accumulator2 += exp(-temp*m_sigma_ph/10.)*weight + 1 - exp(temp*m_cascade/10.)*weight;
+        accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(temp*m_cascade/10.))*weight;
       }
     }
     if(zrange2==0){
