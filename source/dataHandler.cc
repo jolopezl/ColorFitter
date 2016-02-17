@@ -78,19 +78,20 @@ void myData::applyCorrection(myData* nucl, double rho) { // nucl is the bkg
 
 double pow2(double x) {return x*x;} // move this to somewhere else.
 
-void myData::doTGraphErrors() {
+std::string myData::name() {
+  return m_name;
+}
 
+void myData::doTGraphErrors() {
   const int markerStyleCode = 20; // circle 20, box 21
   const int markerColorCode = 1; // black 1, red 2, blue 4
   const int markerSizeCode = 1;
   const int makerLineWidthCode = 2;
-
   const int markerColorCodeStat = 2; // red
   const int markerColorCodeSyst = 4; // blue
   const float markerAlphaCode = 1.0;
   const int fillColorCode = 4;
   const int fillStyleCode = 3144;
-
   m_tge.clear();
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_stat[0]));
   m_tge.push_back(new TGraphErrors(DIM, &m_zbin[0], &m_value[0], &m_wbin[0], &m_syst[0]));
@@ -187,7 +188,7 @@ std::vector<myData*> dataHandler(myConfig *config) {
   kr->doTGraphErrors();
   xe->doTGraphErrors();
   // Do plots of data
-  // doDataPlots(config,he,ne,kr,xe);
+  doDataPlots(config,he,ne,kr,xe);
   // Prepare output and finish
   std::vector<myData*> output;
   // output.push_back(he); // we don't need to return He.
@@ -195,6 +196,24 @@ std::vector<myData*> dataHandler(myConfig *config) {
   output.push_back(kr);
   output.push_back(xe);
   // output.push_back(he);
+    // **** Print values to file **** //
+  if (config->writeCorrectedValues) {
+    std::ofstream filevalues;
+    filevalues.open("data_correct_pT2.txt", std::ios::out);
+    if (filevalues.is_open()) {
+      filevalues.precision(10);
+      for (const auto &nucl : output) {
+        filevalues << nucl->name() << "\n";
+        for (int i=0; i<4; ++i) {
+          filevalues << nucl->m_zbin[i] << "\t" << nucl->m_value_corrected[i] << nucl->m_err_corrected[i] << "\n";
+        }
+      }
+      filevalues.close();
+    }
+    else {
+      std::cerr << "ERROR from dataHandler, A problem ocurred when opening a file" << std::endl;
+    }
+  }
   std::cout << "dataHandler finished" << std::endl;
   return output;
 }

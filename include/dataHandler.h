@@ -70,6 +70,7 @@ public:
   void applyCorrection(myData*,double);
   void fill(int,double,double,double);
   void doTGraphErrors();
+  std::string name();
 };
 
 std::vector<myData*> dataHandler(myConfig*);

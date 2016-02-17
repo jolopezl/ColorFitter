@@ -23,13 +23,14 @@ int computeSimpleFit() {
   int Q2Int = -1;
   int izInt = -1;
   // defauls
-  int input_energyloss     = 0;
+  int input_energyloss     = 1;
   int input_subtraction    = 1;
   double input_correlation = 0.0;
   config->m_stat_only         = false;
   config->m_energyloss        = input_energyloss; // false;
   config->m_logbehavior       = false;
   config->m_fermimotion       = false;
+  config->m_preh              = true; // usually true
   config->m_cascade           = false;
   config->m_subtraction       = input_subtraction; // false;
   config->m_correlation       = input_correlation; // -1.0; // for physics -1.0 < rho < 0.0
@@ -37,6 +38,10 @@ int computeSimpleFit() {
   config->m_zBinOfInterest    = izInt;   // value in between 1 and ZDIM of z bins. -1 fits all.
   config->m_output_fit        = "testFit.txt";
   config->m_input_pt          = "hermesData.txt";
+  config->m_comment           = "2 Parameter Fit, sigma = 25 mbarn";
+
+  config->writeCorrectedValues = true;
+
   // config->Update();
   // Write configuration to file
   std::ostringstream foo;

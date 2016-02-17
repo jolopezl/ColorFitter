@@ -21,6 +21,9 @@ public:
   std::string m_output_fit = "testFit.txt";
   std::string m_input_pt   = "";
   std::string m_comment = "bin_info comment";
+
+  bool writeCorrectedValues = false;
+
   myConfig();
   ~myConfig();
   // void Update();

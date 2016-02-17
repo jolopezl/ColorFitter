@@ -199,9 +199,9 @@ std::vector<myResult*> ifit(myConfig *config) {
       //   //double lim_lo[] = {0.,0.1,-60.,0.1,0.0}; // negative limit on cross section models inelastic bin migration                   
       //   double lim_hi[] = {10.,50.,500.,1000.0,10.};
       // }
-      double vstart[] = {0.4775, 1.6,     40.,   2.5,    0.0,     0.2};
+      double vstart[] = {0.4775, 1.6,     25.,   2.5,    0.0,     0.2};
       double step[]   = {0.01,   0.01,    0.01,  0.5,    0.00001, 0.01};
-      double lim_lo[] = {0.,     0.0001, -0.01,  0.1,   -0.001,  -0.01};
+      double lim_lo[] = {0.,     0.0001, -0.01,  0.1,   -0.1,  -0.01};
       double lim_hi[] = {10.,    40.,     200.,  100.0,  10.,     100.0}; 
       gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
       gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
@@ -383,7 +383,8 @@ void modelplot(TMinuit *g,
   fout << pT2[0] << "\t" << pT2[1] << "\t" << pT2[2] << "\t";
   fout << Rm[0] << "\t" << Rm[1] << "\t" << Rm[2] << "\n"; 
   fout.close();
-  if (false) { // plots 
+  if (true) { // plots 
+    std::cout << "Now doing fit plots with model " << std::endl;
     int nbins = 40;
     double pt_fit[40];
     double pt_fiterr[40];
@@ -391,7 +392,7 @@ void modelplot(TMinuit *g,
     double mr_fit[40];
     double mr_fiterr[40];
     double mr_x[40];
-    for (int i=11;i<nbins; ++i) {
+    for (int i=12;i<nbins; ++i) {
       callModel(i/6.,par);
       pt_fit[i]=func_array[0];
       pt_fiterr[i]=0.;
@@ -439,7 +440,7 @@ void modelplot(TMinuit *g,
     ptfit->SetMarkerStyle(21);
     ptfit->SetLineWidth(2);
     ptfit->Draw("L SAME");
-    c1->Write();
+    // c1->Write();
     out_pt << ".pdf";
     c1->Print(out_pt.str().c_str());
     // Now do multiplicity ratio plot
@@ -464,8 +465,30 @@ void modelplot(TMinuit *g,
     mrfit->SetMarkerStyle(21);
     mrfit->SetLineWidth(2);
     mrfit->Draw("L SAME");
-    c2->Write();
+    // c2->Write();
     out_mr << ".pdf";
     c2->Print(out_mr.str().c_str());
+    // ***** print to file ***** //
+    std::string ptname_fout = ptname.substr(0, ptname.find(".", 0));
+    std::string mrname_fout = mrname.substr(0, mrname.find(".", 0));
+    ptname_fout+=".txt";
+    mrname_fout+=".txt";
+    std::ofstream fout_pt, fout_mr;
+    fout_pt.open(ptname_fout, std::ios::out);
+    fout_mr.open(mrname_fout, std::ios::out);
+    std::cout << "now printing to file " << std::endl;
+    if (fout_pt.is_open() && fout_mr.is_open()) {
+      fout_pt.precision(10);
+      fout_mr.precision(10);
+      for (int i = 12; i < 40; ++i) {
+        fout_pt << pt_x[i] << "\t" << pt_fit[i] << "\n";
+        fout_mr << mr_x[i] << "\t" << mr_fit[i] << "\n";
+      }
+      fout_pt.close();
+      fout_mr.close();
+    }
+    else {
+      std::cerr << "ERROR from ifit, A problem ocurred when opening a file" << std::endl;
+    }
   }
 }
