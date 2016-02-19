@@ -225,7 +225,10 @@ void Model::Compute(const double A){
   TRandom3 *gRandom = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
   gRandom->SetSeed(2053);
   double R=FindR(A,m_density_threshold); // this has to be done somewhere else since it takes time
-  // std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << std::endl;
+  if (irun == -1) {
+    std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << "1.1*A^(1/3)=" << 1.1*pow(A,1/3.) << std::endl;
+    irun = 1;
+  }
   double max_density=Density(A,0.,0.,0.);
   double x,y,z;
   double L;

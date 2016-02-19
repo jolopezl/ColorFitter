@@ -55,10 +55,10 @@ double rmerrstat[3][4] =
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model *m = new Model("default"); 
 
-void callModel(const double A,double *par){
+void callModel(const double A13,double *par){
   // qhat, lp, pre-hadron cross-section, log behaviour, energy loss, cascade
   std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4],par[5]};
-  double nucleus = (double) A*A*A;
+  double nucleus = (double) A13*A13*A13;
   m->SetParameters(my_pars);
   m->Compute(nucleus);
   func_array[0] = m->Get1(); 
@@ -110,9 +110,9 @@ std::vector<myResult*> ifit(myConfig *config) {
   // xxx[1]=pow(55.845,1./3.);  // Fe
   // xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
-  xxx[0]=1.1*pow(20.1797,1./3.); // Ne
-  xxx[1]=1.1*pow(83.7980,1./3.);  // Kr
-  xxx[2]=1.1*pow(131.293,1./3.); // Xe
+  xxx[0]=pow(20.1797,1./3.); // Ne
+  xxx[1]=pow(83.7980,1./3.); // Kr
+  xxx[2]=pow(131.293,1./3.); // Xe
   xxx[3]=xxx[0];
   xxx[4]=xxx[1];
   xxx[5]=xxx[2];

@@ -41,6 +41,7 @@ private:
   // Other parameters
   int m_maxmcSteps = 100000; // number of mc steps in the calculation
   double m_density_threshold = 0.005;
+  int irun = -1;
   // private methods
   double Density(const double, const double, const double, const double);
   double FindR(const double, const double);

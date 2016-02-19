@@ -23,7 +23,7 @@ int computeSimpleFit() {
   int Q2Int = -1;
   int izInt = -1;
   // defauls
-  int input_energyloss     = 1;
+  int input_energyloss     = 0;
   int input_subtraction    = 1;
   double input_correlation = 0.0;
   config->m_stat_only         = false;
