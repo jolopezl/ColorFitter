@@ -110,7 +110,7 @@ std::vector<myResult*> ifit(myConfig *config) {
   // xxx[1]=pow(55.845,1./3.);  // Fe
   // xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
-  xxx[0]=pow(20.1797,1./3.); // Ne
+  xxx[0]=pow(20.1797,1./3.); // Ne   here goes A^1/3
   xxx[1]=pow(83.7980,1./3.); // Kr
   xxx[2]=pow(131.293,1./3.); // Xe
   xxx[3]=xxx[0];
@@ -122,9 +122,7 @@ std::vector<myResult*> ifit(myConfig *config) {
     double A = pow(xxx[i],3.0);
     std::cout << "Value of c " << m->GetC((int) A) << " for A " << (int) A << std::endl;
   }
-  // dataHandler called here:
   auto fc = dataHandler(config);
-  // Here the rest of the code
   // TFile *fout = new TFile("fullfit.root","RECREATE");
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
     for (int iz=0; iz<ZDIM; ++iz) {
@@ -227,7 +225,7 @@ std::vector<myResult*> ifit(myConfig *config) {
       std::string bin_info = config->m_comment; // dummy value for HERMES
       double xB = -1; // dummy value for HERMES
       double Q2 = -1; // dummy value for HERMES
-      modelplot(gMinuit,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit,result);
+      modelplot(gMinuit,config,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit,result);
       vResult.push_back(result);
       // fout->Write();
       delete(gMinuit);
@@ -314,7 +312,7 @@ void justCompute(myConfig* config) {
 }
 
 // this will be moved away someday to graphics.cc
-void modelplot(TMinuit *g,
+void modelplot(TMinuit *g, myConfig *config,
                std::string bin_info,
                int iQ2x, int iz, double Q2,
                double xB, double z,  
@@ -383,7 +381,7 @@ void modelplot(TMinuit *g,
   fout << pT2[0] << "\t" << pT2[1] << "\t" << pT2[2] << "\t";
   fout << Rm[0] << "\t" << Rm[1] << "\t" << Rm[2] << "\n"; 
   fout.close();
-  if (true) { // plots 
+  if (config->outputPlots) { // plots 
     std::cout << "Now doing fit plots with model " << std::endl;
     int nbins = 40;
     double pt_fit[40];

@@ -226,7 +226,7 @@ void Model::Compute(const double A){
   gRandom->SetSeed(2053);
   double R=FindR(A,m_density_threshold); // this has to be done somewhere else since it takes time
   if (irun == -1) {
-    std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << "1.1*A^(1/3)=" << 1.1*pow(A,1/3.) << std::endl;
+    std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << "\t 1.1*A^(1/3) = " << 1.1*pow(A,1/3.) << " [fm]" << std::endl;
     irun = 1;
   }
   double max_density=Density(A,0.,0.,0.);

@@ -30,7 +30,7 @@ double chisq(double*);
 void fcn(int&, double*, double&, double*, int);
 // void ifit(bool,bool,bool,int,int,double,std::string);
 std::vector<myResult*> ifit(myConfig*);
-void modelplot(TMinuit*, std::string, int, int, double, double, double,std::string,myResult*);
+void modelplot(TMinuit*, myConfig*, std::string, int, int, double, double, double,std::string,myResult*);
 void justCompute(myConfig*);
 int test();
 

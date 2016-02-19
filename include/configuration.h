@@ -22,6 +22,7 @@ public:
   std::string m_input_pt   = "";
   std::string m_comment = "bin_info comment";
 
+  bool outputPlots = true;
   bool writeCorrectedValues = false;
 
   myConfig();

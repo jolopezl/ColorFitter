@@ -41,6 +41,7 @@ int computeSimpleFit() {
   config->m_comment           = "2 Parameter Fit, sigma = 25 mbarn";
 
   config->writeCorrectedValues = true;
+  config->outputPlots          = true;
 
   // config->Update();
   // Write configuration to file
