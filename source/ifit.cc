@@ -53,7 +53,7 @@ double rmerrstat[3][4] =
 */
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
-Model *m = new Model("default"); 
+Model *m;
 
 void callModel(const double A13,double *par){
   // qhat, lp, pre-hadron cross-section, log behaviour, energy loss, cascade
@@ -98,6 +98,7 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
 }
 
 std::vector<myResult*> ifit(myConfig *config) {
+  m = new Model("default");
   std::vector<myResult*> vResult;
   myResult *result = new myResult();
   m->Initialization();
@@ -236,88 +237,10 @@ std::vector<myResult*> ifit(myConfig *config) {
   return vResult;
 }
 
-double fermi(double m_xB, double m_zbinvalue, int inucleus) {
-  // Computes the contribution of fermi momentum broadening to 
-  // pT broadening using Boris's formula
-  double avgFermi;// <(Fermi momentum)**2>
-  //.033 Pb
-  //.028 Fe
-  //.029 C
-  //.023 D
-  // From Taya's study, not completely final: 
-  //0.019 Pb
-  //0.014 Fe
-  //0.015 C
-  //0.002 D
-  avgFermi=-999.;
-  //  if(inucleus==0){avgFermi=0.029-.023;} // Carbon
-  //  if(inucleus==1){avgFermi=0.028-.023;} // Iron
-  //  if(inucleus==2){avgFermi=0.033-.023;} // Lead
-  if (inucleus == 0) avgFermi=0.015-.002; // Carbon
-  if (inucleus == 1) avgFermi=0.014-.002; // Iron
-  if (inucleus == 2) avgFermi=0.019-.002; // Lead
-  if (avgFermi == -999.) {
-    std::cout << "Fermi error" << std::endl;
-  }
-  // x=Q2/2Mnu
-  //  Double_t x = Q2_lo[iQ2nu][iz][0]/2.+Q2_hi[iQ2nu][iz][0]/2.;
-  //x=x/(2.*0.9385);
-  //x=x/(nu_lo[iQ2nu][iz][0]/2.+nu_hi[iQ2nu][iz][0]/2.);
-  // The part below is for the data when it is read in as x, not as nu.
-  double x = m_xB; 
-  double z_h = m_zbinvalue;
-  double result = 0.6666666*x*x*z_h*z_h*avgFermi;
-  return result; 
-}
-
-// For testing only
-int test() {
-  std::vector<std::string> atoms = {"Carbon","Iron","Lead"};
-  std::vector<double> masses = {12.0107,55.845,207.2};
-  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0}; //{ 0.2, 7.,1.0 }
-  Model *m = new Model("default");
-  m->SetParameters(parms);
-  m->Initialization();
-  std::vector<double> foo;
-  double nucleus;
-  double nu[3]={20.1797,83.798,131.293};
-  for (int i=0; i<3; ++i){
-    nucleus = (double) nu[i];
-    m->Compute(nucleus);
-    std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
-  }
-  for (int i=1; i<=6; ++i){
-    nucleus = (double) i*i*i;
-    m->Compute(nucleus);
-    std::cout << i << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
-  }
-  delete(m);
-  return 0;
-}
-
-// function to compite the model given a set of parameters and print the output to the screen
-void justCompute(myConfig* config) {
-  Model* model = new Model("toy");
-  m->Initialization();
-  m->DoEnergyLoss(config->m_energyloss);
-  m->DoLogBehavior(config->m_logbehavior);
-  double A_Ne = 1.1*pow(20.1797,1./3.); // Ne
-  double A_Kr = 1.1*pow(83.7980,1./3.); // Kr
-  double A_Xe = 1.1*pow(131.293,1./3.); // Xe
-  double foo = 0.0;
-  foo = pow(A_Ne,3.0);
-  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0,0.0};
-  m->SetParameters(parms);
-  m->Compute(foo);
-}
-
 // this will be moved away someday to graphics.cc
-void modelplot(TMinuit *g, myConfig *config,
-               std::string bin_info,
-               int iQ2x, int iz, double Q2,
-               double xB, double z,  
-               std::string filename,
-               myResult *result){
+void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
+               int iQ2x, int iz, double Q2, double xB, double z,  
+               std::string filename, myResult *result) {
   double z1[3],x1[3],errorz1[3];  
   double z2[3],x2[3],errorz2[3];
   z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -335,7 +258,7 @@ void modelplot(TMinuit *g, myConfig *config,
   TString chnam;
   double par[NPAR], par_errors[NPAR];
   std::ostringstream out;
-  for (int parNo=0; parNo<NPAR; ++parNo) {
+  for (int parNo = 0; parNo < NPAR; ++parNo) {
     out << "a" << parNo;
     chnam = (TString) out.str();
     out.flush();
@@ -343,17 +266,14 @@ void modelplot(TMinuit *g, myConfig *config,
     par[parNo] = val;
     par_errors[parNo] = err;
   }
-  double chisquared = chisq(par);
-  // add values to result obj
+  const double chisquared = chisq(par);
   result->m_zbin         = z;
-  // Parameters
   result->m_qhat         = par[0];
   result->m_lp           = par[1];
   result->m_sigma_ph     = par[2];
   result->m_log          = par[3];
   result->m_dz           = par[4];
   result->m_cascade      = par[5];
-  // Parameters Errors
   result->m_qhat_err     = par_errors[0];
   result->m_lp_err       = par_errors[1];
   result->m_sigma_ph_err = par_errors[2];
@@ -362,24 +282,32 @@ void modelplot(TMinuit *g, myConfig *config,
   result->m_cascade      = par_errors[5];
   result->m_chi2         = chisquared;
   // At this point, we know the parameters, so let's write them out
+  bool doCSVFile = true;
+  std::string myDelimeter;
+  if (doCSVFile) {
+    myDelimeter = ";";
+  }
+  else {
+    myDelimeter = "\t";
+  }
   std::ofstream fout;
   fout.open(filename, std::ios::out | std::ios::app);
   fout.precision(10);
   if (iz == 0) fout << bin_info << "\n";
   if (Q2!=-1 && xB!=-1) {
-    fout << iQ2x << "\t" << iz << "\t";
-    fout << Q2 << "\t" << xB << "\t";
+    fout << iQ2x << myDelimeter << iz << myDelimeter;
+    fout << Q2 << myDelimeter << xB << myDelimeter;
   }
-  fout << z << "\t";
+  fout << z << myDelimeter;
   for (int i=0; i<NPAR; ++i){
-    fout << par[i] << "\t";
+    fout << par[i] << myDelimeter;
   }
   for (int i=0; i<NPAR; ++i){
-    fout << par_errors[i] << "\t";
+    fout << par_errors[i] << myDelimeter;
   }
-  fout << chisquared << "\t";
-  fout << pT2[0] << "\t" << pT2[1] << "\t" << pT2[2] << "\t";
-  fout << Rm[0] << "\t" << Rm[1] << "\t" << Rm[2] << "\n"; 
+  fout << chisquared << myDelimeter;
+  fout << pT2[0] << myDelimeter << pT2[1] << myDelimeter << pT2[2] << myDelimeter;
+  fout << Rm[0] << myDelimeter << Rm[1] << myDelimeter << Rm[2] << "\n"; 
   fout.close();
   if (config->outputPlots) { // plots 
     std::cout << "Now doing fit plots with model " << std::endl;
@@ -410,11 +338,12 @@ void modelplot(TMinuit *g, myConfig *config,
     ptname = out_pt.str();
     TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
     TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
-    c1->SetGrid();c2->SetGrid();
+    c1->SetGrid();
+    c2->SetGrid();
     TGraphErrors *pt_broadening = new TGraphErrors(3,x1,z1,errorz1,errorz1);
-    TGraphErrors *ptfit = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
-    TGraphErrors *mult_ratio = new TGraphErrors(3,x2,z2,errorz2,errorz2);
-    TGraphErrors *mrfit = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
+    TGraphErrors *ptfit         = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
+    TGraphErrors *mult_ratio    = new TGraphErrors(3,x2,z2,errorz2,errorz2);
+    TGraphErrors *mrfit         = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
     c1->cd();
     pt_broadening->SetTitle(out_pt.str().c_str());
     pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
@@ -490,3 +419,79 @@ void modelplot(TMinuit *g, myConfig *config,
     }
   }
 }
+
+double fermi(double m_xB, double m_zbinvalue, int inucleus) {
+  // Computes the contribution of fermi momentum broadening to 
+  // pT broadening using Boris's formula
+  double avgFermi;// <(Fermi momentum)**2>
+  //.033 Pb
+  //.028 Fe
+  //.029 C
+  //.023 D
+  // From Taya's study, not completely final: 
+  //0.019 Pb
+  //0.014 Fe
+  //0.015 C
+  //0.002 D
+  avgFermi=-999.;
+  //  if(inucleus==0){avgFermi=0.029-.023;} // Carbon
+  //  if(inucleus==1){avgFermi=0.028-.023;} // Iron
+  //  if(inucleus==2){avgFermi=0.033-.023;} // Lead
+  if (inucleus == 0) avgFermi=0.015-.002; // Carbon
+  if (inucleus == 1) avgFermi=0.014-.002; // Iron
+  if (inucleus == 2) avgFermi=0.019-.002; // Lead
+  if (avgFermi == -999.) {
+    std::cout << "Fermi error" << std::endl;
+  }
+  // x=Q2/2Mnu
+  //  Double_t x = Q2_lo[iQ2nu][iz][0]/2.+Q2_hi[iQ2nu][iz][0]/2.;
+  //x=x/(2.*0.9385);
+  //x=x/(nu_lo[iQ2nu][iz][0]/2.+nu_hi[iQ2nu][iz][0]/2.);
+  // The part below is for the data when it is read in as x, not as nu.
+  double x = m_xB; 
+  double z_h = m_zbinvalue;
+  double result = 0.6666666*x*x*z_h*z_h*avgFermi;
+  return result; 
+}
+
+// For testing only
+int test() {
+  std::vector<std::string> atoms = {"Carbon","Iron","Lead"};
+  std::vector<double> masses = {12.0107,55.845,207.2};
+  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0}; //{ 0.2, 7.,1.0 }
+  Model *m = new Model("default");
+  m->SetParameters(parms);
+  m->Initialization();
+  std::vector<double> foo;
+  double nucleus;
+  double nu[3]={20.1797,83.798,131.293};
+  for (int i=0; i<3; ++i){
+    nucleus = (double) nu[i];
+    m->Compute(nucleus);
+    std::cout << nu[i] << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
+  }
+  for (int i=1; i<=6; ++i){
+    nucleus = (double) i*i*i;
+    m->Compute(nucleus);
+    std::cout << i << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
+  }
+  delete(m);
+  return 0;
+}
+
+// function to compite the model given a set of parameters and print the output to the screen
+void justCompute(myConfig* config) {
+  Model* model = new Model("toy");
+  m->Initialization();
+  m->DoEnergyLoss(config->m_energyloss);
+  m->DoLogBehavior(config->m_logbehavior);
+  double A_Ne = 1.1*pow(20.1797,1./3.); // Ne
+  double A_Kr = 1.1*pow(83.7980,1./3.); // Kr
+  double A_Xe = 1.1*pow(131.293,1./3.); // Xe
+  double foo = 0.0;
+  foo = pow(A_Ne,3.0);
+  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0,0.0};
+  m->SetParameters(parms);
+  m->Compute(foo);
+}
+

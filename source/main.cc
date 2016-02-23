@@ -30,7 +30,7 @@ int computeSimpleFit() {
   config->m_energyloss        = input_energyloss; // false;
   config->m_logbehavior       = false;
   config->m_fermimotion       = false;
-  config->m_preh              = true; // usually true
+  config->m_preh              = false; // usually true
   config->m_cascade           = false;
   config->m_subtraction       = input_subtraction; // false;
   config->m_correlation       = input_correlation; // -1.0; // for physics -1.0 < rho < 0.0
@@ -39,12 +39,8 @@ int computeSimpleFit() {
   config->m_output_fit        = "testFit.txt";
   config->m_input_pt          = "hermesData.txt";
   config->m_comment           = "2 Parameter Fit, sigma = 25 mbarn";
-
   config->writeCorrectedValues = true;
   config->outputPlots          = true;
-
-  // config->Update();
-  // Write configuration to file
   std::ostringstream foo;
   foo << "iFit Info: Energy Loss: " << config->m_energyloss;
   foo << " - He subtraction: "      << config->m_subtraction;
