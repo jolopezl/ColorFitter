@@ -189,19 +189,15 @@ std::vector<myResult*> ifit(myConfig *config) {
       gMinuit->mnexcm("SET ERR", arglist ,1,ierflg);
       arglist[0] = 3;
       gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
-      // Set starting values and step sizes for parameters
-      // if (false) {
-      //   // double vstart[] = {0.7, 1.6, 20.,2.5,0.0};
-      //   double vstart[] = {0.4775, 1.6, 20.,2.5,0.0};
-      //   double step[]   = {0.01,0.01, 1.,0.5,0.00001};
-      //   double lim_lo[] = {0.,0.0001,-60.,0.1,-0.001}; // negative limit on cross section models inelastic bin migration
-      //   //double lim_lo[] = {0.,0.1,-60.,0.1,0.0}; // negative limit on cross section models inelastic bin migration                   
-      //   double lim_hi[] = {10.,50.,500.,1000.0,10.};
-      // }
-      double vstart[] = {0.4775, 1.6,     25.,   2.5,    0.0,     0.2};
+      const double s0 = config->m_initial_sigma;
+      double vstart[] = {0.4775, 1.6,     s0,    2.5,    0.0,     0.2};
       double step[]   = {0.01,   0.01,    0.01,  0.5,    0.00001, 0.01};
       double lim_lo[] = {0.,     0.0001, -0.01,  0.1,   -0.1,  -0.01};
-      double lim_hi[] = {10.,    40.,     200.,  100.0,  10.,     100.0}; 
+      double lim_hi[] = {10.,    400.,     400.,  100.0,  10.,     100.0}; 
+      if (false) {
+        lim_lo[4] = -10.0;
+        lim_hi[4] = +10.0;
+      }
       gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
       gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
       gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
@@ -218,6 +214,13 @@ std::vector<myResult*> ifit(myConfig *config) {
       arglist[0] = 500;
       arglist[1] = 1.;
       gMinuit->mnexcm("MIGRAD", arglist, 6,ierflg);
+      if (config->doMINOSErrors == true) {
+        double p0[10];
+        for (int i=1; i<=3; i++) {
+          p0[1] = i;
+          gMinuit->mnexcm("MINOS", p0, 6,ierflg);
+        }
+      }
       // Print results
       double amin,edm,errdef;
       int nvpar,nparx,icstat;
@@ -319,6 +322,7 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
     double mr_fiterr[40];
     double mr_x[40];
     for (int i=12;i<nbins; ++i) {
+      std::cout << "Modelplot " << i << " A^1/3 = " << i/6. << std::endl;
       callModel(i/6.,par);
       pt_fit[i]=func_array[0];
       pt_fiterr[i]=0.;
@@ -482,16 +486,17 @@ int test() {
 // function to compite the model given a set of parameters and print the output to the screen
 void justCompute(myConfig* config) {
   Model* model = new Model("toy");
-  m->Initialization();
-  m->DoEnergyLoss(config->m_energyloss);
-  m->DoLogBehavior(config->m_logbehavior);
-  double A_Ne = 1.1*pow(20.1797,1./3.); // Ne
-  double A_Kr = 1.1*pow(83.7980,1./3.); // Kr
-  double A_Xe = 1.1*pow(131.293,1./3.); // Xe
-  double foo = 0.0;
-  foo = pow(A_Ne,3.0);
-  std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0,0.0};
-  m->SetParameters(parms);
-  m->Compute(foo);
+  model->Initialization();
+  model->DoEnergyLoss(config->m_energyloss);
+  model->DoLogBehavior(config->m_logbehavior);
+  const double A_Ne = pow(20.1797,1./3.); // Ne
+  const double A_Kr = pow(83.7980,1./3.); // Kr
+  const double A_Xe = pow(131.293,1./3.); // Xe
+  const double foo[3] = {pow(A_Ne,3.0),pow(A_Kr,3.0),pow(A_Xe,3.0)};
+  const std::vector<double> parms = {0.2, 7.0, 1.0,2.5,0.0,0.0};
+  model->SetParameters(parms);
+  for (int i = 0; i < 3; ++i){
+    model->Compute(foo[i]);
+    std::cout << i << "\t" << m->Get1() << "\t" << m->Get2() << std::endl;
+  }
 }
-

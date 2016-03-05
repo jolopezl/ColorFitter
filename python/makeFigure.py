@@ -4,10 +4,10 @@ from numpy import loadtxt
 from ROOT import *
 
 # path = '2p-fixed-crosssection=25mbarn/'
-path = '3p-no-energy/'
+path = 'Ifit__2p-25mbarn/'
 file = 'testFit.txt'
 fitfile = path+file
-zbin = 3
+zbin = 2
 ########################################################
 ########################################################
 #### data points pT2 is corrected here ####
@@ -27,7 +27,7 @@ rm_err_kripton   = array("f",[0.0542930099596,0.0447182315218,0.05222907333,0.05
 rm_err_xenon     = array("f",[0.0535218789044,0.0411665583174,0.0503850083386,0.0529182285411])
 ########################################################
 ########################################################
-fitpars = loadtxt(fitfile,skiprows=1)
+fitpars = loadtxt(fitfile,delimiter=";",skiprows=1)
 zval       = "%.2f" % zcentr[zbin]
 qhat       = "%.2f" % fitpars[zbin, 1]
 lp         = "%.2f" % fitpars[zbin, 2]
@@ -86,11 +86,11 @@ def getDataPoints(zin):
   gg_pt.GetYaxis().SetTitleSize(fontAxesSize)
   gg_pt.GetYaxis().SetLabelFont(fontAxesCode)
   gg_pt.GetYaxis().SetLabelSize(fontAxesSize)
-  ylo = -0.028
-  yhi = 0.036
+  ylo = -0.025
+  yhi = 0.045
   gg_pt.GetYaxis().SetRangeUser(ylo,yhi)
-  ylo = 0.4
-  yhi = 0.94
+  ylo = 0.41
+  yhi = 0.99
   gg_rm.GetYaxis().SetRangeUser(ylo,yhi)
   gg_rm.GetYaxis().SetTitleOffset(1.75)
   gg_pt.GetYaxis().SetTitleOffset(1.75)
@@ -109,38 +109,39 @@ def getModelPlots(zin):
 ########################################################
 gStyle.SetPadRightMargin(0.05)
 gStyle.SetPadLeftMargin(0.125)
+# gStyle.SetPadLeftMargin(0.15)
 gStyle.SetPadBottomMargin(0.16)
 gStyle.SetOptStat(0)
 gStyle.SetOptTitle(0)
 gStyle.SetEndErrorSize(7.5)
 
-c1 = TCanvas("paddy","paddy",800,1600)#,700,700)
-c1.Divide(1,2)
-# zbin = 0
-# updateParameters(zbin)
-gg_pt,gg_rm=getDataPoints(zbin)
-model_pt,model_rm=getModelPlots(zbin)  
-c1.cd(1)
-gPad.SetBottomMargin(0.001)
-gPad.SetTopMargin(0.01)
-gPad.SetRightMargin(0.01)
-gg_pt.Draw("AP")
-model_pt.Draw("SAME")
-##
-c1.cd(2)
-gPad.SetTopMargin(0.001)
-gPad.SetRightMargin(0.01)
-gg_rm.Draw("AP")
-model_rm.Draw("SAME")
-
-c1.cd(1)
-# text
-text1 = TLatex()
-text1.SetNDC()
-text1.SetTextFont(83)
-text1.SetTextSize(28-4)
-text1.DrawLatex(0.16,0.82,
-"#splitline{#splitline{z = "+zval+"}{q_{0} = "+str(qhat)+" #pm "+str(qhat_err)+"}}{#splitline{l_{p} = "+str(lp)+" #pm "+str(lp_err)+"}{#sigma_{ph} = "+str(sigma)+" #pm "+str(sigma_err)+"}}")
-
-c1.Print("test_result.pdf")
+for i in range(4):
+  zbin = i
+  c1 = TCanvas("paddy","paddy",800,800)#,700,700)
+  c1.Divide(1,2)
+  gg_pt,gg_rm=getDataPoints(zbin)
+  model_pt,model_rm=getModelPlots(zbin)  
+  c1.cd(1)
+  gPad.SetBottomMargin(0.001)
+  gPad.SetTopMargin(0.01)
+  gPad.SetRightMargin(0.01)
+  gg_pt.Draw("AP")
+  model_pt.Draw("SAME")
+  c1.cd(2)
+  gPad.SetTopMargin(0.001)
+  gPad.SetRightMargin(0.01)
+  gg_rm.Draw("AP")
+  model_rm.Draw("SAME")
+  c1.cd(1)
+  ####### text #######
+  text1 = TLatex()
+  text1.SetNDC()
+  text1.SetTextFont(43)
+  text1.SetTextSize(28-4)
+  text1.DrawLatex(
+    0.16,0.81,
+    "#splitline{#splitline{z = "+zval+"}{q_{0} = "+str(qhat)+" #pm "+str(qhat_err)+"}}{#splitline{l_{p} = "+str(lp)+" #pm "+str(lp_err)+"}{#sigma_{ph} = "+str(sigma)+" #pm "+str(sigma_err)+"}}"
+    )
+  # text1.DrawLatex(0.16,0.81,"z = "+zval+"  q_{0} = "+str(qhat)+" #pm "+str(qhat_err)+"  l_{p} = "+str(lp)+" #pm "+str(lp_err)+"  #sigma_{ph} = "+str(sigma)+" #pm "+str(sigma_err))
+  c1.Print("modelplot_0"+str(zbin)+".pdf")
 

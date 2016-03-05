@@ -335,10 +335,12 @@ void Model::Compute(const double A){
   temp = accumulator2/normalize;
   if (m_DoEnergyLoss == true) {
     if (m_iz > 0) {
-      temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+      //temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+      temp+=(-(1.-m_binratio)*m_dz/m_zbinwidth );
     }
     else {
-      temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
+      //temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
+      temp+=((m_binratio*m_dz)/m_zbinwidth);
     }
   }
   m_dPt2=accumulator1/normalize; //  pT broadening

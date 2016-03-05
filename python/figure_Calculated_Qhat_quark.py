@@ -7,21 +7,25 @@ import sys, os, ROOT
 # factor = 0.02844
 factor=1.0/42.0;
 
-
-basepath = "data/fitPIplus/"
-
-folders3P = ["test3P/","test3P-0.0/","test3P-0.5/","test3P-1.0/"]
-folders4P = ["test4P/","test4P-0.0/","test4P-0.5/","test4P-1.0/"]
-filaname = "testFit.txt"
+basepath = "../../test/"
+folders3P = ["Ifit__3p-uncorrected/","Ifit__3p/","Ifit__3p-rho=-0.5/","Ifit__3p-rho=-1.0/"]
+folders4P = ["Ifit__4p-new-uncorrected/","Ifit__4p-new/","Ifit__4p-new-rho=-0.5/","Ifit__4p-new-rho=-1.0/"]
+filaname = "testFit.csv"
 
 file_pt_ne = "data/pt_ne.dat"
 file_pt_kr = "data/pt_kr.dat"
 file_pt_xe = "data/pt_xe.dat"
 
 def retrieveTGraphErrors(i,par,nop,aux):
-  xtemp,ytemp,yerrtemp,pT2 = loadtxt(filepath,unpack=True,skiprows=1,usecols=[ix,iy,iyerr,pT2col])
-  
-
+  if (nop=="3P"):
+    filepath = basepath+folders3P[i]+filaname
+  elif (nop=="4P"):
+    filepath = basepath+folders4P[i]+filaname
+  ix = 0
+  iy = 2
+  iyerr = 8
+  pT2col = 13 + aux # increases in 0(Ne), 1(Kr), 2(Xe)
+  xtemp,ytemp,yerrtemp,pT2 = loadtxt(filepath,delimiter=";",unpack=True,skiprows=1,usecols=[ix,iy,iyerr,pT2col])
   # compute new values:
   xval = array("f",[0,0,0,0])
   yval = array("f",[0,0,0,0])
@@ -29,7 +33,7 @@ def retrieveTGraphErrors(i,par,nop,aux):
   yerr = array("f",[0,0,0,0])
   for i in range(4):
     xval[i] = xtemp[i]
-    yval[i] = pT2[i]/ytemp[i]
+    yval[i] = pT2[i]/ytemp[i]/(xval[i]**2)
     yerr[i] = abs(yval[i])*sqrt((yerrtemp[i]/abs(ytemp[i]))**2)
     # normalize yval
     yval[i] = yval[i]/factor
@@ -127,7 +131,7 @@ text1.SetNDC()
 text1.SetTextFont(43)
 text1.SetTextSize(fontAxesSize+5)
 #
-c.Divide(3,2)
+c.Divide(1,2)
 nuclei_name = "Neon"
 plt3P,plt4P,leg=arrayPlot("pT2/lp",0)
 c.cd(1)
@@ -159,6 +163,7 @@ line0.Draw("SAME")
 #   plt4P[i].Fit("pol0","N0")
 leg.SetFillStyle(0)
 leg.Draw()
+c.Print("qhat_neon.pdf")
 ###################################
 nuclei_name = "Krypton"
 plt3P,plt4P,leg=arrayPlot("pT2/lp",1)

@@ -188,7 +188,9 @@ std::vector<myData*> dataHandler(myConfig *config) {
   kr->doTGraphErrors();
   xe->doTGraphErrors();
   // Do plots of data
-  doDataPlots(config,he,ne,kr,xe);
+  if (config->correctionPlots){
+    doDataPlots(config,he,ne,kr,xe);
+  }
   // Prepare output and finish
   std::vector<myData*> output;
   // output.push_back(he); // we don't need to return He.
@@ -205,7 +207,7 @@ std::vector<myData*> dataHandler(myConfig *config) {
       for (const auto &nucl : output) {
         filevalues << nucl->name() << "\n";
         for (int i=0; i<4; ++i) {
-          filevalues << nucl->m_zbin[i] << "\t" << nucl->m_value_corrected[i] << nucl->m_err_corrected[i] << "\n";
+          filevalues << nucl->m_zbin[i] << "\t" << nucl->m_value_corrected[i] << "\t" << nucl->m_err_corrected[i] << "\n";
         }
       }
       filevalues.close();

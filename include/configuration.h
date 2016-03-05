@@ -2,6 +2,7 @@
 #define CONFIGURATION_H
 
 #include <iostream>
+#include <sstream>
 
 class myConfig {
 public:
@@ -14,6 +15,7 @@ public:
   bool m_qhat         = true;
   bool m_lp           = true;
   bool m_preh         = true;
+  double m_initial_sigma = 40.0;
   bool m_subtraction  = false;
   double m_correlation = 0.0;
   int  m_Q2BinOfInterest   = -1; // someone in between 1 and Q2DIM of Q2,x bins. -1 fits all.
@@ -22,12 +24,15 @@ public:
   std::string m_input_pt   = "";
   std::string m_comment = "bin_info comment";
 
+  bool doMINOSErrors = false;
+
   bool outputPlots = true;
   bool writeCorrectedValues = false;
+  bool correctionPlots = false;
 
   myConfig();
   ~myConfig();
-  // void Update();
+  void Update();
 };
 
 #endif
