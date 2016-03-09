@@ -214,7 +214,7 @@ void Model::InteractionPoint(double &x, double &y, double &z, const double R){
   }
 }
 
-void Model::Compute(const double A){
+int Model::Compute(const double A){
   // Computation of both quantities dPt2 and Rm
   // We are doing an MC average
   TF1 *dtd1 = new TF1("dtd1", "[0]*0.170/(1+exp((sqrt([1]*[1]+[2]*[2]+x*x)-[3])/0.5))", 0.,40.); // pT broadening divided by constant.
@@ -289,6 +289,7 @@ void Model::Compute(const double A){
       std::cout << "igdtd1 is negative!! Error!! \n";
       temp=0.;
       zrange1=1.; // dummy value
+      return 1;
     }
     if(temp==0){ 
       zrange1=1.; // dummy value
@@ -313,6 +314,7 @@ void Model::Compute(const double A){
     }
     if(temp<0){ // this integral should always be positive.
       std::cout << "igdtd2 is negative!! Error!! \n";
+      return 1;
     }
     if(zrange2>0){
       if (!m_doCascade) {
@@ -327,6 +329,7 @@ void Model::Compute(const double A){
     }
     if(zrange2<0){
       std::cout<<"Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";  
+      return 1;
     }
     //      normalize+= 1.;
     normalize+=weight; // weight initial interaction by density  
@@ -345,4 +348,5 @@ void Model::Compute(const double A){
   }
   m_dPt2=accumulator1/normalize; //  pT broadening
   m_Rm=temp; //  Multiplicity
+  return 0;
 }

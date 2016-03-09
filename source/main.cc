@@ -7,6 +7,7 @@ int demoPlots2D(); // Do fancier plots and studies of the model
 int computeSimpleFit();                           // A simple fits trusted.
 int computeComplexFit(int argc, char *argv[]);    // A fit with a complex configuration
 int printInteractionPoints();
+int computeBand();
 
 
 // ************ main function ************ //
@@ -14,6 +15,7 @@ int main(int argc, char *argv[]) {
   // demoPlots();
   // printInteractionPoints();
   computeSimpleFit();
+  // computeBand();
 }
 
 // **************** Compute a Simple Fit **************** //
@@ -26,30 +28,78 @@ int computeSimpleFit() {
   int input_energyloss     = 1;
   int input_subtraction    = 1;
   double input_correlation = 0.0;
-  config->m_stat_only         = false;
-  config->m_energyloss        = input_energyloss; // false;
-  config->m_logbehavior       = false;
-  config->m_fermimotion       = false;
-  config->m_preh              = true; // usually true
-  config->m_initial_sigma     = 40.0;
-  config->m_cascade           = false;
+  config->m_energyloss        = input_energyloss;  // false;
   config->m_subtraction       = input_subtraction; // false;
-  config->m_correlation       = input_correlation; // -1.0; // for physics -1.0 < rho < 0.0
-  config->m_Q2BinOfInterest   = Q2Int;   // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
-  config->m_zBinOfInterest    = izInt;   // value in between 1 and ZDIM of z bins. -1 fits all.
+  config->m_correlation       = input_correlation; // for physics -1.0 < rho < 0.0
+  config->m_preh              = false; // usually true
+  config->m_initial_sigma     = 25.0;  // do it < 40 mbarns
+  config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
+  config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
   config->m_output_fit        = "testFit.csv";
   config->m_input_pt          = "hermesData.txt";
   config->writeCorrectedValues = false; // text file from dataHandler
   config->correctionPlots      = false; // from dataHandler
   config->outputPlots          = false; // model and data
-
-  config->doMINOSErrors = false;
-
+  config->doMINOSErrors = false; // usually false
   config->Update();
   std::cout << "Running iFit now:" << std::endl;
   auto fitOutput = ifit(config);
   return 0;
 }
+
+// **** computations of the model **** //
+int computeBand() {
+  Model *model = new Model("computeBand");
+  model->Initialization();
+  model->DoFixedLp(false);
+  // Calculated values for z=0.75 with 3P Fit
+  const double values[] = {1.39305676,  3.02980576,  19.51217989}; // qhat, lp, cross-section
+  const double errors[] = {1.71818655,  4.670434572, 26.69759973};
+  double qhat = -1.0, lp = -1.0, sigma = -1.0;
+  TRandom3 random;
+  double nucleus   = 83.7980;
+  double delta_pT2 = -1.0;
+  double Rm        = -1.0;
+  double acc1 = 0., acc2 = 0;
+  int sc = -1; // status code
+
+  TFile *fout = new TFile("fullfit2.root","RECREATE");
+  TTree *tree = new TTree("tree", "fits");
+  tree->Branch("qhat",  &qhat,      "qhat/D"  );
+  tree->Branch("lp",    &lp,        "lp/D"    );
+  tree->Branch("sigma", &sigma,     "sigma/D" );
+  tree->Branch("pT2",   &delta_pT2, "pT2/D"   );
+  tree->Branch("Rm",    &Rm,        "Rm/D"    );
+  tree->Branch("SC",    &sc,        "SC/I"    );
+
+  int mcsteps = 5000;
+  for (int i = 0; i < mcsteps; i++) {
+    qhat  = random.Gaus(values[0], errors[0]/2.0);
+    lp    = random.Gaus(values[1], errors[1]/2.0);
+    sigma = random.Gaus(values[2], errors[2]/2.0);
+    model->SetParameters("qhat",     qhat  );
+    model->SetParameters("lp",       lp    );
+    model->SetParameters("sigma_ph", sigma );
+    sc = model->Compute(nucleus);
+    // if (sc == 1) continue;
+    delta_pT2 = model->Get1();
+    Rm = model->Get2();
+    // std::cout << "         QHAT VALUE=" << values[0] << "+/-" << errors[0] << " SORTED=" << parameter[0] << std::endl;
+    // std::cout << "           LP VALUE=" << values[1] << "+/-" << errors[1] << " SORTED=" << parameter[1] << std::endl;
+    // std::cou t << "CROSS-SECTION VALUE=" << values[2] << "+/-" << errors[2] << " SORTED=" << parameter[2] << std::endl;
+    // std::cout << i << "\t" << delta_pT2 << "\t" << Rm << std::endl;
+    tree->Fill();
+    acc1+=delta_pT2;
+    acc2+=Rm;
+  }
+  delta_pT2 = acc1/mcsteps;
+  Rm = acc2/mcsteps;
+  std::cout << "AVERAGE VALUES " << delta_pT2 << "\t" << Rm << std::endl;
+  tree->Write();
+  fout->Write();
+  return 0;
+}
+
 
 // *** prints interaction points *** //
 int printInteractionPoints() {

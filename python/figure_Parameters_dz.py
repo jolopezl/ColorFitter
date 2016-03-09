@@ -23,15 +23,15 @@ errors[0].append( array("f",[0,0,0,0]) ) # rho =  0.0
 errors[0].append( array("f",[0,0,0,0]) ) # rho = -0.5
 errors[0].append( array("f",[0,0,0,0]) ) # rho = -1.0
 
-values[1].append( array("f",[-0.011283372,-0.026647436,-0.066144118,-0.018588115]) ) # unsubtracted
-values[1].append( array("f",[-0.002802976,-0.030409575,-0.056962346,-0.018320743]) ) # rho =  0.0
-values[1].append( array("f",[-0.005235504,-0.018375814,-0.056024581,-0.018320984]) ) # rho = -0.5
-values[1].append( array("f",[-0.007088794,-0.036870089,-0.054087861,-0.018069479]) ) # rho = -1.0
+values[1].append( array("f",[-0.011283372, -0.026647436, -0.066144118, -0.018588115]) ) # unsubtracted
+values[1].append( array("f",[-0.002802976, -0.030409575, -0.056962346, -0.018320743]) ) # rho =  0.0
+values[1].append( array("f",[-0.005235504, -0.018375814, -0.056024581, -0.018320984]) ) # rho = -0.5
+values[1].append( array("f",[-0.007088794, -0.036870089, -0.054087861, -0.018069479]) ) # rho = -1.0
 
-errors[1].append( array("f",[0.074671959,0.094380494,0.103986215,0.039909578]) ) # unsubtracted
-errors[1].append( array("f",[0.084725235,0.103987234,0.121343651,0.040199065]) ) # rho =  0.0
-errors[1].append( array("f",[0.08187597,0.080513466,0.12070617,0.040000753]) ) # rho = -0.5
-errors[1].append( array("f",[0.079628074,0.086322027,0.115140559,0.038905246]) ) # rho = -1.0
+errors[1].append( array("f",[0.074671959, 0.094380494, 0.103986215, 0.039909578]) ) # unsubtracted
+errors[1].append( array("f",[0.084725235, 0.103987234, 0.121343651, 0.040199065]) ) # rho =  0.0
+errors[1].append( array("f",[0.08187597,  0.080513466, 0.12070617,  0.040000753]) ) # rho = -0.5
+errors[1].append( array("f",[0.079628074, 0.086322027, 0.115140559, 0.038905246]) ) # rho = -1.0
 
 def retrieveTGraphErrors(i,par,nop):
   dx = 0.0075*(i-1.5)
@@ -59,7 +59,7 @@ ROOT.gStyle.SetOptTitle(0)
 ROOT.gStyle.SetEndErrorSize(7.5)
 
 # Configuration
-xlabel = "z"
+xlabel = "z_{h}"
 
 # dz energy loss
 ylabel_up = "#Delta z_{3P}"
@@ -70,9 +70,11 @@ x0 = 0.5
 y0 = 0.6
 x1 = 0.9
 y1 = 0.85
-ylo = -0.25
-yhi = 0.35
+ylo = -0.19
+yhi = 0.25
 
+markerSize = 2.0
+lineWidth = 3
 
 legends = ["Uncorrected","He subtracted #rho =  0.0","He subtracted #rho = -0.5","He subtracted #rho = -1.0"]
 ############# code
@@ -83,22 +85,26 @@ plt4P = []
 for i in range(4):
   plt3P.append(retrieveTGraphErrors(i,parameter,"3P"))
   plt3P[i].SetMarkerStyle(20+i)
-  plt3P[i].SetMarkerSize(1.5)
+  plt3P[i].SetMarkerSize(markerSize)
   plt3P[i].SetMarkerColor(color[i]) 
   plt3P[i].SetLineColor(color[i])
-  plt3P[i].SetLineWidth(2)
+  plt3P[i].SetLineWidth(lineWidth)
   plt3P[i].GetXaxis().SetTitle(xlabel)
   plt3P[i].GetYaxis().SetTitle(ylabel_up)
   plt3P[i].GetYaxis().SetTitleOffset(1.5)
   plt4P.append(retrieveTGraphErrors(i,parameter,"4P"))
   plt4P[i].SetMarkerStyle(20+i)
-  plt4P[i].SetMarkerSize(1.5)
+  plt4P[i].SetMarkerSize(markerSize)
   plt4P[i].SetMarkerColor(color[i]) 
   plt4P[i].SetLineColor(color[i])
-  plt4P[i].SetLineWidth(2)
+  plt4P[i].SetLineWidth(lineWidth)
   plt4P[i].GetXaxis().SetTitle(xlabel)
   plt4P[i].GetYaxis().SetTitle(ylabel_down)
   plt4P[i].GetYaxis().SetTitleOffset(1.5)
+
+  plt3P[i].GetYaxis().SetNdivisions(5+100*5);
+  plt4P[i].GetYaxis().SetNdivisions(5+100*5);
+
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetTextFont(43)
 leg.SetTextSize(28)

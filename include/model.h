@@ -60,7 +60,7 @@ public:
   void DoFixedLp(bool);
   void DoCascade(bool);
   void Initialization();
-  void Compute(const double);
+  int Compute(const double);
   void InteractionPoint(double &, double &, double &, const double);
   double GetR(const double, const double);
   double Get1();

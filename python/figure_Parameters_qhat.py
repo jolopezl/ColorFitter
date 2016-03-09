@@ -13,30 +13,31 @@ errors = []
 errors.append([])
 errors.append([])
 
-values[0].append( array("f",[1.783259081,2.359101836,0.046824664,6.15E-07]) ) # unsubtracted
-values[0].append( array("f",[1.937605378,2.451870533,1.390701946,1.325518864]) ) # rho =  0.0
-values[0].append( array("f",[1.926978412,2.419270628,1.353903941,1.295141276]) ) # rho = -0.5
-values[0].append( array("f",[1.916631914,2.385707681,1.292526878,1.249361285]) ) # rho = -1.0
+values[0].append( array("f",[1.783259081, 2.359101836, 0.046824664, 6.15E-07]) ) # unsubtracted
+values[0].append( array("f",[1.938687543, 2.448948148, 1.39305676,  1.326101671]) ) # rho =  0.0
+values[0].append( array("f",[1.926978412, 2.419270628, 1.353903941, 1.295141276]) ) # rho = -0.5
+values[0].append( array("f",[1.917446287, 2.385027334, 1.290374092, 1.246098187]) ) # rho = -1.0
 
-errors[0].append( array("f",[0.232558318,0.555006047,8.745636509,6.653189238]) ) # unsubtracted
-errors[0].append( array("f",[0.284763384,0.697034046,1.667032683,2.685889045]) ) # rho =  0.0
-errors[0].append( array("f",[0.433821661,0.605366834,1.426322873,2.456219795]) ) # rho = -0.5
-errors[0].append( array("f",[0.241510758,0.564889424,1.177186258,2.107379463]) ) # rho = -1.0
+errors[0].append( array("f",[0.232558318, 0.555006047, 8.745636509, 6.653189238]) ) # unsubtracted
+errors[0].append( array("f",[0.386525534, 0.706130101, 1.71818655,  2.694773228]) ) # rho =  0.0
+errors[0].append( array("f",[0.433821661, 0.605366834, 1.426322873, 2.456219795]) ) # rho = -0.5
+errors[0].append( array("f",[0.251073142, 0.614171136, 1.278532048, 2.16813939]) ) # rho = -1.0
 
-values[1].append( array("f",[1.771398551,2.412180865,0.005217184,2.01E-06]) ) # unsubtracted
-values[1].append( array("f",[1.93317907,2.501781292,1.732744031,1.694833994]) ) # rho =  0.0
-values[1].append( array("f",[1.920935166,2.464056612,1.677625074,1.652262325]) ) # rho = -0.5
-values[1].append( array("f",[1.908828444,2.389102269,1.562426638,1.571110585]) ) # rho = -1.0
+values[1].append( array("f",[1.771398551, 2.412180865, 0.005217184, 2.01E-06]) ) # unsubtracted
+values[1].append( array("f",[1.93317907,  2.501781292, 1.732744031, 1.694833994]) ) # rho =  0.0
+values[1].append( array("f",[1.920935166, 2.464056612, 1.677625074, 1.652262325]) ) # rho = -0.5
+values[1].append( array("f",[1.908828444, 2.389102269, 1.562426638, 1.571110585]) ) # rho = -1.0
 
-errors[1].append( array("f",[0.230071148,0.563087591,6.996401851,6.989005551]) ) # unsubtracted
-errors[1].append( array("f",[0.307281346,0.649868425,2.524074135,5.733476976]) ) # rho =  0.0
-errors[1].append( array("f",[0.296045067,0.622413772,2.464351098,5.773890896]) ) # rho = -0.5
-errors[1].append( array("f",[0.271160745,0.514046442,1.902753054,2.76858071]) ) # rho = -1.0
+errors[1].append( array("f",[0.230071148, 0.563087591, 6.996401851, 6.989005551]) ) # unsubtracted
+errors[1].append( array("f",[0.307281346, 0.649868425, 2.524074135, 5.733476976]) ) # rho =  0.0
+errors[1].append( array("f",[0.296045067, 0.622413772, 2.464351098, 5.773890896]) ) # rho = -0.5
+errors[1].append( array("f",[0.271160745, 0.514046442, 1.902753054, 2.76858071]) ) # rho = -1.0
+
+a = 0.0075
+dx = [-3*a/2.,-a/2.,a/2.,3*a/2.]
 
 def retrieveTGraphErrors(i,par,nop):
-  dx = 0.0075*(i-1.5)
-  # dx=0
-  xval = array("f",[0.32+dx,0.53+dx,0.75+dx,0.94+dx])
+  xval = array("f",[ 0.32+dx[i],0.53+dx[i],0.75+dx[i],0.94+dx[i] ])
   xerr = array("f",[0,0,0,0])
   if(nop == "3P"):
     yval = values[0][i]
@@ -59,12 +60,12 @@ ROOT.gStyle.SetOptTitle(0)
 ROOT.gStyle.SetEndErrorSize(7.5)
 
 # Configuration
-xlabel = "z"
+xlabel = "z_{h}"
 # Q-HAT configuration
 # ylabel_up = "#hat{q}_{0} [GeV^{2}/fm^{2}]_{3P}"
 # ylabel_down = "#hat{q}_{0} [GeV^{2}/fm^{2}]_{4P}"
-ylabel_up = "#hat{q}_{0} [GeV^{2}fm]_{3P}"
-ylabel_down = "#hat{q}_{0} [GeV^{2}fm]_{4P}"
+ylabel_up = "q_{0} [GeV^{2}fm]_{3P}"
+ylabel_down = "q_{0} [GeV^{2}fm]_{4P}"
 parameter = "qhat"
 fileout = "fig04a.pdf"
 x0 = 0.15
@@ -76,6 +77,9 @@ yhi = 9.15*factor
 # ylo = -0.029
 # yhi = 0.029
 
+markerSize = 2.0
+lineWidth = 3
+
 legends = ["Uncorrected","He subtracted #rho =  0.0","He subtracted #rho = -0.5","He subtracted #rho = -1.0"]
 ############# code
 c = ROOT.TCanvas("canvas","canvas",800,800)
@@ -85,22 +89,28 @@ plt4P = []
 for i in range(4):
   plt3P.append(retrieveTGraphErrors(i,parameter,"3P"))
   plt3P[i].SetMarkerStyle(20+i)
-  plt3P[i].SetMarkerSize(1.5)
+  plt3P[i].SetMarkerSize(markerSize)
   plt3P[i].SetMarkerColor(color[i]) 
   plt3P[i].SetLineColor(color[i])
-  plt3P[i].SetLineWidth(2)
+  plt3P[i].SetLineWidth(lineWidth)
   plt3P[i].GetXaxis().SetTitle(xlabel)
   plt3P[i].GetYaxis().SetTitle(ylabel_up)
   plt3P[i].GetYaxis().SetTitleOffset(1.5)
   plt4P.append(retrieveTGraphErrors(i,parameter,"4P"))
   plt4P[i].SetMarkerStyle(20+i)
-  plt4P[i].SetMarkerSize(1.5)
+  plt4P[i].SetMarkerSize(markerSize)
   plt4P[i].SetMarkerColor(color[i]) 
   plt4P[i].SetLineColor(color[i])
-  plt4P[i].SetLineWidth(2)
+  plt4P[i].SetLineWidth(lineWidth)
   plt4P[i].GetXaxis().SetTitle(xlabel)
   plt4P[i].GetYaxis().SetTitle(ylabel_down)
   plt4P[i].GetYaxis().SetTitleOffset(1.5)
+
+  # plt3P[i].GetYaxis().CenterTitle()
+  # plt4P[i].GetYaxis().CenterTitle()
+  plt3P[i].GetYaxis().SetNdivisions(5+100*5);
+  plt4P[i].GetYaxis().SetNdivisions(5+100*5);
+
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetTextFont(43)
 leg.SetTextSize(28)

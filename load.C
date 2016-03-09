@@ -2,7 +2,7 @@
 // $ root -l load.C
 // root[#] ifit()
 int load(){
-  gROOT->ProcessLine(".L model.cc+ ");
-  gROOT->ProcessLine(".L ifit.cc+");
+  gROOT->ProcessLine(".L source/model.cc+ ");
+  gROOT->ProcessLine(".L source/ifit.cc+");
   return 1;
 }
