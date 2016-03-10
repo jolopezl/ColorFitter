@@ -4,7 +4,7 @@
 
 int demoPlots(); // Do plots and studies of the model
 int demoPlots2D(); // Do fancier plots and studies of the model
-int computeSimpleFit();                           // A simple fits trusted.
+int computeSimpleFit(const bool, const bool, const double);                           // A simple fits trusted.
 int computeComplexFit(int argc, char *argv[]);    // A fit with a complex configuration
 int printInteractionPoints();
 int computeBand();
@@ -14,28 +14,34 @@ int computeBand();
 int main(int argc, char *argv[]) {
   // demoPlots();
   // printInteractionPoints();
-  computeSimpleFit();
+  // ********  EnergyLoss, Subtraction, Correlation                  
+  computeSimpleFit(true, false,  0.0);
+  computeSimpleFit(true, true,  0.0);
+  computeSimpleFit(true, true, -0.5);
+  computeSimpleFit(true, true, -1.0);
   // computeBand();
 }
 
 // **************** Compute a Simple Fit **************** //
-int computeSimpleFit() {
+int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
   myConfig *config = new myConfig();
   // bins of interest
   int Q2Int = -1;
   int izInt = -1;
   // defauls
-  int input_energyloss     = 1;
-  int input_subtraction    = 1;
-  double input_correlation = 0.0;
+  bool input_energyloss     = tEnergyLoss;
+  bool input_subtraction    = tSubtraction;
+  double input_correlation  = tCorrelation;
   config->m_energyloss        = input_energyloss;  // false;
   config->m_subtraction       = input_subtraction; // false;
   config->m_correlation       = input_correlation; // for physics -1.0 < rho < 0.0
-  config->m_preh              = false; // usually true
-  config->m_initial_sigma     = 25.0;  // do it < 40 mbarns
+  // Pre-hadron cross section
+  config->m_preh              = true; // usually true
+  config->m_initial_sigma     = 40.0;  // do it < 40 mbarns
+  // more.
   config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
   config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
-  config->m_output_fit        = "testFit.csv";
+  config->m_output_fit        = "testFit4par.csv";
   config->m_input_pt          = "hermesData.txt";
   config->writeCorrectedValues = false; // text file from dataHandler
   config->correctionPlots      = false; // from dataHandler
