@@ -215,7 +215,6 @@ void Model::InteractionPoint(double &x, double &y, double &z, const double R){
 }
 
 int Model::Compute(const double A){
-  const double A13 = pow(A, 1/3.);
   // Computation of both quantities dPt2 and Rm
   // We are doing an MC average
   TF1 *dtd1 = new TF1("dtd1", "[0]*0.170/(1+exp((sqrt([1]*[1]+[2]*[2]+x*x)-[3])/0.5))", 0.,40.); // pT broadening divided by constant.
@@ -338,13 +337,12 @@ int Model::Compute(const double A){
   // ADD ENERGY LOSS, From Will's original code:
   temp = accumulator2/normalize;
   if (m_DoEnergyLoss == true) {
-    double afactor=A13/pow(131.293,1./3.);
     if (m_iz > 0) {
-      temp*=(1.-(1.-m_binratio)*m_dz*afactor/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+      temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
       // temp+=(-(1.-m_binratio)*m_dz*A13/m_zbinwidth );
     }
     else {
-      temp*=(1.+(m_binratio*m_dz*afactor)/m_zbinwidth); // events increase in the lowest z bin.
+      temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
       // temp+=((m_binratio*m_dz*A13)/m_zbinwidth);
     }
   }

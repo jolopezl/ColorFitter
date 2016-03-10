@@ -192,18 +192,18 @@ std::vector<myResult*> ifit(myConfig *config) {
       const double s0 = config->m_initial_sigma;
       double vstart[] = {0.4775, 1.6,     s0,    2.5,    0.0,     0.2};
       double step[]   = {0.01,   0.01,    0.01,  0.5,    0.00001, 0.01};
-      double lim_lo[] = {0.,     0.0001, -0.01,  0.1,   -0.1,  -0.01};
-      double lim_hi[] = {10.,    400.,     400.,  100.0,  10.,     100.0}; 
+      double lim_lo[] = {0.,     0.0001, -0.01,  0.1,   -1.0,    -0.01};
+      double lim_hi[] = {10.,    400.,    400.,  100.0,  1.0,     100.0}; 
       if (false) {
         lim_lo[4] = -10.0;
         lim_hi[4] = +10.0;
       }
-      gMinuit->mnparm(0, "a1", vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
-      gMinuit->mnparm(1, "a2", vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
-      gMinuit->mnparm(2, "a3", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
-      gMinuit->mnparm(3, "a4", vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
-      gMinuit->mnparm(4, "a5", vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
-      gMinuit->mnparm(5, "a6", vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
+      gMinuit->mnparm(0, "QHAT",  vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
+      gMinuit->mnparm(1, "LP",    vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
+      gMinuit->mnparm(2, "SIGMA", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
+      gMinuit->mnparm(3, "DLOG",  vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
+      gMinuit->mnparm(4, "DZ",    vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
+      gMinuit->mnparm(5, "CASCAD",vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
       if (!config->m_qhat)        gMinuit->FixParameter(0); // q-hat
       if (!config->m_lp)          gMinuit->FixParameter(1); // production length
       if (!config->m_preh)        gMinuit->FixParameter(2); // prehadron cross section
