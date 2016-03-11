@@ -11,20 +11,20 @@ errors = []
 errors.append([])
 errors.append([])
 
-values[0].append( array("f",[2.287781766, 1.134511264, 0.490208758, 0.419877037]) ) # unsubtracted
-values[0].append( array("f",[1.439136856, 0.86423568,  0.32681735,  0.297840314]) ) # rho =  0.0
-values[0].append( array("f",[1.583986546, 0.997879765, 0.377075587, 0.321974829]) ) # rho = -0.5
-values[0].append( array("f",[1.762573424, 1.186224459, 0.489362825, 0.371093161]) ) # rho = -1.0
+values[0].append( array("f",[2.287781766,1.134511257,0.490208758,0.419877037]) ) # unsubtracted
+values[0].append( array("f",[1.439136856,0.864235678,0.326817342,0.297840314]) ) # rho =  0.0
+values[0].append( array("f",[1.583986536,0.997879765,0.377075587,0.321974829]) ) # rho = -0.5
+values[0].append( array("f",[1.762573426,1.186224459,0.489362825,0.371093161]) ) # rho = -1.0
 
 errors[0].append( array("f",[0,0,0,0]) ) # unsubtracted
 errors[0].append( array("f",[0,0,0,0]) ) # rho =  0.0
 errors[0].append( array("f",[0,0,0,0]) ) # rho = -0.5
 errors[0].append( array("f",[0,0,0,0]) ) # rho = -1.0
 
-values[1].append( array("f",[3.424659529, 1.645792305, 0.45516461,  0.515535979]) ) # unsubtracted
-values[1].append( array("f",[2.158231074, 1.229392776, 0.23027471,  0.336269652]) ) # rho =  0.0
-values[1].append( array("f",[2.374500883, 1.441772115, 0.311304842, 0.373639384]) ) # rho = -0.5
-values[1].append( array("f",[2.640686749, 1.750390569, 0.490944829, 0.449596266]) ) # rho = -1.0
+values[1].append( array("f",[3.425385433,1.520533906,0.451327273,0.313829407]) ) # unsubtracted
+values[1].append( array("f",[2.137191558,1.12430168,0.183660046,0.121672328]) ) # rho =  0.0
+values[1].append( array("f",[2.358594386,1.319393743,0.252515182,0.155919062]) ) # rho = -0.5
+values[1].append( array("f",[2.631371177,1.598463538,0.408925707,0.258576782]) ) # rho = -1.0
 
 errors[1].append( array("f",[0,0,0,0]) ) # unsubtracted
 errors[1].append( array("f",[0,0,0,0]) ) # rho =  0.0
@@ -32,9 +32,7 @@ errors[1].append( array("f",[0,0,0,0]) ) # rho = -0.5
 errors[1].append( array("f",[0,0,0,0]) ) # rho = -1.0
 
 def retrieveTGraphErrors(i,par,nop):
-  # dx = 0.01*(i-2)
-  dx=0
-  xval = array("f",[0.32+dx,0.53+dx,0.75+dx,0.94+dx])
+  xval = array("f",[0.32,0.53,0.75,0.94])
   xerr = array("f",[0,0,0,0])
   if(nop == "3P"):
     yval = values[0][i]
@@ -59,18 +57,13 @@ ROOT.gStyle.SetEndErrorSize(7.5)
 # Configuration
 xlabel = "z"
 # CHI2 configuration
-ylabel_up = "#chi^{2}/^{}DOF _{3P}"
-ylabel_down = "#chi^{2}/^{}DOF _{4P}"
+ylabel_up = "#chi^{2}/^{}DOF"
+ylabel_down = "#chi^{2}/^{}DOF"
 parameter = "chi2"
 fileout = "fig05.pdf"
-x0 = 0.5
-y0 = 0.6 + 0.05
-x1 = 0.9
-y1 = 0.85 + 0.05
+
 ylo = 0.15
 yhi = 3.75
-# ylo = -0.029
-# yhi = 0.029
 
 markerSize = 2.0
 lineWidth = 3
@@ -100,10 +93,18 @@ for i in range(4):
   plt4P[i].GetXaxis().SetTitle(xlabel)
   plt4P[i].GetYaxis().SetTitle(ylabel_down)
   plt4P[i].GetYaxis().SetTitleOffset(1.5)
+
+
+x0 = 0.56
+y0 = 0.7
+x1 = x0 + 0.3
+y1 = y0 + 0.25
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetTextFont(43)
 leg.SetTextSize(28)
 leg.SetBorderSize(0)
+leg.SetFillStyle(0)
+
 for i in range(4):
   leg.AddEntry(plt3P[i],legends[i],"ep")
 fontAxesSize = 28
@@ -131,6 +132,15 @@ plt3P[0].GetYaxis().SetTitleOffset(1.75)
 plt4P[0].GetYaxis().SetTitleOffset(1.75)
 plt4P[0].GetXaxis().SetTitleOffset(1.5)
 #
+
+
+text1 = ROOT.TLatex()
+text1.SetNDC()
+text1.SetTextFont(43)
+text1.SetTextSize(fontAxesSize)
+
+
+
 c.Divide(1,2,0,0)
 c.cd(1)
 ROOT.gPad.SetBottomMargin(0.001)
@@ -140,6 +150,7 @@ plt3P[0].Draw("AP")
 plt3P[1].Draw("P SAME")
 plt3P[2].Draw("P SAME")
 plt3P[3].Draw("P SAME")
+text1.DrawLatex(0.27,0.91,"3 Parameter Fit")
 # for i in range(4):
 #   plt3P[i].Fit("pol0","N0")
 c.cd(2)
@@ -149,6 +160,7 @@ plt4P[0].Draw("AP")
 plt4P[1].Draw("P SAME")
 plt4P[2].Draw("P SAME")
 plt4P[3].Draw("P SAME")
+text1.DrawLatex(0.27,0.91,"4 Parameter Fit")
 # for i in range(4):
 #   plt4P[i].Fit("pol0","N0")
 leg.Draw()

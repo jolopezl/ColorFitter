@@ -23,20 +23,22 @@ errors[0].append( array("f",[0,0,0,0]) ) # rho =  0.0
 errors[0].append( array("f",[0,0,0,0]) ) # rho = -0.5
 errors[0].append( array("f",[0,0,0,0]) ) # rho = -1.0
 
-values[1].append( array("f",[-0.011283372, -0.026647436, -0.066144118, -0.018588115]) ) # unsubtracted
-values[1].append( array("f",[-0.002802976, -0.030409575, -0.056962346, -0.018320743]) ) # rho =  0.0
-values[1].append( array("f",[-0.005235504, -0.018375814, -0.056024581, -0.018320984]) ) # rho = -0.5
-values[1].append( array("f",[-0.007088794, -0.036870089, -0.054087861, -0.018069479]) ) # rho = -1.0
+values[1].append( array("f",[0.008497238,-0.086342572,-0.039538395,-0.036207375,]) ) # unsubtracted
+values[1].append( array("f",[0.023970141,-0.09027767,-0.096765855,-0.070503146,]) ) # rho =  0.0
+values[1].append( array("f",[0.019596812,-0.088084703,-0.108753775,-0.079385432,]) ) # rho = -0.5
+values[1].append( array("f",[0.014759475,-0.084527834,-0.1117634,-0.046867095,]) ) # rho = -1.0
 
-errors[1].append( array("f",[0.074671959, 0.094380494, 0.103986215, 0.039909578]) ) # unsubtracted
-errors[1].append( array("f",[0.084725235, 0.103987234, 0.121343651, 0.040199065]) ) # rho =  0.0
-errors[1].append( array("f",[0.08187597,  0.080513466, 0.12070617,  0.040000753]) ) # rho = -0.5
-errors[1].append( array("f",[0.079628074, 0.086322027, 0.115140559, 0.038905246]) ) # rho = -1.0
+errors[1].append( array("f",[0.056258988,0.097967776,0.056029048,0.051966122]) ) # unsubtracted
+errors[1].append( array("f",[0.138624751,0.112212584,0.174856466,0.173052092]) ) # rho =  0.0
+errors[1].append( array("f",[0.058490901,0.105839395,0.218933457,0.170064816]) ) # rho = -0.5
+errors[1].append( array("f",[0.062959199,0.097159853,0.198981891,0.088536499]) ) # rho = -1.0
+
+offset = 0.0075
+dx = [-3*offset/2.,-offset/2.,offset/2.,3*offset/2.]
 
 def retrieveTGraphErrors(i,par,nop):
-  dx = 0.0075*(i-1.5)
   # dx=0
-  xval = array("f",[0.32+dx,0.53+dx,0.75+dx,0.94+dx])
+  xval = array("f",[0.32+dx[i],0.53+dx[i],0.75+dx[i],0.94+dx[i]])
   xerr = array("f",[0,0,0,0])
   if(nop == "3P"):
     yval = values[0][i]
@@ -62,16 +64,14 @@ ROOT.gStyle.SetEndErrorSize(7.5)
 xlabel = "z_{h}"
 
 # dz energy loss
-ylabel_up = "#Delta z_{3P}"
-ylabel_down = "#Delta z_{4P}"
+ylabel_up = "#Deltaz"
+ylabel_down = "#Deltaz"
 parameter = "dz"
 fileout = "fig04d.pdf" #sys.argv[3]
-x0 = 0.5
-y0 = 0.6
-x1 = 0.9
-y1 = 0.85
-ylo = -0.19
-yhi = 0.25
+
+
+ylo = -0.35
+yhi = 0.35
 
 markerSize = 2.0
 lineWidth = 3
@@ -105,12 +105,6 @@ for i in range(4):
   plt3P[i].GetYaxis().SetNdivisions(5+100*5);
   plt4P[i].GetYaxis().SetNdivisions(5+100*5);
 
-leg = ROOT.TLegend(x0,y0,x1,y1)
-leg.SetTextFont(43)
-leg.SetTextSize(28)
-leg.SetBorderSize(0)
-for i in range(4):
-  leg.AddEntry(plt3P[i],legends[i],"ep")
 fontAxesSize = 28
 fontAxesCode = 43
 plt3P[0].GetXaxis().SetTitleFont(fontAxesCode)
@@ -164,10 +158,28 @@ line00.GetYaxis().SetRangeUser(ylo,yhi)
 line00.GetYaxis().SetRangeUser(ylo,yhi)
 line00.GetXaxis().SetTitleOffset(1.5)
 
+x0 = 0.55
+y0 = 0.625
+x1 = x0 + 0.3
+y1 = y0 + 0.25
+leg = ROOT.TLegend(x0,y0,x1,y1)
+leg.SetTextFont(43)
+leg.SetTextSize(28)
+leg.SetBorderSize(0)
+leg.SetFillStyle(0)
+for i in range(4):
+  leg.AddEntry(plt3P[i],legends[i],"ep")
+
+text1 = ROOT.TLatex()
+text1.SetNDC()
+text1.SetTextFont(43)
+text1.SetTextSize(fontAxesSize)
+
 plt4P[0].Draw("AP")
 line00.Draw("SAME")
 plt4P[1].Draw("P SAME")
 plt4P[2].Draw("P SAME")
 plt4P[3].Draw("P SAME")
 leg.Draw()
+text1.DrawLatex(0.17,0.8,"4 Parameter Fit")
 c.Print(fileout)

@@ -3,8 +3,6 @@ from numpy import loadtxt
 from array import array
 import sys, os, ROOT
 
-factor = 1.
-
 values = []
 values.append([]) # position 0 for 3 parameter fits
 values.append([]) # position 1 for 4 parameter fits
@@ -13,31 +11,31 @@ errors = []
 errors.append([])
 errors.append([])
 
-values[0].append( array("f",[1.783259081, 2.359101836, 0.046824664, 6.15E-07]) ) # unsubtracted
-values[0].append( array("f",[1.938687543, 2.448948148, 1.39305676,  1.326101671]) ) # rho =  0.0
-values[0].append( array("f",[1.926978412, 2.419270628, 1.353903941, 1.295141276]) ) # rho = -0.5
-values[0].append( array("f",[1.917446287, 2.385027334, 1.290374092, 1.246098187]) ) # rho = -1.0
+values[0].append( array("f",[1.783259079,2.35910074,0.046824663,6.15E-07]) ) # unsubtracted
+values[0].append( array("f",[1.938687537,2.448948249,1.393052958,1.32610177]) ) # rho =  0.0
+values[0].append( array("f",[1.926978397,2.419270628,1.353904991,1.295141011]) ) # rho = -0.5
+values[0].append( array("f",[1.917446575,2.385027347,1.290374082,1.246098182]) ) # rho = -1.0
 
-errors[0].append( array("f",[0.232558318, 0.555006047, 8.745636509, 6.653189238]) ) # unsubtracted
-errors[0].append( array("f",[0.386525534, 0.706130101, 1.71818655,  2.694773228]) ) # rho =  0.0
-errors[0].append( array("f",[0.433821661, 0.605366834, 1.426322873, 2.456219795]) ) # rho = -0.5
-errors[0].append( array("f",[0.251073142, 0.614171136, 1.278532048, 2.16813939]) ) # rho = -1.0
+errors[0].append( array("f",[0.232557913,0.554786187,8.745636603,6.653189239]) ) # unsubtracted
+errors[0].append( array("f",[0.386524721,0.706124829,1.718347814,2.694773181]) ) # rho =  0.0
+errors[0].append( array("f",[0.433949533,0.605368032,1.426427075,2.456219219]) ) # rho = -0.5
+errors[0].append( array("f",[0.250634508,0.614172841,1.278535804,2.168140149]) ) # rho = -1.0
 
-values[1].append( array("f",[1.771398551, 2.412180865, 0.005217184, 2.01E-06]) ) # unsubtracted
-values[1].append( array("f",[1.93317907,  2.501781292, 1.732744031, 1.694833994]) ) # rho =  0.0
-values[1].append( array("f",[1.920935166, 2.464056612, 1.677625074, 1.652262325]) ) # rho = -0.5
-values[1].append( array("f",[1.908828444, 2.389102269, 1.562426638, 1.571110585]) ) # rho = -1.0
+values[1].append( array("f",[1.79824157,2.330934153,0.052069603,4.23E-05]) ) # unsubtracted
+values[1].append( array("f",[1.960080704,2.382862333,1.131726636,1.076690994]) ) # rho =  0.0
+values[1].append( array("f",[1.948602678,2.375885323,1.106043011,1.034065338]) ) # rho = -0.5
+values[1].append( array("f",[1.935007017,2.369727404,1.079419287,5.155405572]) ) # rho = -1.0
 
-errors[1].append( array("f",[0.230071148, 0.563087591, 6.996401851, 6.989005551]) ) # unsubtracted
-errors[1].append( array("f",[0.307281346, 0.649868425, 2.524074135, 5.733476976]) ) # rho =  0.0
-errors[1].append( array("f",[0.296045067, 0.622413772, 2.464351098, 5.773890896]) ) # rho = -0.5
-errors[1].append( array("f",[0.271160745, 0.514046442, 1.902753054, 2.76858071]) ) # rho = -1.0
+errors[1].append( array("f",[0.217728893,0.450412377,8.776851091,6.829139897]) ) # unsubtracted
+errors[1].append( array("f",[0.468834974,0.453703411,1.100816193,2.056530162]) ) # rho =  0.0
+errors[1].append( array("f",[0.241652716,0.44818071,0.908007271,1.806845322]) ) # rho = -0.5
+errors[1].append( array("f",[0.24508155,0.407427979,0.730242733,5.355293349]) ) # rho = -1.0
 
-a = 0.0075
-dx = [-3*a/2.,-a/2.,a/2.,3*a/2.]
+offset = 0.0075
+dx = [-3*offset/2.,-offset/2.,offset/2.,3*offset/2.]
 
 def retrieveTGraphErrors(i,par,nop):
-  xval = array("f",[ 0.32+dx[i],0.53+dx[i],0.75+dx[i],0.94+dx[i] ])
+  xval = array("f",[0.32+dx[i],0.53+dx[i],0.75+dx[i],0.94+dx[i]])
   xerr = array("f",[0,0,0,0])
   if(nop == "3P"):
     yval = values[0][i]
@@ -66,14 +64,16 @@ xlabel = "z_{h}"
 # ylabel_down = "#hat{q}_{0} [GeV^{2}/fm^{2}]_{4P}"
 ylabel_up = "q_{0} [GeV^{2}fm]_{3P}"
 ylabel_down = "q_{0} [GeV^{2}fm]_{4P}"
+
+ylabel = "q_{0} [GeV^{2}fm]"
+ylabel_up = ylabel
+ylabel_down = ylabel
+
 parameter = "qhat"
 fileout = "fig04a.pdf"
-x0 = 0.15
-y0 = 0.25
-x1 = 0.5
-y1 = 0.5
-ylo = -9.15*factor
-yhi = 9.15*factor
+
+ylo = -9.15
+yhi = 12.15
 # ylo = -0.029
 # yhi = 0.029
 
@@ -111,12 +111,6 @@ for i in range(4):
   plt3P[i].GetYaxis().SetNdivisions(5+100*5);
   plt4P[i].GetYaxis().SetNdivisions(5+100*5);
 
-leg = ROOT.TLegend(x0,y0,x1,y1)
-leg.SetTextFont(43)
-leg.SetTextSize(28)
-leg.SetBorderSize(0)
-for i in range(4):
-  leg.AddEntry(plt3P[i],legends[i],"ep")
 fontAxesSize = 28
 fontAxesCode = 43
 plt3P[0].GetXaxis().SetTitleFont(fontAxesCode)
@@ -140,6 +134,24 @@ plt3P[0].GetYaxis().SetRangeUser(ylo,yhi)
 plt4P[0].GetYaxis().SetRangeUser(ylo,yhi)
 plt4P[0].GetXaxis().SetTitleOffset(1.5)
 #
+
+x0 = 0.15 - 0.025
+y0 = 0.25 - 0.05
+x1 = 0.5 - 0.025
+y1 = 0.5 - 0.05
+leg = ROOT.TLegend(x0,y0,x1,y1)
+leg.SetTextFont(43)
+leg.SetTextSize(28)
+leg.SetBorderSize(0)
+leg.SetFillStyle(0)
+for i in range(4):
+  leg.AddEntry(plt3P[i],legends[i],"ep")
+
+text1 = ROOT.TLatex()
+text1.SetNDC()
+text1.SetTextFont(43)
+text1.SetTextSize(fontAxesSize)
+
 c.Divide(1,2,0,0)
 c.cd(1)
 ROOT.gPad.SetBottomMargin(0.001)
@@ -149,6 +161,7 @@ plt3P[0].Draw("AP")
 plt3P[1].Draw("P SAME")
 plt3P[2].Draw("P SAME")
 plt3P[3].Draw("P SAME")
+text1.DrawLatex(0.17,0.91,"3 Parameter Fit")
 c.cd(2)
 ROOT.gPad.SetTopMargin(0.001)
 ROOT.gPad.SetRightMargin(0.01)
@@ -156,7 +169,6 @@ plt4P[0].Draw("AP")
 plt4P[1].Draw("P SAME")
 plt4P[2].Draw("P SAME")
 plt4P[3].Draw("P SAME")
-# lundModel = ROOT.TF1("lund","x*(log(1/(x*x))-1+x*x)/(1-x*x)",0,1)
-# lundModel.Draw("SAME")
+text1.DrawLatex(0.17,0.91,"4 Parameter Fit")
 leg.Draw()
 c.Print(fileout)

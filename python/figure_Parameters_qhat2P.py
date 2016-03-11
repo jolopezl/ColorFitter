@@ -4,20 +4,17 @@ from array import array
 import sys, os, ROOT
 factor = 1.
 
-val1 = array("f",[1.938687543, 2.448948148, 1.39305676,  1.326101671])  # rho = 0.0 3P
-val2 = array("f",[2.125454155,2.432882642,1.072942812,1.028574808])     # rho = 0.0 fixed cross section 40 mbarn
-val3 = array("f",[2.28503815,2.692596932,1.231221746,1.370080582])     # rho = 0.0 fixed cross section 25 mbarn
+val1 = array("f",[1.938687537,2.448948249,1.393052958,1.32610177])  # rho = 0.0 3P
+val2 = array("f",[2.125454155,2.432882642,1.072942811,1.028574807]) # rho = 0.0 fixed cross section 40 mbarn
+val3 = array("f",[2.212336101,2.570475157,1.152221654,1.19471209])  # rho = 0.0 fixed cross section 30 mbarn
+val4 = array("f",[2.013385697,2.567153257,1.309393114,1.471376678]) # rho = 0.0 fixed cross section 40 mbarn with energy loss
+val5 = array("f",[2.034191371,2.669101521,1.437872973,2.024431129]) # rho = 0.0 fixed cross section 30 mbarn with energy loss
 
-val4 = array("f",[1.969285359,2.56781668,1.797813667,1.603401537])
-val5 = array("f",[1.997913781,2.70579518,2.262760808,2.073499557])
-
-
-err1 = array("f",[0.386525534, 0.706130101, 1.71818655,  2.694773228])  # rho =  0.0 3P
-err2 = array("f",[0.219496572,0.396206758,1.031536598,1.953019178])     # rho = 0.0 fixed cross section
-err3 = array("f",[0.256574919,0.453565716,1.194780334,2.54386404])     # rho = 0.0 fixed cross section 25 mbarn
-
-err4 = array("f",[0.367954361,0.707643485,2.748259856,5.74277365])
-err5 = array("f",[0.397620204,0.79744404,6.067171147,5.868822427])
+err1 = array("f",[0.386524721,0.706124829,1.718347814,2.694773181])  # rho =  0.0 3P
+err2 = array("f",[0.219496572,0.396206752,1.031536588,1.953019171])  # rho = 0.0 fixed cross section 40 mbarn
+err3 = array("f",[0.238980688,0.425794534,1.116852869,2.242302313])  # rho = 0.0 fixed cross section 30 mbarn
+err4 = array("f",[0.376595945,0.562137198,1.304146158,2.792658242])  # rho = 0.0 fixed cross section 40 mbarn with energy loss
+err5 = array("f",[0.393934159,0.629025801,1.461976975,5.921170572])  # rho = 0.0 fixed cross section 30 mbarn with energy loss
 
 xval = array("f",[0.32,0.53,0.75,0.94])
 xerr = array("f",[0,0,0,0])
@@ -27,7 +24,7 @@ xval3 = array("f",[0,0,0,0])
 xval4 = array("f",[0,0,0,0])
 xval5 = array("f",[0,0,0,0])
 
-offset = 0.0075
+offset = 0.01
 offset = offset/2
 for i in range(4):   
   xval1[i] = xval[i]
@@ -42,8 +39,6 @@ g3 = ROOT.TGraphErrors(4,xval3,val3,xerr,err3)
 g4 = ROOT.TGraphErrors(4,xval4,val4,xerr,err4)
 g5 = ROOT.TGraphErrors(4,xval5,val5,xerr,err5)
 
-a = 0.0075
-dx = [-3*a/2.,-a/2.,a/2.,3*a/2.]
 
 # ROOT.gROOT.SetStyle("Plain")
 # ROOT.gStyle.SetPadTickX(1)
@@ -62,10 +57,7 @@ xlabel = "z_{h}"
 ylabel = "q_{0} [GeV^{2}fm]"
 parameter = "qhat"
 fileout = "fig04a2p.pdf" #sys.argv[3]
-x0 = 0.5
-y0 = 0.6 - 0.2
-x1 = 0.9
-y1 = 0.85 + 0.04#+ 0.05
+
 
 ylo = -4.0
 yhi = 9.15
@@ -106,7 +98,7 @@ g3.GetYaxis().SetTitle(ylabel)
 g3.GetYaxis().SetTitleOffset(0.75)
 i = 3
 g4.SetMarkerStyle(20+i)
-g4.SetMarkerSize(markerSize)
+g4.SetMarkerSize(markerSize+0.75)
 g4.SetMarkerColor(color[i]) 
 g4.SetLineColor(color[i])
 g4.SetLineWidth(lineWidth)
@@ -115,7 +107,7 @@ g4.GetYaxis().SetTitle(ylabel)
 g4.GetYaxis().SetTitleOffset(0.75)
 i = 4
 g5.SetMarkerStyle(33)
-g5.SetMarkerSize(markerSize)
+g5.SetMarkerSize(markerSize+0.75)
 g5.SetMarkerColor(color[i]) 
 g5.SetLineColor(color[i])
 g5.SetLineWidth(lineWidth)
@@ -127,16 +119,7 @@ g1.GetYaxis().SetNdivisions(5+100*5);
 g2.GetYaxis().SetNdivisions(5+100*5);
 g3.GetYaxis().SetNdivisions(5+100*5);
 
-leg = ROOT.TLegend(x0,y0,x1,y1)
-leg.SetTextFont(43)
-leg.SetTextSize(28)
-leg.SetBorderSize(0)
-leg.SetHeader("He subtracted #rho = 0.0")
-leg.AddEntry(g1,"3P  - free #sigma_{ph}","ep")
-leg.AddEntry(g2,"2P  - #sigma_{ph} = 40 [mbarn]","ep")
-leg.AddEntry(g3,"2P  - #sigma_{ph} = 25 [mbarn]","ep")
-leg.AddEntry(g4,"3P* - #sigma_{ph} = 40 [mbarn]","ep")
-leg.AddEntry(g5,"3P* - #sigma_{ph} = 25 [mbarn]","ep")
+
 fontAxesSize = 28
 fontAxesCode = 43
 
@@ -171,12 +154,26 @@ g2.GetYaxis().SetRangeUser(ylo,yhi)
 g3.GetYaxis().SetRangeUser(ylo,yhi)
 # g1.GetXaxis().SetTitleOffset(1.5)
 
-
+x0 = 0.15
+y0 = 0.58
+x1 = x0 + 0.3
+y1 = y0 + 0.315
+leg = ROOT.TLegend(x0,y0,x1,y1)
+leg.SetTextFont(43)
+leg.SetTextSize(28)
+leg.SetBorderSize(0)
+leg.SetFillStyle(0)
+leg.SetHeader("He subtracted #rho = 0.0")
+leg.AddEntry(g1,"3P  - free #sigma_{ph} - #Deltaz = 0","ep")
+leg.AddEntry(g2,"2P  - #sigma_{ph} = 40 [mbarn]","ep")
+leg.AddEntry(g3,"2P  - #sigma_{ph} = 30 [mbarn]","ep")
+leg.AddEntry(g4,"3P* - #sigma_{ph} = 40 [mbarn] free #Deltaz","ep")
+leg.AddEntry(g5,"3P* - #sigma_{ph} = 30 [mbarn] free #Deltaz","ep")
 
 g1.Draw("AP")
-g4.Draw("P SAME")
-g5.Draw("P SAME")
 g2.Draw("P SAME")
 g3.Draw("P SAME")
-# leg.Draw()
+g4.Draw("P SAME")
+g5.Draw("P SAME")
+leg.Draw()
 c.Print(fileout)

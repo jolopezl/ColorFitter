@@ -18,20 +18,20 @@ values[0].append( array("f",[155.928215,  38.41367971, 19.51217989, 25.90466669]
 values[0].append( array("f",[184.058854,  41.41878193, 20.0098872,  26.0476387]) ) # rho = -0.5
 values[0].append( array("f",[228.1761888, 45.61409581, 20.90185032, 26.38412097]) ) # rho = -1.0
 
-errors[0].append( array("f",[359.2263148, 55.70172103, 26.7360517,  25.86462152]) ) # unsubtracted
-errors[0].append( array("f",[288.8095812, 52.5782164,  26.69759973, 28.13700665]) ) # rho =  0.0
-errors[0].append( array("f",[274.22988,   52.41039975, 23.25715415, 28.19598746]) ) # rho = -0.5
-errors[0].append( array("f",[258.5873862, 67.79884438, 28.89710532, 32.59137114]) ) # rho = -1.0
+errors[0].append( array("f",[359.2265356,55.67064829,26.7360229,25.86490465]) ) # unsubtracted
+errors[0].append( array("f",[288.8089248,52.57768348,26.70406836,28.13699807]) ) # rho =  0.0
+errors[0].append( array("f",[274.0898039,52.41050185,23.26176394,28.1959846]) ) # rho = -0.5
+errors[0].append( array("f",[257.8719775,67.79902084,28.89728351,32.59142606]) ) # rho = -1.0
 
-values[1].append( array("f",[166.7678294, 78.43110625, 35.7742569,  35.16900859]) ) # unsubtracted
-values[1].append( array("f",[139.9974142, 75.06270127, 41.18379195, 35.78160847]) ) # rho =  0.0
-values[1].append( array("f",[143.488942,  59.46720623, 41.90878049, 35.98944953]) ) # rho = -0.5
-values[1].append( array("f",[156.6794948, 151.7202217, 43.66457825, 36.15996987]) ) # rho = -1.0
+values[1].append( array("f",[399.5513201,397.9858632,23.45143611,37.21908878]) ) # unsubtracted
+values[1].append( array("f",[396.3541695,385.4976906,171.6206303,150.1345343]) ) # rho =  0.0
+values[1].append( array("f",[399.6938622,387.3063491,227.2951723,193.7940624]) ) # rho = -0.5
+values[1].append( array("f",[398.886293,366.5469273,249.0802896,23.8339861]) ) # rho = -1.0
 
-errors[1].append( array("f",[308.4540732, 321.8839333, 51.43014498, 46.21377645]) ) # unsubtracted
-errors[1].append( array("f",[290.738684,  325.788957,  86.6042786,  47.98297351]) ) # rho =  0.0
-errors[1].append( array("f",[293.3263346, 119.2359533, 90.69377101, 48.07656261]) ) # rho = -0.5
-errors[1].append( array("f",[303.6203887, 270.8649815, 87.93950452, 46.17254951]) ) # rho = -1.0
+errors[1].append( array("f",[361.6060231,364.4155968,44.23396039,67.22150109,]) ) # unsubtracted
+errors[1].append( array("f",[200.6929694,255.942428,281.0169835,290.8718307,]) ) # rho =  0.0
+errors[1].append( array("f",[200.3977299,349.0317648,278.1828202,279.9607114,]) ) # rho = -0.5
+errors[1].append( array("f",[321.082018,279.0394081,275.1074907,21.28889001,]) ) # rho = -1.0
 
 a = 0.0075
 dx = [-3*a/2.,-a/2.,a/2.,3*a/2.]
@@ -65,14 +65,19 @@ xlabel = "z_{h}"
 # Cross section
 ylabel_up = "#sigma_{ph} [mbarn]_{3P}"
 ylabel_down = "#sigma_{ph} [mbarn]_{4P}"
+
+ylabel = "#sigma_{ph} [mbarn]"
+ylabel_up = ylabel
+ylabel_down = ylabel
+
 parameter = "sigma"
 fileout = "fig04c.pdf" #sys.argv[3]
 x0 = 0.5
 y0 = 0.6 + 0.05
 x1 = 0.9
 y1 = 0.85 + 0.05
-ylo = -290
-yhi = 690
+ylo = -150
+yhi = 900
 
 markerSize = 2.0
 lineWidth = 3
@@ -152,6 +157,23 @@ line40.GetYaxis().SetRangeUser(ylo,yhi)
 line40.GetYaxis().SetRangeUser(ylo,yhi)
 line40.GetXaxis().SetTitleOffset(1.5)
 
+x0 = 0.56
+y0 = 0.7
+x1 = x0 + 0.3
+y1 = y0 + 0.25
+leg = ROOT.TLegend(x0,y0,x1,y1)
+leg.SetTextFont(43)
+leg.SetTextSize(28)
+leg.SetBorderSize(0)
+leg.SetFillStyle(0)
+for i in range(4):
+  leg.AddEntry(plt3P[i],legends[i],"ep")
+
+text1 = ROOT.TLatex()
+text1.SetNDC()
+text1.SetTextFont(43)
+text1.SetTextSize(fontAxesSize)
+
 c.Divide(1,2,0,0)
 c.cd(1)
 ROOT.gPad.SetBottomMargin(0.001)
@@ -162,6 +184,8 @@ line40.Draw("SAME");
 plt3P[1].Draw("P SAME")
 plt3P[2].Draw("P SAME")
 plt3P[3].Draw("P SAME")
+text1.DrawLatex(0.17,0.91,"3 Parameter Fit")
+leg.Draw()
 c.cd(2)
 ROOT.gPad.SetTopMargin(0.001)
 ROOT.gPad.SetRightMargin(0.01)
@@ -170,5 +194,6 @@ line40.Draw("SAME");
 plt4P[1].Draw("P SAME")
 plt4P[2].Draw("P SAME")
 plt4P[3].Draw("P SAME")
-leg.Draw()
+text1.DrawLatex(0.17,0.91,"4 Parameter Fit")
+
 c.Print(fileout)
