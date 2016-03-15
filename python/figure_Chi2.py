@@ -62,8 +62,8 @@ ylabel_down = "#chi^{2}/^{}DOF"
 parameter = "chi2"
 fileout = "fig05.pdf"
 
-ylo = 0.15
-yhi = 3.75
+ylo = 0.01
+yhi = 3.6
 
 markerSize = 2.0
 lineWidth = 3
