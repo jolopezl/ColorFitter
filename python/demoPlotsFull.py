@@ -38,6 +38,11 @@ legend.SetFillStyle(0)
 legend.SetBorderSize(0)
 legend.SetNColumns(2);
 
+text1 = ROOT.TLatex()
+text1.SetNDC()
+text1.SetTextFont(43)
+text1.SetTextSize(fontAxesSize)
+
 lpList = ['1','2','3','4','5','7','10','20']
 graphs = []
 index = 0
@@ -55,4 +60,5 @@ graphs[0].Draw("AC")
 for i in range(1,len(graphs)):
     graphs[i].Draw("SAME")
 legend.Draw()
+#text1.DrawLatex(0.17,0.51,"Exp(L_{p})")
 c1.Print("demoPlot.pdf");

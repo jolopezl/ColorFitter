@@ -15,11 +15,12 @@ int main(int argc, char *argv[]) {
   // demoPlots();
   // printInteractionPoints();
   // ********  EnergyLoss, Subtraction, Correlation                  
-  computeSimpleFit(true, false, 0.0);
-  computeSimpleFit(true, true,  0.0);
-  computeSimpleFit(true, true, -0.5);
-  computeSimpleFit(true, true, -1.0);
+  // computeSimpleFit(true, false, 0.0);
+  // computeSimpleFit(true, true,  0.0);
+  // computeSimpleFit(true, true, -0.5);
+  // computeSimpleFit(true, true, -1.0);
   // computeBand();
+  demoPlots();
 }
 
 // **************** Compute a Simple Fit **************** //
@@ -128,7 +129,8 @@ int printInteractionPoints() {
 int demoPlots() {
   Model *model = new Model("demoPlots");
   model->Initialization();
-  model->DoFixedLp(true); 
+  // model->DoFixedLp(true); 
+  model->SetParameters("qhat", 1.0);
   // To run and produce full list of files at once.
   std::vector<double> lpList = {1.0,2.0,3.0,4.0,5.0,7.0,9.0,10.0,20.0};
   for (const auto &lp : lpList) {
