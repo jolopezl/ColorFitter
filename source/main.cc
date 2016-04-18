@@ -15,12 +15,12 @@ int main(int argc, char *argv[]) {
   // demoPlots();
   // printInteractionPoints();
   // ********  EnergyLoss, Subtraction, Correlation                  
-  // computeSimpleFit(true, false, 0.0);
+  computeSimpleFit(true, true, 0.0);
   // computeSimpleFit(true, true,  0.0);
   // computeSimpleFit(true, true, -0.5);
   // computeSimpleFit(true, true, -1.0);
   // computeBand();
-  demoPlots();
+  // demoPlots();
 }
 
 // **************** Compute a Simple Fit **************** //
@@ -42,11 +42,11 @@ int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const doub
   // more.
   config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
   config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
-  config->m_output_fit        = "testFit4p.csv";
+  config->m_output_fit        = "testFitBLE.csv";
   config->m_input_pt          = "hermesData.txt";
   config->writeCorrectedValues = false; // text file from dataHandler
   config->correctionPlots      = false; // from dataHandler
-  config->outputPlots          = false; // model and data
+  config->outputPlots          = true; // model and data
   config->doMINOSErrors = false; // usually false
   config->Update();
   std::cout << "Running iFit now:" << std::endl;

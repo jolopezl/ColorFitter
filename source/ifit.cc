@@ -123,7 +123,9 @@ std::vector<myResult*> ifit(myConfig *config) {
     double A = pow(xxx[i],3.0);
     std::cout << "Value of c " << m->GetC((int) A) << " for A " << (int) A << std::endl;
   }
+  std::cout << "Calling dataHandler" << std::endl;
   auto fc = dataHandler(config);
+  std::cout << "dataHandler run succesfuly" << std::endl;
   // TFile *fout = new TFile("fullfit.root","RECREATE");
   for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
     for (int iz=0; iz<ZDIM; ++iz) {

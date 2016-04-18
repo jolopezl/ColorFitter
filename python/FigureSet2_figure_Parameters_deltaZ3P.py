@@ -52,8 +52,8 @@ ylabel = "#Deltaz"
 
 fileout = "fig05c_dz.pdf" #sys.argv[3]
 
-ylo = -0.35
-yhi = 0.35
+ylo = -0.29
+yhi = 0.18
 
 markerSize = 2.0
 lineWidth = 3
@@ -99,16 +99,16 @@ g2.GetYaxis().SetRangeUser(ylo,yhi)
 g3.GetYaxis().SetRangeUser(ylo,yhi)
 g1.GetYaxis().SetTitleOffset(1.0)
 
-x0 = 0.55-0.02
-y0 = 0.625+0.06
-x1 = x0 + 0.3-0.02
-y1 = y0 + 0.25
+x0 = 0.175
+y0 = 0.2
+x1 = x0 + 0.3
+y1 = y0 + 0.15
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetTextFont(43)
 leg.SetTextSize(28)
 leg.SetBorderSize(0)
 leg.SetFillStyle(0)
-leg.SetHeader("He subtracted #rho = 0.0")
+# leg.SetHeader("He subtracted #rho = 0.0")
 leg.AddEntry(g1,"BLE","ep")
 # leg.AddEntry(g2,"2P  - #sigma_{ph} = 40 [mbarn]","ep")
 # leg.AddEntry(g3,"2P  - #sigma_{ph} = 30 [mbarn]","ep")
@@ -120,9 +120,18 @@ text1.SetNDC()
 text1.SetTextFont(43)
 text1.SetTextSize(fontAxesSize)
 
+line00 = ROOT.TF1("line00","00",0.0,1.0);
+line00.SetLineWidth(2);
+line00.SetLineColor(1);
+line00.SetLineStyle(2);
+# line00.GetYaxis().SetRangeUser(ylo,yhi)
+# line00.GetYaxis().SetRangeUser(ylo,yhi)
+# line00.GetXaxis().SetTitleOffset(1.5)
+
 g1.Draw("AP")
+line00.Draw("SAME")
 g2.Draw("P SAME")
 g3.Draw("P SAME")
 leg.Draw()
-# text1.DrawLatex(0.17,0.85,"He subtracted #rho = 0.0")
+AddLabel(0.6,0.88,"He subtracted #rho = 0.0")
 c.Print(fileout)

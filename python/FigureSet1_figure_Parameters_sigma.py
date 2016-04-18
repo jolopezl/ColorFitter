@@ -159,7 +159,7 @@ line40.Draw("SAME");
 plt3P[1].Draw("P SAME")
 plt3P[2].Draw("P SAME")
 plt3P[3].Draw("P SAME")
-text1.DrawLatex(0.2,0.88,"3 Parameter Fit")
+text1.DrawLatex(0.2,0.88,"3 Parameter Fit (BL)")
 leg.Draw()
 c.cd(2)
 ROOT.gPad.SetTopMargin(0.001)
@@ -169,6 +169,6 @@ line40.Draw("SAME");
 plt4P[1].Draw("P SAME")
 plt4P[2].Draw("P SAME")
 plt4P[3].Draw("P SAME")
-AddLabel(0.2,0.88,"4 Parameter Fit")
+AddLabel(0.2,0.88,"4 Parameter Fit (BLE)")
 
 c.Print(fileout)

@@ -143,6 +143,11 @@ std::vector<myData*> dataHandler(myConfig *config) {
   myData *xe = new myData("Xenon");
   std::ifstream input;
   input.open(config->m_input_pt);
+  if (!input.is_open()) {
+    std::cout << "Check your input data file is here" << std::endl;
+    std::vector<myData*> output = {};
+    return output;
+  }
   std::string foo, line;
   std::vector<std::string> words = {};
   double val,stat,syst;

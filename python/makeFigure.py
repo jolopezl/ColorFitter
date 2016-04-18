@@ -5,8 +5,9 @@ from ROOT import *
 
 # path = '2p-fixed-crosssection=25mbarn/'
 path = 'Ifit__2p-25mbarn/'
-file = 'testFit.txt'
-fitfile = path+file
+path = ''
+file = 'testFitBLE30'
+fitfile = path+file+'.csv'
 zbin = 2
 ########################################################
 ########################################################
@@ -98,8 +99,8 @@ def getDataPoints(zin):
 ########################################################
 ########################################################
 def getModelPlots(zin):
-  model_pt_file = path+"testFit_plot_pt_0_"+str(zbin)+".txt"
-  model_rm_file = path+"testFit_plot_mr_0_"+str(zbin)+".txt"
+  model_pt_file = path+file+"_plot_pt_0_"+str(zbin)+".txt"
+  model_rm_file = path+file+"_plot_mr_0_"+str(zbin)+".txt"
   model_pt = TGraph(model_pt_file)
   model_rm = TGraph(model_rm_file)
   model_pt.SetLineWidth(2)

@@ -59,9 +59,9 @@ for i in range(6):
     g[i].GetYaxis().SetTitle(ylabel)
 
 x0 = 0.625
-y0 = 0.7
+y0 = 0.765
 x1 = x0 + 0.3
-y1 = y0 + 0.215
+y1 = y0 + 0.15
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetNColumns(2)
 leg.SetTextFont(43)
@@ -72,10 +72,15 @@ for i in range(6):
     leg.AddEntry(g[i],labels[i],"ep")
 
 # ROOT.gStyle.SetEndErrorSize(7.5)
-c = ROOT.TCanvas()
+c = ROOT.TCanvas("c","title",800,600)
+line00 = ROOT.TF1("line00","00",0.0,1.0);
+line00.SetLineWidth(2);
+line00.SetLineColor(1);
+line00.SetLineStyle(2);
 for i in range(6):
     if(i == 0):
         g[i].Draw("AP")
+        # line00.Draw("SAME")
     else:
         g[i].Draw("P SAME")
 AddLabel(0.2,0.88,"He subtracted #rho = 0.0")

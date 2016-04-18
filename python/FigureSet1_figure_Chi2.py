@@ -63,7 +63,7 @@ xlabel = "z"
 ylabel_up = "#chi^{2}/^{}DOF"
 ylabel_down = "#chi^{2}/^{}DOF"
 parameter = "chi2"
-fileout = "fig04_chi2.pdf"
+fileout = "fig04e_chi2.pdf"
 
 ylo = 0.01
 yhi = 3.6
@@ -99,7 +99,7 @@ for i in range(4):
 
 
 x0 = 0.56-0.01
-y0 = 0.7
+y0 = 0.6
 x1 = x0 + 0.3-0.01
 y1 = y0 + 0.25
 leg = ROOT.TLegend(x0,y0,x1,y1)
@@ -137,7 +137,7 @@ plt3P[0].Draw("AP")
 plt3P[1].Draw("P SAME")
 plt3P[2].Draw("P SAME")
 plt3P[3].Draw("P SAME")
-text1.DrawLatex(0.27,0.91,"3 Parameter Fit")
+text1.DrawLatex(0.27,0.88,"3 Parameter Fit (BL)")
 # for i in range(4):
 #   plt3P[i].Fit("pol0","N0")
 c.cd(2)
@@ -147,7 +147,7 @@ plt4P[0].Draw("AP")
 plt4P[1].Draw("P SAME")
 plt4P[2].Draw("P SAME")
 plt4P[3].Draw("P SAME")
-text1.DrawLatex(0.27,0.91,"4 Parameter Fit")
+text1.DrawLatex(0.27,0.91,"4 Parameter Fit (BLE)")
 # for i in range(4):
 #   plt4P[i].Fit("pol0","N0")
 leg.Draw()

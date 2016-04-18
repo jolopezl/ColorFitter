@@ -37,7 +37,7 @@ xlabel = "z_{h}"
 # L_P configuration
 ylabel = "#chi^{2}/^{}DOF"
 
-fileout = "fig05Summary.pdf" #sys.argv[3]
+fileout = "fig03_chi2_Summary.pdf" #sys.argv[3]
 
 ylo = 0
 yhi = 2.2
@@ -49,33 +49,33 @@ c = ROOT.TCanvas("canvas","canvas",800,600)
 color = [1,2,4,8,9]
 i = 0
 g1.SetMarkerStyle(20+i)
-g1.SetMarkerSize(markerSize)
+# g1.SetMarkerSize(markerSize)
 g1.SetMarkerColor(color[i]) 
 g1.SetLineColor(color[i])
-g1.SetLineWidth(lineWidth)
+# g1.SetLineWidth(lineWidth)
 g1.GetXaxis().SetTitle(xlabel)
 g1.GetYaxis().SetTitle(ylabel)
 g1.GetYaxis().SetTitleOffset(1.75)
 i = 1
 g2.SetMarkerStyle(20+i)
-g2.SetMarkerSize(markerSize)
+# g2.SetMarkerSize(markerSize)
 g2.SetMarkerColor(color[i]) 
 g2.SetLineColor(color[i])
-g2.SetLineWidth(lineWidth)
+# g2.SetLineWidth(lineWidth)
 g2.GetYaxis().SetTitleOffset(1.75)
 i = 2
 g3.SetMarkerStyle(20+i)
-g3.SetMarkerSize(markerSize)
+# g3.SetMarkerSize(markerSize)
 g3.SetMarkerColor(color[i]) 
 g3.SetLineColor(color[i])
-g3.SetLineWidth(lineWidth)
+# g3.SetLineWidth(lineWidth)
 g3.GetYaxis().SetTitleOffset(1.75)
 i = 3
 g4.SetMarkerStyle(20+i)
-g4.SetMarkerSize(markerSize)
+# g4.SetMarkerSize(markerSize)
 g4.SetMarkerColor(color[i]) 
 g4.SetLineColor(color[i])
-g4.SetLineWidth(lineWidth)
+# g4.SetLineWidth(lineWidth)
 g4.GetYaxis().SetTitleOffset(1.75)
 
 g1.GetYaxis().SetNdivisions(5+100*5);
@@ -84,31 +84,6 @@ g2.GetYaxis().SetNdivisions(5+100*5);
 
 fontAxesSize = 28
 fontAxesCode = 43
-
-g1.GetXaxis().SetTitleFont(fontAxesCode)
-g1.GetXaxis().SetTitleSize(fontAxesSize)
-g1.GetXaxis().SetLabelFont(fontAxesCode)
-g1.GetXaxis().SetLabelSize(fontAxesSize)
-g1.GetYaxis().SetTitleFont(fontAxesCode)
-g1.GetYaxis().SetTitleSize(fontAxesSize)
-g1.GetYaxis().SetLabelFont(fontAxesCode)
-g1.GetYaxis().SetLabelSize(fontAxesSize)
-g2.GetXaxis().SetTitleFont(fontAxesCode)
-g2.GetXaxis().SetTitleSize(fontAxesSize)
-g2.GetXaxis().SetLabelFont(fontAxesCode)
-g2.GetXaxis().SetLabelSize(fontAxesSize)
-g2.GetYaxis().SetTitleFont(fontAxesCode)
-g2.GetYaxis().SetTitleSize(fontAxesSize)
-g2.GetYaxis().SetLabelFont(fontAxesCode)
-g2.GetYaxis().SetLabelSize(fontAxesSize)
-g3.GetXaxis().SetTitleFont(fontAxesCode)
-g3.GetXaxis().SetTitleSize(fontAxesSize)
-g3.GetXaxis().SetLabelFont(fontAxesCode)
-g3.GetXaxis().SetLabelSize(fontAxesSize)
-g3.GetYaxis().SetTitleFont(fontAxesCode)
-g3.GetYaxis().SetTitleSize(fontAxesSize)
-g3.GetYaxis().SetLabelFont(fontAxesCode)
-g3.GetYaxis().SetLabelSize(fontAxesSize)
 # axes range
 g1.GetXaxis().SetRangeUser(0.01,0.99)
 g1.GetYaxis().SetRangeUser(ylo,yhi)

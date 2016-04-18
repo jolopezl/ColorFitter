@@ -10,12 +10,12 @@ SetAtlasStyle()
 val0 = array("f",[-0.018364875,-0.017736651,-0.045972771,-0.036238201])
 err0 = array("f",[0.05202612,0.048785183,0.055557061,0.051039642])
 
-val1 = array("f",[-0.012313897,  -0.011892665,  -0.030825365,  -0.024298204])  
-val2 = array("f",[-0.019792553,  -0.019115492,  -0.049546678,  -0.039055346])  
-val3 = array("f",[-0.022988173,  -0.022201797,  -0.05754627, -0.045361053])   
-err1 = array("f",[0.034884217, 0.032711125, 0.037251761, 0.03422277]) 
-err2 = array("f",[0.056070612, 0.052577726, 0.059876047, 0.055007446])
-err3 = array("f",[0.06512353,  0.061066698, 0.069543374, 0.06388871]) 
+val1 = array("f",[-0.007794226,-0.007527602,-0.019511277,-0.015379834])  
+val2 = array("f",[-0.020136575,-0.019447746,-0.050407867,-0.039734182])  
+val3 = array("f",[-0.027163823,-0.026234606,-0.067999169,-0.053600588])   
+err1 = array("f",[0.022080375,0.020704891,0.02357894,0.021661705]) 
+err2 = array("f",[0.057045196,0.0534916,0.060916775,0.055963551])
+err3 = array("f",[0.076952788,0.072159059,0.082175467,0.07549367]) 
 
 xval = array("f",[0.32,0.53,0.75,0.94])
 xerr = array("f",[0,0,0,0])
@@ -63,9 +63,9 @@ g3 = ROOT.TGraphErrors(4,xval3,val3,xerr,err3)
 # Configuration
 xlabel = "z_{h}"
 # L_P configuration
-ylabel = "w(A^{1/3}) #nu #Deltaz [GeV] "
+ylabel = "w(A^{2/3}) #nu #Deltaz [GeV] "
 
-fileout = "fig06b_dz.pdf" #sys.argv[3]
+fileout = "fig06b_dz_23.pdf" #sys.argv[3]
 
 ylo = -0.13*14
 yhi = 0.09*14
@@ -100,6 +100,7 @@ g3.GetYaxis().SetTitleOffset(1.75)
 g1.GetYaxis().SetNdivisions(5+100*5);
 g2.GetYaxis().SetNdivisions(5+100*5);
 
+g0.SetMarkerStyle(25)
 
 fontAxesSize = 28
 fontAxesCode = 43
@@ -108,12 +109,10 @@ g1.GetXaxis().SetRangeUser(0.01,0.99)
 g1.GetYaxis().SetRangeUser(ylo,yhi)
 g1.GetYaxis().SetTitleOffset(1.25)
 
-g0.SetMarkerStyle(25)
-
 x0 = 0.725
 y0 = 0.7
 x1 = x0 + 0.325
-y1 = y0 + 0.17#/3.*4.
+y1 = y0 + 0.17#/3.*4
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetTextFont(43)
 leg.SetTextSize(28)

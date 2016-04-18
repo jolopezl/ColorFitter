@@ -3,6 +3,9 @@ from numpy import loadtxt
 from array import array
 import sys, os, ROOT
 
+from AtlasStyle import SetAtlasStyle, AddLabel
+SetAtlasStyle()
+
 values = []
 values.append([]) # position 0 for 3 parameter fits
 values.append([]) # position 1 for 4 parameter fits
@@ -47,12 +50,12 @@ def retrieveTGraphErrors(i,par,nop):
 # ROOT.gStyle.SetPadTickX(1)
 # ROOT.gStyle.SetPadTickY(1)
 # ROOT.gStyle.SetPadTopMargin(0.05)
-ROOT.gStyle.SetPadRightMargin(0.05)
-ROOT.gStyle.SetPadLeftMargin(0.125)
-ROOT.gStyle.SetPadBottomMargin(0.16)
-ROOT.gStyle.SetOptStat(0)
-ROOT.gStyle.SetOptTitle(0)
-ROOT.gStyle.SetEndErrorSize(7.5)
+# ROOT.gStyle.SetPadRightMargin(0.05)
+# ROOT.gStyle.SetPadLeftMargin(0.125)
+# ROOT.gStyle.SetPadBottomMargin(0.16)
+# ROOT.gStyle.SetOptStat(0)
+# ROOT.gStyle.SetOptTitle(0)
+# ROOT.gStyle.SetEndErrorSize(7.5)
 
 # Configuration
 xlabel = "z"
@@ -60,7 +63,7 @@ xlabel = "z"
 ylabel_up = "#chi^{2}/^{}DOF"
 ylabel_down = "#chi^{2}/^{}DOF"
 parameter = "chi2"
-fileout = "fig05.pdf"
+fileout = "fig04_chi2.pdf"
 
 ylo = 0.01
 yhi = 3.6
@@ -95,9 +98,9 @@ for i in range(4):
   plt4P[i].GetYaxis().SetTitleOffset(1.5)
 
 
-x0 = 0.56
+x0 = 0.56-0.01
 y0 = 0.7
-x1 = x0 + 0.3
+x1 = x0 + 0.3-0.01
 y1 = y0 + 0.25
 leg = ROOT.TLegend(x0,y0,x1,y1)
 leg.SetTextFont(43)
@@ -109,22 +112,6 @@ for i in range(4):
   leg.AddEntry(plt3P[i],legends[i],"ep")
 fontAxesSize = 28
 fontAxesCode = 43
-plt3P[0].GetXaxis().SetTitleFont(fontAxesCode)
-plt3P[0].GetXaxis().SetTitleSize(fontAxesSize)
-plt3P[0].GetXaxis().SetLabelFont(fontAxesCode)
-plt3P[0].GetXaxis().SetLabelSize(fontAxesSize)
-plt3P[0].GetYaxis().SetTitleFont(fontAxesCode)
-plt3P[0].GetYaxis().SetTitleSize(fontAxesSize)
-plt3P[0].GetYaxis().SetLabelFont(fontAxesCode)
-plt3P[0].GetYaxis().SetLabelSize(fontAxesSize)
-plt4P[0].GetXaxis().SetTitleFont(fontAxesCode)
-plt4P[0].GetXaxis().SetTitleSize(fontAxesSize)
-plt4P[0].GetXaxis().SetLabelFont(fontAxesCode)
-plt4P[0].GetXaxis().SetLabelSize(fontAxesSize)
-plt4P[0].GetYaxis().SetTitleFont(fontAxesCode)
-plt4P[0].GetYaxis().SetTitleSize(fontAxesSize)
-plt4P[0].GetYaxis().SetLabelFont(fontAxesCode)
-plt4P[0].GetYaxis().SetLabelSize(fontAxesSize)
 # axes range
 plt3P[0].GetYaxis().SetRangeUser(ylo,yhi)
 plt4P[0].GetYaxis().SetRangeUser(ylo,yhi)
