@@ -1,0 +1,21 @@
+Broadening results as a function of z for pi+:
+   D<pt^2>_He^pi+(GeV^2)  Value  Stat. error  Sys. uncertainty 
+z-bin# 1  -0.0005  0.0021  0.0009
+z-bin# 2  0.0004  0.0037  0.0021
+z-bin# 3  -0.0073  0.0076  0.0076
+z-bin# 4  -0.0094  0.0123  0.0110
+   D<pt^2>_Ne^pi+(GeV^2)  Value  Stat. error  Sys. uncertainty 
+z-bin# 1  0.0064  0.0013  0.0008
+z-bin# 2  0.0067  0.0022  0.0019
+z-bin# 3  -0.0088  0.0044  0.0069
+z-bin# 4  -0.0131  0.0073  0.0103
+   D<pt^2>_Kr^pi+(GeV^2)  Value  Stat. error  Sys. uncertainty 
+z-bin# 1  0.0205  0.0015  0.0011
+z-bin# 2  0.0228  0.0025  0.0023
+z-bin# 3  0.0012  0.0051  0.0066
+z-bin# 4  0.0021  0.0090  0.0095
+   D<pt^2>_Xe^pi+(GeV^2)  Value  Stat. error  Sys. uncertainty 
+z-bin# 1  0.0269  0.0019  0.0013
+z-bin# 2  0.0300  0.0033  0.0026
+z-bin# 3  0.0071  0.0067  0.0069
+z-bin# 4  -0.0021  0.0116  0.0082
