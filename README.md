@@ -11,11 +11,11 @@ hermes-figures
 
 Enter the folder containing the requiered script.
 
-`cd python
-python Figure.py`
+`cd python`
+`python Figure.py`
 
-`cd ROOT
-root -l -q makeFigure.C`
+`cd ROOT`
+`root -l -q makeFigure.C`
 
 Moves PDF files around, do not remove any other file.
 
