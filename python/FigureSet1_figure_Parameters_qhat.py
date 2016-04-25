@@ -6,6 +6,8 @@ import sys, os, ROOT
 from AtlasStyle import SetAtlasStyle,AddLabel
 SetAtlasStyle()
 
+factor = 0.1*3./(4.*3.141592)
+
 values = []
 values.append([]) # position 0 for 3 parameter fits
 values.append([]) # position 1 for 4 parameter fits
@@ -33,6 +35,13 @@ errors[1].append( array("f",[0.217728893,0.450412377,8.776851091,6.829139897]) )
 errors[1].append( array("f",[0.468834974,0.453703411,1.100816193,2.056530162]) ) # rho =  0.0
 errors[1].append( array("f",[0.241652716,0.44818071,0.908007271,1.806845322]) ) # rho = -0.5
 errors[1].append( array("f",[0.24508155,0.407427979,0.730242733,5.355293349]) ) # rho = -1.0
+
+for k in range(2):
+  for j in range(4):
+    for i in range(4):
+      values[k][j][i] = values[k][j][i]/factor
+      errors[k][j][i] = errors[k][j][i]/factor
+
 
 offset = 0.0075
 dx = [-3*offset/2.,-offset/2.,offset/2.,3*offset/2.]
@@ -75,8 +84,8 @@ ylabel_down = ylabel
 parameter = "qhat"
 fileout = "fig04a_q0.pdf"
 
-ylo = -9.15
-yhi = 12.15
+ylo = -9.15/factor
+yhi = 12.15/factor
 # ylo = -0.029
 # yhi = 0.029
 
@@ -97,7 +106,7 @@ for i in range(4):
   # plt3P[i].SetLineWidth(lineWidth)
   plt3P[i].GetXaxis().SetTitle(xlabel)
   plt3P[i].GetYaxis().SetTitle(ylabel_up)
-  plt3P[i].GetYaxis().SetTitleOffset(1.5)
+  plt3P[i].GetYaxis().SetTitleOffset(1.6)
   plt4P.append(retrieveTGraphErrors(i,parameter,"4P"))
   plt4P[i].SetMarkerStyle(20+i)
   plt4P[i].SetMarkerColor(color[i]) 
@@ -105,7 +114,7 @@ for i in range(4):
   # plt4P[i].SetLineWidth(lineWidth)
   plt4P[i].GetXaxis().SetTitle(xlabel)
   plt4P[i].GetYaxis().SetTitle(ylabel_down)
-  plt4P[i].GetYaxis().SetTitleOffset(1.5)
+  plt4P[i].GetYaxis().SetTitleOffset(1.6)
 
   # plt3P[i].GetYaxis().CenterTitle()
   # plt4P[i].GetYaxis().CenterTitle()
@@ -117,7 +126,7 @@ fontAxesCode = 43
 # axes range
 plt3P[0].GetYaxis().SetRangeUser(ylo,yhi)
 plt4P[0].GetYaxis().SetRangeUser(ylo,yhi)
-plt4P[0].GetXaxis().SetTitleOffset(1.5)
+# plt4P[0].GetXaxis().SetTitleOffset(1.5)
 #
 
 x0 = 0.2
