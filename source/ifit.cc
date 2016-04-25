@@ -105,6 +105,7 @@ std::vector<myResult*> ifit(myConfig *config) {
   m->DoEnergyLoss(config->m_energyloss);
   m->DoLogBehavior(config->m_logbehavior);
   m->DoCascade(config->m_cascade);
+  m->DoFixedLp(config->fixedLp);
   // m->DoFermiMotion(config->m_fermimotion);
   // This is for Jlab
   // xxx[0]=pow(12.0107,1./3.); // C

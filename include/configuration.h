@@ -29,6 +29,7 @@ public:
   bool outputPlots = true;
   bool writeCorrectedValues = false;
   bool correctionPlots = false;
+  bool fixedLp = false;
 
   myConfig();
   ~myConfig();
