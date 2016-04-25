@@ -41,9 +41,9 @@ for i in range(4):
     err3[i] = err3[i]/factor;
 
 for i in range(4):
-    val1[i] = val1[i]/xval[i];
-    val2[i] = val2[i]/xval[i];
-    val3[i] = val3[i]/xval[i];
+    val1[i] = val1[i]/(xval[i]**2);
+    val2[i] = val2[i]/(xval[i]**2);
+    val3[i] = val3[i]/(xval[i]**2);
 
 g1 = ROOT.TGraphErrors(4,xval1,val1,xerr,err1)
 g2 = ROOT.TGraphErrors(4,xval2,val2,xerr,err2)
@@ -69,7 +69,7 @@ ylabel = "#hat{q} [GeV^{2}/fm] "
 fileout = "fig06a_qhat_quark.pdf" #sys.argv[3]
 
 ylo = 0.0
-yhi = 0.01/factor
+yhi = 1
 
 0.000979387
 0.004087083
@@ -137,6 +137,6 @@ g1.Draw("AP")
 g2.Draw("P SAME")
 g3.Draw("P SAME")
 leg.Draw()
-# AddLabel(0.2,0.26,"#hat{q} = #hat{q}_{h}/z_{h} with a 3 Parameter Fit")
+AddLabel(0.2,0.26,"#hat{q} = #hat{q}_{h}/z_{h}^2")
 # AddLabel(0.2, 0.2, "Fixed cross section #sigma_{ph} = 40 [mbarn]")
 c.Print(fileout)
