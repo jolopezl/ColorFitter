@@ -40,6 +40,11 @@ for i in range(4):
     err2[i] = err2[i]/factor;
     err3[i] = err3[i]/factor;
 
+for i in range(4):
+    val1[i] = val1[i]/xval[i];
+    val2[i] = val2[i]/xval[i];
+    val3[i] = val3[i]/xval[i];
+
 g1 = ROOT.TGraphErrors(4,xval1,val1,xerr,err1)
 g2 = ROOT.TGraphErrors(4,xval2,val2,xerr,err2)
 g3 = ROOT.TGraphErrors(4,xval3,val3,xerr,err3)
@@ -59,9 +64,9 @@ g3 = ROOT.TGraphErrors(4,xval3,val3,xerr,err3)
 # Configuration
 xlabel = "z_{h}"
 # L_P configuration
-ylabel = "#hat{q}_{h} [GeV^{2}/fm] "
+ylabel = "#hat{q} [GeV^{2}/fm] "
 
-fileout = "fig06a_qhat.pdf" #sys.argv[3]
+fileout = "fig06a_qhat_quark.pdf" #sys.argv[3]
 
 ylo = 0.0
 yhi = 0.01/factor
@@ -132,6 +137,6 @@ g1.Draw("AP")
 g2.Draw("P SAME")
 g3.Draw("P SAME")
 leg.Draw()
-AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{t}^{2}#GT/L_{p} with a 3 Parameter Fit")
-AddLabel(0.2, 0.82, "Fixed cross section #sigma_{ph} = 40 [mbarn]")
+# AddLabel(0.2,0.26,"#hat{q} = #hat{q}_{h}/z_{h} with a 3 Parameter Fit")
+# AddLabel(0.2, 0.2, "Fixed cross section #sigma_{ph} = 40 [mbarn]")
 c.Print(fileout)

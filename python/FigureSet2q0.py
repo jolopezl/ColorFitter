@@ -12,7 +12,8 @@ err = []
 labels = ['BL','BLE','BL40','BL30','BLE40','BLE30']
 
 xlabel = 'z_{h}'
-ylabel = 'q_{0} [GeV^{2}fm]'
+#ylabel = 'q_{0} [GeV^{2}fm]'
+ylabel = "q_{0} [0.2 GeV^{3}]"
 filename = 'test_q0'
 
 # VALUES
