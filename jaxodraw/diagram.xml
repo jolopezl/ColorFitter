@@ -901,7 +901,7 @@
       <int>2</int>
      </void>
      <void property="color">
-      <object class="java.awt.Color" id="Color3">
+      <object class="java.awt.Color">
        <int>0</int>
        <int>0</int>
        <int>0</int>
@@ -934,80 +934,6 @@
      </void>
      <void property="textString">
       <string>g</string>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="net.sf.jaxodraw.object.text.JaxoLatexText" id="JaxoLatexText7">
-     <void property="allign">
-      <int>2</int>
-     </void>
-     <void property="color">
-      <object idref="Color3"/>
-     </void>
-     <void property="latexTextSize">
-      <int>6</int>
-     </void>
-     <void id="PointArray18" property="points">
-      <void id="Point29" index="0">
-       <void class="java.awt.Point" method="getField">
-        <string>x</string>
-        <void method="set">
-         <object idref="Point29"/>
-         <int>315</int>
-        </void>
-       </void>
-       <void class="java.awt.Point" method="getField">
-        <string>y</string>
-        <void method="set">
-         <object idref="Point29"/>
-         <int>104</int>
-        </void>
-       </void>
-      </void>
-     </void>
-     <void property="points">
-      <object idref="PointArray18"/>
-     </void>
-     <void property="textString">
-      <string>L_p</string>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="net.sf.jaxodraw.object.text.JaxoLatexText" id="JaxoLatexText8">
-     <void property="allign">
-      <int>2</int>
-     </void>
-     <void property="color">
-      <object idref="Color3"/>
-     </void>
-     <void property="latexTextSize">
-      <int>6</int>
-     </void>
-     <void id="PointArray19" property="points">
-      <void id="Point30" index="0">
-       <void class="java.awt.Point" method="getField">
-        <string>x</string>
-        <void method="set">
-         <object idref="Point30"/>
-         <int>188</int>
-        </void>
-       </void>
-       <void class="java.awt.Point" method="getField">
-        <string>y</string>
-        <void method="set">
-         <object idref="Point30"/>
-         <int>132</int>
-        </void>
-       </void>
-      </void>
-     </void>
-     <void property="points">
-      <object idref="PointArray19"/>
-     </void>
-     <void property="textString">
-      <string>I.P.</string>
      </void>
     </object>
    </void>
