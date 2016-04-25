@@ -306,11 +306,13 @@ int Model::Compute(const double A){
     // Next, integrate from the prehadron vertex up to the end of the sphere of integration
     if (z+L<ul){
       temp=igdtd2->Integral(z+L,ul) ; // find hadronic lengths
+      std::cout << temp << "\t" << ul - (z+L) << std::endl; 
       zrange2=ul-(z+L);
     }
     if (z+L>=ul){ // pre-hadron forms outside nucleus
       temp=0.;
       zrange2=1.; // dummy value
+      std::cout << temp << "\t" << ul - (z+L) << std::endl; 
     }
     if(temp<0){ // this integral should always be positive.
       std::cout << "igdtd2 is negative!! Error!! \n";

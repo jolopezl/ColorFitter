@@ -8,6 +8,7 @@ int computeSimpleFit(const bool, const bool, const double);                     
 int computeComplexFit(int argc, char *argv[]);    // A fit with a complex configuration
 int printInteractionPoints();
 int computeBand();
+int average_density();
 
 
 // ************ main function ************ //
@@ -15,12 +16,13 @@ int main(int argc, char *argv[]) {
   // demoPlots();
   // printInteractionPoints();
   // ********  EnergyLoss, Subtraction, Correlation                  
-  computeSimpleFit(true, true, 0.0);
+  // computeSimpleFit(true, true, 0.0);
   // computeSimpleFit(true, true,  0.0);
   // computeSimpleFit(true, true, -0.5);
   // computeSimpleFit(true, true, -1.0);
   // computeBand();
   // demoPlots();
+  int foo = average_density();
 }
 
 // **************** Compute a Simple Fit **************** //
@@ -121,6 +123,22 @@ int printInteractionPoints() {
   for (int i = 0; i < 10; ++i) {
     model->InteractionPoint(x,y,z,R);
     std::cout << x << "\t" << y << "\t" << z << std::endl;
+  }
+  return 0;
+}
+
+int average_density() {
+  Model *model = new Model("AverageDensityComputation");
+  model->Initialization();
+  model->SetParameters("lp", 3.1); // z=0.75
+  float xxx[3];
+  xxx[0]=pow(20.1797,1./3.); // Ne   here goes A^1/3
+  xxx[1]=pow(83.7980,1./3.); // Kr
+  xxx[2]=pow(131.293,1./3.); // Xe
+  {
+    int i = 2;
+    std::cout << "A13 = " << xxx[i] << std::endl;
+    model->Compute(xxx[i]);
   }
   return 0;
 }
