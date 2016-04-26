@@ -30,8 +30,8 @@ int main(int argc, char *argv[]) {
 int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
   myConfig *config = new myConfig();
   // bins of interest
-  int Q2Int = -1;
-  int izInt = -1;
+  int Q2Int = 3;
+  int izInt = 3;
   // defauls
   bool input_energyloss     = tEnergyLoss;
   bool input_subtraction    = tSubtraction;
@@ -40,18 +40,18 @@ int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const doub
   config->m_subtraction       = input_subtraction; // false;
   config->m_correlation       = input_correlation; // for physics -1.0 < rho < 0.0
   // Production lenght behaviour
-  config->fixedLp = true;
+  config->fixedLp = false;
   // Pre-hadron cross section
-  config->m_preh              = true; // usually true
-  config->m_initial_sigma     = 40.0;  // do it < 40 mbarns
+  config->m_preh              = false; // usually true
+  config->m_initial_sigma     = 30.0;  // do it < 40 mbarns
   // more.
   config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
   config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
-  config->m_output_fit        = "testFitBLS.csv";
+  config->m_output_fit        = "testFitBLS30.csv";
   config->m_input_pt          = "hermesData.txt";
   config->writeCorrectedValues = false; // text file from dataHandler
   config->correctionPlots      = false; // from dataHandler
-  config->outputPlots          = true; // model and data
+  config->outputPlots          = false; // model and data
   config->doMINOSErrors = false; // usually false
   config->Update();
   std::cout << "Running iFit now:" << std::endl;

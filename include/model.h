@@ -7,8 +7,37 @@
 #include "Math/WrappedTF1.h"
 #include "Math/GSLIntegrator.h"
 
+using vector_d = std::vector<double>;
+
 class Model {
+public:
+  // public members
+  Model(std::string);
+  Model();
+  ~Model();
+  void SetParameters(std::vector<double>);
+  void SetParameters(std::string,double);
+  void SetBinRatio(int,double,double);
+  void SetFermiValues(double,double);
+  void DoEnergyLoss(bool);
+  void DoLogBehavior(bool);
+  void DoFermiMotion(bool);
+  void DoFixedLp(bool);
+  void DoCascade(bool);
+  void Initialization();
+  int Compute(const double);
+  void InteractionPoint(double &, double &, double &, const double);
+  double GetR(const double, const double);
+  double Get1();
+  double Get2();
+  double GetC(int);
+  vector_d GetResult();
+  void GetResult(double&,double&);
+  double Fermi(int inucleus);
 private:
+  // private methods
+  double Density(const double, const double, const double, const double);
+  double FindR(const double, const double);
   // private members
   std::string m_ModelName;
   double m_dPt2;
@@ -37,38 +66,11 @@ private:
   double m_xB;
   double m_zbinvalue;
   // tools
-  std::vector<double> m_c_interpolation;
+  vector_d m_c_interpolation;
   // Other parameters
   int m_maxmcSteps = 100000; // number of mc steps in the calculation
   double m_density_threshold = 0.005;
   int irun = -1;
-  // private methods
-  double Density(const double, const double, const double, const double);
-  double FindR(const double, const double);
-public:
-  // public members
-  Model(std::string);
-  Model();
-  ~Model();
-  void SetParameters(std::vector<double>);
-  void SetParameters(std::string,double);
-  void SetBinRatio(int,double,double);
-  void SetFermiValues(double,double);
-  void DoEnergyLoss(bool);
-  void DoLogBehavior(bool);
-  void DoFermiMotion(bool);
-  void DoFixedLp(bool);
-  void DoCascade(bool);
-  void Initialization();
-  int Compute(const double);
-  void InteractionPoint(double &, double &, double &, const double);
-  double GetR(const double, const double);
-  double Get1();
-  double Get2();
-  double GetC(int);
-  std::vector<double> GetResult();
-  void GetResult(double&,double&);
-  double Fermi(int inucleus);
 };
 
 #endif

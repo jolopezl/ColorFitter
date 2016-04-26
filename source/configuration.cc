@@ -17,6 +17,7 @@ void myConfig::Update() {
     foo << " - Cross Section = "      << m_initial_sigma;
     foo << " mbarn";
     foo << " fixed";
+    foo << " fixed Lp " << fixedLp;
   }
   m_comment = foo.str();
 }

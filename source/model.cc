@@ -42,8 +42,8 @@ Model::~Model() {
   std::cout << "Model destructed: " << m_ModelName << std::endl;
 }
 
-std::vector<double> Model::GetResult() {
-  std::vector<double> output = {m_dPt2, m_Rm};
+vector_d Model::GetResult() {
+  vector_d output = {m_dPt2, m_Rm};
   return output;
 }
 
@@ -52,17 +52,15 @@ void Model::GetResult(double &dPT2,double &Rm) {
   Rm   = m_Rm;
 }
 
-double Model::Get1(){
-  return m_dPt2;
-}
+double Model::Get1() {return m_dPt2;}
+double Model::Get2() {return m_Rm;}
+double Model::GetC(int A) {return m_c_interpolation[A];}
 
-double Model::Get2(){
-  return m_Rm; 
-}
-
-double Model::GetC(int A) {
-  return m_c_interpolation[A];
-}
+void Model::DoEnergyLoss(bool foo) {m_DoEnergyLoss = foo;}
+void Model::DoLogBehavior(bool foo) {m_DoLogBehavior = foo;}
+void Model::DoFermiMotion(bool foo) {m_DoFermiMotion = foo;}
+void Model::DoFixedLp(bool foo) {m_doFixedLp = foo;}
+void Model::DoCascade(bool foo) {m_doCascade = foo;}
 
 void Model::SetParameters(std::vector<double> parms) {
   m_qhat     = parms.at(0);
@@ -93,26 +91,6 @@ void Model::SetBinRatio(int diz, double dbinw, double dbinratio){
 void Model::SetFermiValues(double xb, double z) {
   m_xB = xb;
   m_zbinvalue = z;
-}
-
-void Model::DoEnergyLoss(bool foo) {
-  m_DoEnergyLoss = foo;
-}
-
-void Model::DoLogBehavior(bool foo) {
-  m_DoLogBehavior = foo;
-}
-
-void Model::DoFermiMotion(bool foo) {
-  m_DoFermiMotion = foo;
-}
-
-void Model::DoFixedLp(bool foo) {
-  m_doFixedLp = foo;
-}
-
-void Model::DoCascade(bool foo) {
-  m_doCascade = foo;
 }
 
 void Model::Initialization() {
@@ -265,38 +243,38 @@ int Model::Compute(const double A){
     igdtd1->SetRelTolerance(0.00001);
     igdtd2->SetFunction(wdtd2);
     igdtd2->SetRelTolerance(0.00001);
-    weight=Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
+    weight = Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
     ul = sqrt(R*R-x*x-y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
     // Next, integrate from the starting vertex up to the end of the production length
-    if(z+L<ul) {// endpoint of quark path is within the sphere of integration
-      temp=constant*igdtd1->Integral(z,z+L) ; // find partonic lengths
-      zrange1=L;
+    if(z+L < ul) {// endpoint of quark path is within the sphere of integration
+      temp = constant*igdtd1->Integral(z,z+L) ; // find partonic lengths
+      zrange1 = L;
       if(m_DoLogBehavior == true) {
-        zrange1*= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
+        zrange1 *= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
       }
     }
-    if(z+L>=ul){ // endpoint of quark path is outside the sphere of integration
-      temp=constant*igdtd1->Integral(z,ul) ; // find partonic lengths
-      zrange1=ul-z;
+    if(z+L >= ul){ // endpoint of quark path is outside the sphere of integration
+      temp = constant*igdtd1->Integral(z,ul) ; // find partonic lengths
+      zrange1 = ul-z;
       if(m_DoLogBehavior == true) {
-        zrange1*= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
+        zrange1 *= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
       }
     }
-    if(z>ul){// this should not be possible
+    if(z > ul){// this should not be possible
       std::cout << "Point A: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp << " " << R << " " << x << " " << y << " " << z << " " << R*R-x*x-y*y << std::endl;
     }
-    if(temp<0){ // this integral should always be positive.
+    if(temp < 0){ // this integral should always be positive.
       std::cout << "igdtd1 is negative!! Error!! \n";
-      temp=0.;
-      zrange1=1.; // dummy value
+      temp = 0.;
+      zrange1 = 1.; // dummy value
       return 1;
     }
-    if(temp==0){ 
-      zrange1=1.; // dummy value
+    if(temp == 0){ 
+      zrange1 = 1.; // dummy value
     }
-    if(zrange1>0){
+    if(zrange1 > 0){
       // accumulator1+=zrange1*temp*weight;
-      accumulator1+=temp*weight;
+      accumulator1 += temp*weight;
       // accumulator1+=m_qhat*zrange1*temp*weight; 
     }
     else{
@@ -304,21 +282,21 @@ int Model::Compute(const double A){
       std::cout << "Point B: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp <<" "<< R <<" "<< x <<" "<< y <<" "<< z << " " << R*R-x*x-y*y << std::endl;
     }
     // Next, integrate from the prehadron vertex up to the end of the sphere of integration
-    if (z+L<ul){
-      temp=igdtd2->Integral(z+L,ul) ; // find hadronic lengths
+    if (z+L < ul){
+      temp = igdtd2->Integral(z+L,ul) ; // find hadronic lengths
       // std::cout << temp << "\t" << ul - (z+L) << std::endl; 
-      zrange2=ul-(z+L);
+      zrange2 = ul-(z+L);
     }
-    if (z+L>=ul){ // pre-hadron forms outside nucleus
-      temp=0.;
-      zrange2=1.; // dummy value
+    if (z+L >= ul){ // pre-hadron forms outside nucleus
+      temp = 0.;
+      zrange2 = 1.; // dummy value
       // std::cout << temp << "\t" << ul - (z+L) << std::endl; 
     }
-    if(temp<0){ // this integral should always be positive.
+    if(temp < 0){ // this integral should always be positive.
       std::cout << "igdtd2 is negative!! Error!! \n";
       return 1;
     }
-    if(zrange2>0){
+    if(zrange2 > 0){
       if (!m_doCascade) {
         accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
       }
@@ -326,29 +304,29 @@ int Model::Compute(const double A){
         accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(temp*m_cascade/10.))*weight;
       }
     }
-    if(zrange2==0){
+    if(zrange2 == 0){
       std::cout<<"Info: zrange2 = 0 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";
     }
-    if(zrange2<0){
-      std::cout<<"Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";  
+    if(zrange2 < 0){
+      std::cout <<"Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";  
       return 1;
     }
     //      normalize+= 1.;
-    normalize+=weight; // weight initial interaction by density  
+    normalize += weight; // weight initial interaction by density  
   } // End of big loop     energy loss down here ------------*
   // ADD ENERGY LOSS, From Will's original code:
   temp = accumulator2/normalize;
   if (m_DoEnergyLoss == true) {
     if (m_iz > 0) {
-      temp*=(1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+      temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
       // temp+=(-(1.-m_binratio)*m_dz*A13/m_zbinwidth );
     }
     else {
-      temp*=(1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
+      temp *= (1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
       // temp+=((m_binratio*m_dz*A13)/m_zbinwidth);
     }
   }
-  m_dPt2=accumulator1/normalize; //  pT broadening
-  m_Rm=temp; //  Multiplicity
+  m_dPt2 = accumulator1/normalize; //  pT broadening
+  m_Rm = temp; //  Multiplicity
   return 0;
 }
