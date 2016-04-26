@@ -4,7 +4,7 @@ Model::Model():
   m_ModelName("Default"),
   m_dPt2(0.0), 
   m_Rm(0.0),
-  m_qhat(1.5),
+  m_q0(1.5),
   m_lp(3.5),
   m_sigma_ph(40.0), // prehadron cross section
   m_dlog(0.0),      // log description?
@@ -23,7 +23,7 @@ Model::Model(std::string name):
   m_ModelName(name), 
   m_dPt2(0.0), 
   m_Rm(0.0),
-  m_qhat(1.5),
+  m_q0(1.5),
   m_lp(3.5),
   m_sigma_ph(40.0), // prehadron cross section
   m_dlog(0.0),      // log description?
@@ -63,7 +63,7 @@ void Model::DoFixedLp(bool foo) {m_doFixedLp = foo;}
 void Model::DoCascade(bool foo) {m_doCascade = foo;}
 
 void Model::SetParameters(std::vector<double> parms) {
-  m_qhat     = parms.at(0);
+  m_q0     = parms.at(0);
   m_lp       = parms.at(1);
   m_sigma_ph = parms.at(2);
   m_dlog     = parms.at(3);
@@ -72,9 +72,9 @@ void Model::SetParameters(std::vector<double> parms) {
 }
 
 void Model::SetParameters(std::string parameter, double value) {
-  if      (parameter == "qhat")              m_qhat = value;
+  if      (parameter == "q0")              m_q0 = value;
   else if (parameter == "lp")                m_lp = value;
-  else if (parameter == "sigma_ph")          m_sigma_ph = value;
+  else if (parameter == "sigma")          m_sigma_ph = value;
   else if (parameter == "dlog")              m_dlog = value;
   else if (parameter == "dz")                m_dz = value;
   else if (parameter == "cascade")           m_cascade = value;
@@ -228,7 +228,7 @@ int Model::Compute(const double A){
       L = gRandom->Exp(m_lp); // exponentially distributed production length
     }
     /* 
-    dtd1->SetParameter(0,m_qhat); // qhat parameter  
+    dtd1->SetParameter(0,m_q0); // qhat parameter  
     dtd1->SetParameter(1,x); // starting value of longitudinal coordinate  
     dtd1->SetParameter(2,y); // x
     dtd1->SetParameter(3,m_c_interpolation[(int)A]); // density parameter
@@ -279,7 +279,7 @@ int Model::Compute(const double A){
     if(zrange1 > 0){
       // accumulator1+=zrange1*temp*weight;
       // accumulator1 += temp*weight;
-      accumulator1 += m_qhat*temp*weight; 
+      accumulator1 += m_q0*temp*weight; 
     }
     else{
       std::cout << "zrange1 of length zero or negative encountered: " << zrange1 << " \n";
@@ -321,13 +321,14 @@ int Model::Compute(const double A){
   // ADD ENERGY LOSS, From Will's original code:
   temp = accumulator2/normalize;
   if (m_DoEnergyLoss == true) {
+    double A13 = pow(A,1/3.);
     if (m_iz > 0) {
-      temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
-      // temp+=(-(1.-m_binratio)*m_dz*A13/m_zbinwidth );
+      // temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+      temp+=(-(1.-m_binratio)*m_dz*A13/m_zbinwidth );
     }
     else {
-      temp *= (1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
-      // temp+=((m_binratio*m_dz*A13)/m_zbinwidth);
+      // temp *= (1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
+      temp+=((m_binratio*m_dz*A13)/m_zbinwidth);
     }
   }
   m_dPt2 = accumulator1/normalize; //  pT broadening

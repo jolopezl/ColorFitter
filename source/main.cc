@@ -23,15 +23,15 @@ int main(int argc, char *argv[]) {
   // computeBand();
   // demoPlots();
   //int foo = average_density();
-  computeSimpleFit(false,true,0.0);
+  computeSimpleFit(true,true,0.0);
 }
 
 // **************** Compute a Simple Fit **************** //
 int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
   myConfig *config = new myConfig();
   // bins of interest
-  int Q2Int = 3;
-  int izInt = 3;
+  int Q2Int = -1;
+  int izInt = -1;
   // defauls
   bool input_energyloss     = tEnergyLoss;
   bool input_subtraction    = tSubtraction;
@@ -89,9 +89,9 @@ int computeBand() {
     qhat  = random.Gaus(values[0], errors[0]/2.0);
     lp    = random.Gaus(values[1], errors[1]/2.0);
     sigma = random.Gaus(values[2], errors[2]/2.0);
-    model->SetParameters("qhat",     qhat  );
+    model->SetParameters("q0",     qhat  );
     model->SetParameters("lp",       lp    );
-    model->SetParameters("sigma_ph", sigma );
+    model->SetParameters("sigma", sigma );
     sc = model->Compute(nucleus);
     // if (sc == 1) continue;
     delta_pT2 = model->Get1();
@@ -151,7 +151,7 @@ int demoPlots() {
   Model *model = new Model("demoPlots");
   model->Initialization();
   // model->DoFixedLp(true); 
-  model->SetParameters("qhat", 1.0);
+  model->SetParameters("q0", 1.0);
   // To run and produce full list of files at once.
   std::vector<double> lpList = {1.0,2.0,3.0,4.0,5.0,7.0,9.0,10.0,20.0};
   for (const auto &lp : lpList) {
@@ -177,7 +177,7 @@ int demoPlots2D() {
   Model *model = new Model("demoPlots2D");
   model->Initialization();
   model->DoFixedLp(true);
-  model->SetParameters("qhat", 1.5);
+  model->SetParameters("q0", 1.5);
   model->SetParameters("density threshold", 0.0005);
   float step_lp = (20.0-1.0)/25;
   int setp_nucl = (int)(240-12)/25;

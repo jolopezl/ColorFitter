@@ -43,7 +43,7 @@ private:
   double m_dPt2;
   double m_Rm;
   // physical input parameters
-  double m_qhat;
+  double m_q0;
   double m_lp; // production lenght
   double m_sigma_ph; // prehadron cross section
   double m_dlog; // log description?
