@@ -42,6 +42,17 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
     config->m_output_fit = "testFitBLE.csv";
     config->m_energyloss = true;
   }
+  else if (model == "BL40") {
+    config->m_preh = false;
+    config->m_input_pt = 40.0;
+    config->m_output_fit = "testFitBL40.csv";
+  }
+  else if (model == "BLE40") {
+    config->m_output_fit = "testFitBL40.csv";
+    config->m_preh = false;
+    config->m_input_pt = 40.0;
+    config->m_energyloss = true;
+  }
   config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
   config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
   config->m_input_pt          = "hermesData.txt";

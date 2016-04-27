@@ -214,7 +214,8 @@ int Model::Compute(const double A){
   double L;
   double weight, ul;
   double temp, zrange1, zrange2;
-  double accumulator1 = 0.0, accumulator2 = 0.0;
+  double accumulator1 = 0.0; // pT2
+  double accumulator2 = 0.0; // Rm
   double constant = 0.1*3./(4.*3.141592); // alpha_s * N_c / 4pi, the prefix of the formula for delta pT^2 = 0.02387
   double normalize = 0.0;
   // MC part
@@ -225,18 +226,8 @@ int Model::Compute(const double A){
       z = gRandom->Uniform(-R,R);
       if(x*x + y*y + z*z < R*R) break;
     }
-    if (m_doFixedLp) {
-      L = m_lp;
-    }
-    else {
-      L = gRandom->Exp(m_lp); // exponentially distributed production length
-    }
-    /* 
-    dtd1->SetParameter(0,m_q0); // qhat parameter  
-    dtd1->SetParameter(1,x); // starting value of longitudinal coordinate  
-    dtd1->SetParameter(2,y); // x
-    dtd1->SetParameter(3,m_c_interpolation[(int)A]); // density parameter
-    */
+    if (m_doFixedLp) L = m_lp;
+    else             L = gRandom->Exp(m_lp); // exponentially distributed production length
     // First function parameters
     dtd1->SetParameter(0,x); // starting value of longitudinal coordinate  
     dtd1->SetParameter(1,y); // x
@@ -245,16 +236,18 @@ int Model::Compute(const double A){
     dtd2->SetParameter(0,x); // x
     dtd2->SetParameter(1,y); // y
     dtd2->SetParameter(2,m_c_interpolation[(int)A]); // density parameter
+    // Wrap functions
     ROOT::Math::WrappedTF1 wdtd1(*dtd1);
     ROOT::Math::WrappedTF1 wdtd2(*dtd2);
     igdtd1->SetFunction(wdtd1);
     igdtd1->SetRelTolerance(0.00001);
     igdtd2->SetFunction(wdtd2);
     igdtd2->SetRelTolerance(0.00001);
+    // Physics
     weight = Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
     ul = sqrt(R*R-x*x-y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
-    // Next, integrate from the starting vertex up to the end of the production length
     bool isOutside = false;
+    // Next, integrate from the starting vertex up to the end of the production length
     if(z+L < ul) {// endpoint of quark path is within the sphere of integration
       temp = constant*igdtd1->Integral(z,z+L) ; // find partonic lengths
       zrange1 = L;
@@ -262,17 +255,17 @@ int Model::Compute(const double A){
         zrange1 *= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
       }
     }
-    if(z+L >= ul){ // endpoint of quark path is outside the sphere of integration
+    if(z+L >= ul) { // endpoint of quark path is outside the sphere of integration
       temp = constant*igdtd1->Integral(z,ul) ; // find partonic lengths
       zrange1 = ul-z;
       if(m_DoLogBehavior == true) {
         zrange1 *= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
       }
     }
-    if(z > ul){// this should not be possible
+    if(z > ul) {// this should not be possible
       std::cout << "Point A: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp << " " << R << " " << x << " " << y << " " << z << " " << R*R-x*x-y*y << std::endl;
     }
-    if(temp < 0){ // this integral should always be positive.
+    if(temp < 0) { // this integral should always be positive.
       std::cout << "igdtd1 is negative!! Error!! \n";
       temp = 0.;
       zrange1 = 1.; // dummy value
@@ -286,27 +279,26 @@ int Model::Compute(const double A){
       // accumulator1 += temp*weight;
       accumulator1 += m_q0*temp*weight; 
     }
-    else{
+    else {
       std::cout << "zrange1 of length zero or negative encountered: " << zrange1 << " \n";
       std::cout << "Point B: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp <<" "<< R <<" "<< x <<" "<< y <<" "<< z << " " << R*R-x*x-y*y << std::endl;
     }
     // Next, integrate from the prehadron vertex up to the end of the sphere of integration
     if (z+L < ul){
-      temp = igdtd2->Integral(z+L,ul) ; // find hadronic lengths
-      // std::cout << temp << "\t" << ul - (z+L) << std::endl; 
+      temp = igdtd2->Integral(z+L,ul); // find hadronic lengths
       zrange2 = ul-(z+L);
+      isOutside = false;
     }
     if (z+L >= ul){ // pre-hadron forms outside nucleus
       temp = 0.;
       zrange2 = 1.; // dummy value
       isOutside = true;
-      // std::cout << temp << "\t" << ul - (z+L) << std::endl; 
     }
     if(temp < 0){ // this integral should always be positive.
       std::cout << "igdtd2 is negative!! Error!! \n";
       return 1;
     }
-    if(zrange2 > 0 && isOutside == false){
+    if(zrange2 > 0 && (isOutside == false)) {
       if (m_doCascade == true) {
         accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(temp*m_cascade/10.))*weight;
       }
@@ -314,10 +306,13 @@ int Model::Compute(const double A){
         accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
       }
     }
-    if(zrange2 == 0){
+    else if (isOutside == true) {
+      accumulator2 += 1*weight;
+    }
+    if (zrange2 == 0) {
       std::cout <<"Info: zrange2 = 0 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";
     }
-    if(zrange2 < 0){
+    if (zrange2 < 0) {
       std::cout <<"Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";  
       return 1;
     }
