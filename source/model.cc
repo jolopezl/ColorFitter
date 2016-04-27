@@ -52,18 +52,19 @@ void Model::GetResult(double &dPT2,double &Rm) {
   Rm   = m_Rm;
 }
 
-double Model::Get1() {return m_dPt2;}
-double Model::Get2() {return m_Rm;}
+double Model::Get1()      {return m_dPt2;}
+double Model::Get2()      {return m_Rm;}
 double Model::GetC(int A) {return m_c_interpolation[A];}
 
-void Model::DoEnergyLoss(bool foo) {m_DoEnergyLoss = foo;}
-void Model::DoLogBehavior(bool foo) {m_DoLogBehavior = foo;}
-void Model::DoFermiMotion(bool foo) {m_DoFermiMotion = foo;}
-void Model::DoFixedLp(bool foo) {m_doFixedLp = foo;}
-void Model::DoCascade(bool foo) {m_doCascade = foo;}
+void Model::DoEnergyLoss(bool foo)         {m_DoEnergyLoss = foo;}
+void Model::DoEnergyLossWeighted(bool foo) {m_DoEnergyLossWeighted = foo;}
+void Model::DoLogBehavior(bool foo)        {m_DoLogBehavior = foo;}
+void Model::DoFermiMotion(bool foo)        {m_DoFermiMotion = foo;}
+void Model::DoFixedLp(bool foo)            {m_doFixedLp = foo;}
+void Model::DoCascade(bool foo)            {m_doCascade = foo;}
 
 void Model::SetParameters(std::vector<double> parms) {
-  m_q0     = parms.at(0);
+  m_q0       = parms.at(0);
   m_lp       = parms.at(1);
   m_sigma_ph = parms.at(2);
   m_dlog     = parms.at(3);
@@ -207,19 +208,22 @@ int Model::Compute(const double A){
     std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << "\t 1.1*A^(1/3) = " << 1.1*pow(A,1/3.) << " [fm]" << std::endl;
     irun = 1;
   }
+  m_A13 = pow(A,1/3.);
   double max_density=Density(A,0.,0.,0.);
   double x,y,z;
   double L;
   double weight, ul;
-  double temp, accumulator1=0.0, accumulator2=0.0, zrange1, zrange2;
+  double temp, zrange1, zrange2;
+  double accumulator1 = 0.0, accumulator2 = 0.0;
   double constant = 0.1*3./(4.*3.141592); // alpha_s * N_c / 4pi, the prefix of the formula for delta pT^2 = 0.02387
   double normalize = 0.0;
-  for (int mcStep=0; mcStep<m_maxmcSteps; ++mcStep){
-    while(1){// only consider points inside the integration sphere
+  // MC part
+  for (int mcStep=0; mcStep<m_maxmcSteps; ++mcStep) {
+    while(1) {// only consider points inside the integration sphere
       x = gRandom->Uniform(-R,R);
       y = gRandom->Uniform(-R,R);
       z = gRandom->Uniform(-R,R);
-      if(x*x+y*y+z*z<R*R) break;
+      if(x*x + y*y + z*z < R*R) break;
     }
     if (m_doFixedLp) {
       L = m_lp;
@@ -250,6 +254,7 @@ int Model::Compute(const double A){
     weight = Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
     ul = sqrt(R*R-x*x-y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
     // Next, integrate from the starting vertex up to the end of the production length
+    bool isOutside = false;
     if(z+L < ul) {// endpoint of quark path is within the sphere of integration
       temp = constant*igdtd1->Integral(z,z+L) ; // find partonic lengths
       zrange1 = L;
@@ -294,18 +299,19 @@ int Model::Compute(const double A){
     if (z+L >= ul){ // pre-hadron forms outside nucleus
       temp = 0.;
       zrange2 = 1.; // dummy value
+      isOutside = true;
       // std::cout << temp << "\t" << ul - (z+L) << std::endl; 
     }
     if(temp < 0){ // this integral should always be positive.
       std::cout << "igdtd2 is negative!! Error!! \n";
       return 1;
     }
-    if(zrange2 > 0){
-      if (!m_doCascade) {
-        accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
+    if(zrange2 > 0 && isOutside == false){
+      if (m_doCascade == true) {
+        accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(temp*m_cascade/10.))*weight;
       }
       else {
-        accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(temp*m_cascade/10.))*weight;
+        accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
       }
     }
     if(zrange2 == 0){
@@ -320,18 +326,24 @@ int Model::Compute(const double A){
   } // End of big loop     energy loss down here ------------*
   // ADD ENERGY LOSS, From Will's original code:
   temp = accumulator2/normalize;
-  if (m_DoEnergyLoss == true) {
-    double A13 = pow(A,1/3.);
-    if (m_iz > 0) {
-      // temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
-      temp+=(-(1.-m_binratio)*m_dz*A13/m_zbinwidth );
-    }
-    else {
-      // temp *= (1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
-      temp+=((m_binratio*m_dz*A13)/m_zbinwidth);
-    }
-  }
+  if (m_DoEnergyLoss == true) ApplyEnergyLoss(temp);
   m_dPt2 = accumulator1/normalize; //  pT broadening
   m_Rm = temp;                     //  Multiplicity
   return 0;
+}
+
+void Model::ApplyEnergyLoss(double &temp) {
+  if (m_DoEnergyLossWeighted == true) {
+    if (m_iz > 0)
+      temp *= (1.-(1.-m_binratio)*m_dz*m_A13/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+    else
+      temp *= (1.+(m_binratio*m_dz*m_A13)/m_zbinwidth); // events increase in the lowest z bin.
+  }
+  // SIMPLE CASE - DEFAULT
+  else {
+    if (m_iz > 0)
+      temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth); // add effect of energy loss; par[4] is the average z shift due to energy loss
+    else
+      temp *= (1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
+  }
 }

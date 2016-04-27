@@ -103,6 +103,7 @@ std::vector<myResult*> ifit(myConfig *config) {
   myResult *result = new myResult();
   m->Initialization();
   m->DoEnergyLoss(config->m_energyloss);
+  m->DoEnergyLossWeighted(config->m_energylossWeighted);
   m->DoLogBehavior(config->m_logbehavior);
   m->DoCascade(config->m_cascade);
   m->DoFixedLp(config->fixedLp);
@@ -192,16 +193,16 @@ std::vector<myResult*> ifit(myConfig *config) {
       gMinuit->mnexcm("SET ERR", arglist ,1,ierflg);
       arglist[0] = 3;
       gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
-      const double s0 = config->m_initial_sigma;
-      double vstart[] = {0.4775, 1.6,     s0,    2.5,    0.0,     0.2};
-      double step[]   = {0.01,   0.01,    0.01,  0.5,    0.00001, 0.01};
-      double lim_lo[] = {0.,     0.0001, -0.01,  0.1,   -1.0,    -0.01};
-      double lim_hi[] = {10.,    400.,    400.,  100.0,  1.0,     100.0}; 
+      const double sigma0 = config->m_initial_sigma;
+      double vstart[] = {0.4775, 1.6,     sigma0, 2.5,    0.0,     0.2};
+      double step[]   = {0.01,   0.01,    0.01,   0.5,    0.00001, 0.01};
+      double lim_lo[] = {0.,     0.0001, -0.01,   0.1,   -1.0,    -0.01};
+      double lim_hi[] = {10.,    400.,    400.,   100.0,  1.0,     100.0}; 
       if (false) {
         lim_lo[4] = -10.0;
         lim_hi[4] = +10.0;
       }
-      gMinuit->mnparm(0, "QHAT",  vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
+      gMinuit->mnparm(0, "Q0",    vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
       gMinuit->mnparm(1, "LP",    vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
       gMinuit->mnparm(2, "SIGMA", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
       gMinuit->mnparm(3, "DLOG",  vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description

@@ -5,6 +5,7 @@
 int demoPlots(); // Do plots and studies of the model
 int demoPlots2D(); // Do fancier plots and studies of the model
 int computeSimpleFit(const bool, const bool, const double);                           // A simple fits trusted.
+int computeSimpleFit2(const std::string, const bool, const double);
 int computeComplexFit(int argc, char *argv[]);    // A fit with a complex configuration
 int printInteractionPoints();
 int computeBand();
@@ -23,7 +24,35 @@ int main(int argc, char *argv[]) {
   // computeBand();
   // demoPlots();
   //int foo = average_density();
-  computeSimpleFit(true,true,0.0);
+  //computeSimpleFit(false,true,0.0);
+  // MODEL TYPE, do subtraction, value
+  computeSimpleFit2("BL", true, 0.0);
+}
+
+int computeSimpleFit2(const std::string model, const bool iSubt, const double iCorr) {
+  myConfig *config = new myConfig();
+  int Q2Int = -1;
+  int izInt = -1;
+  config->m_subtraction = iSubt; // false;
+  config->m_correlation = iCorr; // for physics -1.0 < rho < 0.0
+  if (model == "BL") {
+    config->m_output_fit = "testFitBL.csv";
+  }
+  else if (model == "BLE") {
+    config->m_output_fit = "testFitBLE.csv";
+    config->m_energyloss = true;
+  }
+  config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
+  config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
+  config->m_input_pt          = "hermesData.txt";
+  config->writeCorrectedValues = false; // text file from dataHandler
+  config->correctionPlots      = false; // from dataHandler
+  config->outputPlots          = true; // model and data
+  config->doMINOSErrors = false; // usually false
+  config->Update();
+  std::cout << "Running iFit now:" << std::endl;
+  auto fitOutput = ifit(config);
+  return 0;
 }
 
 // **************** Compute a Simple Fit **************** //
@@ -39,19 +68,20 @@ int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const doub
   config->m_energyloss        = input_energyloss;  // false;
   config->m_subtraction       = input_subtraction; // false;
   config->m_correlation       = input_correlation; // for physics -1.0 < rho < 0.0
+  config->m_energylossWeighted = false;
   // Production lenght behaviour
   config->fixedLp = false;
   // Pre-hadron cross section
-  config->m_preh              = false; // usually true
-  config->m_initial_sigma     = 30.0;  // do it < 40 mbarns
+  config->m_preh              = true; // usually true
+  config->m_initial_sigma     = 40.0;  // do it < 40 mbarns
   // more.
   config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
   config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
-  config->m_output_fit        = "testFitBL30.csv";
+  config->m_output_fit        = "testFitBL.csv";
   config->m_input_pt          = "hermesData.txt";
   config->writeCorrectedValues = false; // text file from dataHandler
   config->correctionPlots      = false; // from dataHandler
-  config->outputPlots          = false; // model and data
+  config->outputPlots          = true; // model and data
   config->doMINOSErrors = false; // usually false
   config->Update();
   std::cout << "Running iFit now:" << std::endl;

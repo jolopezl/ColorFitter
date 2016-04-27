@@ -20,6 +20,7 @@ public:
   void SetBinRatio(int,double,double);
   void SetFermiValues(double,double);
   void DoEnergyLoss(bool);
+  void DoEnergyLossWeighted(bool);
   void DoLogBehavior(bool);
   void DoFermiMotion(bool);
   void DoFixedLp(bool);
@@ -38,6 +39,7 @@ private:
   // private methods
   double Density(const double, const double, const double, const double);
   double FindR(const double, const double);
+  void ApplyEnergyLoss(double &);
   // private members
   std::string m_ModelName;
   double m_dPt2;
@@ -57,7 +59,9 @@ private:
   int m_iz;
   double m_zbinwidth;
   double m_binratio; // with SetParameters??
+  double m_A13;
   bool m_DoEnergyLoss;
+  bool m_DoEnergyLossWeighted;
   bool m_DoLogBehavior;
   bool m_DoFermiMotion;
   bool m_doCascade;
