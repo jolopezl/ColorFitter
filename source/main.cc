@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
 
 int computeSimpleFit2(const std::string model, const bool iSubt, const double iCorr) {
   myConfig *config = new myConfig();
-  int Q2Int = -1;
-  int izInt = -1;
+  int Q2Int = 3;
+  int izInt = 3;
   config->m_subtraction = iSubt; // false;
   config->m_correlation = iCorr; // for physics -1.0 < rho < 0.0
   if (model == "BL") {
@@ -70,8 +70,8 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
 int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
   myConfig *config = new myConfig();
   // bins of interest
-  int Q2Int = -1;
-  int izInt = -1;
+  int Q2Int = 3;
+  int izInt = 3;
   // defauls
   bool input_energyloss     = tEnergyLoss;
   bool input_subtraction    = tSubtraction;

@@ -7,8 +7,6 @@
 #include "Math/WrappedTF1.h"
 #include "Math/GSLIntegrator.h"
 
-using vector_d = std::vector<double>;
-
 class Model {
 public:
   // public members
@@ -32,14 +30,17 @@ public:
   double Get1();
   double Get2();
   double GetC(int);
-  vector_d GetResult();
+  std::vector<double> GetResult();
   void GetResult(double&,double&);
   double Fermi(int inucleus);
 private:
   // private methods
   double Density(const double, const double, const double, const double);
   double FindR(const double, const double);
+  void SortProductionLenght(double &);
   void ApplyEnergyLoss(double &);
+  //void InteractionPoint(double &, double &, double &, const double);
+  void ApplyLogBehavior(double &, double);
   // private members
   std::string m_ModelName;
   double m_dPt2;
@@ -55,6 +56,7 @@ private:
   double m_rho0 = 0.170; // nucleons/fm^3
   double m_a = 0.5; //fm should be 0.54 fm
   // double m_c = 0.0; // to be solved
+  TRandom3 *m_random3;
   // some assistance for the energy loss part
   int m_iz;
   double m_zbinwidth;
@@ -70,7 +72,7 @@ private:
   double m_xB;
   double m_zbinvalue;
   // tools
-  vector_d m_c_interpolation;
+  std::vector<double> m_c_interpolation;
   // Other parameters
   int m_maxmcSteps = 100000; // number of mc steps in the calculation
   double m_density_threshold = 0.005;

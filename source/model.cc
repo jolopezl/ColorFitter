@@ -42,8 +42,8 @@ Model::~Model() {
   std::cout << "Model destructed: " << m_ModelName << std::endl;
 }
 
-vector_d Model::GetResult() {
-  vector_d output = {m_dPt2, m_Rm};
+std::vector<double> Model::GetResult() {
+  std::vector<double> output = {m_dPt2, m_Rm};
   return output;
 }
 
@@ -186,11 +186,16 @@ double Model::Fermi(int inucleus){
 
 void Model::InteractionPoint(double &x, double &y, double &z, const double R){
   while (1) {
-    x = gRandom->Uniform(-R,R);
-    y = gRandom->Uniform(-R,R);
-    z = gRandom->Uniform(-R,R);
+    x = m_random3->Uniform(-R,R);
+    y = m_random3->Uniform(-R,R);
+    z = m_random3->Uniform(-R,R);
     if(x*x+y*y+z*z<R*R) break;
   }
+}
+
+void Model::SortProductionLenght(double &L) {
+  if (m_doFixedLp) L = m_lp;
+  else L = m_random3->Exp(m_lp); // exponentially distributed production length
 }
 
 int Model::Compute(const double A){
@@ -201,41 +206,38 @@ int Model::Compute(const double A){
   TF1 *dtd2 = new TF1("dtd2", "0.170/(1+exp((sqrt([0]*[0]+[1]*[1]+x*x)-[2])/0.5))", 0.,40.); // multiplicity ratio
   ROOT::Math::GSLIntegrator *igdtd1 = new ROOT::Math::GSLIntegrator(ROOT::Math::IntegrationOneDim::kADAPTIVE);
   ROOT::Math::GSLIntegrator *igdtd2 = new ROOT::Math::GSLIntegrator(ROOT::Math::IntegrationOneDim::kADAPTIVE);
-  TRandom3 *gRandom = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
-  gRandom->SetSeed(2053);
-  double R=FindR(A,m_density_threshold); // this has to be done somewhere else since it takes time
+  m_random3 = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
+  m_random3->SetSeed(2053);
+  double R = FindR(A,m_density_threshold); // this has to be done somewhere else since it takes time
   if (irun == -1) {
     std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << "\t 1.1*A^(1/3) = " << 1.1*pow(A,1/3.) << " [fm]" << std::endl;
     irun = 1;
   }
   m_A13 = pow(A,1/3.);
-  double max_density=Density(A,0.,0.,0.);
-  double x,y,z;
+  double max_density = Density(A,0.,0.,0.);
+  double rc = m_c_interpolation[(int) A];
+  double x, y, z;
   double L;
   double weight, ul;
-  double temp, zrange1, zrange2;
+  double temp = 0.0;
+  double zrange1 = -1.0, zrange2 = -1.0;
   double accumulator1 = 0.0; // pT2
   double accumulator2 = 0.0; // Rm
-  double constant = 0.1*3./(4.*3.141592); // alpha_s * N_c / 4pi, the prefix of the formula for delta pT^2 = 0.02387
   double normalize = 0.0;
+  // * Constant to be removed
+  double constant = 0.1*3./(4.*3.141592); // alpha_s * N_c / 4pi, the prefix of the formula for delta pT^2 = 0.02387
   // MC part
-  for (int mcStep=0; mcStep<m_maxmcSteps; ++mcStep) {
-    while(1) {// only consider points inside the integration sphere
-      x = gRandom->Uniform(-R,R);
-      y = gRandom->Uniform(-R,R);
-      z = gRandom->Uniform(-R,R);
-      if(x*x + y*y + z*z < R*R) break;
-    }
-    if (m_doFixedLp) L = m_lp;
-    else             L = gRandom->Exp(m_lp); // exponentially distributed production length
+  for (int mcStep = 0; mcStep < m_maxmcSteps; ++mcStep) {
+    InteractionPoint(x,y,z,R);
+    SortProductionLenght(L);
     // First function parameters
     dtd1->SetParameter(0,x); // starting value of longitudinal coordinate  
     dtd1->SetParameter(1,y); // x
-    dtd1->SetParameter(2,m_c_interpolation[(int)A]); // density parameter
+    dtd1->SetParameter(2,rc); // density parameter
     // Second function parameters
     dtd2->SetParameter(0,x); // x
     dtd2->SetParameter(1,y); // y
-    dtd2->SetParameter(2,m_c_interpolation[(int)A]); // density parameter
+    dtd2->SetParameter(2,rc); // density parameter
     // Wrap functions
     ROOT::Math::WrappedTF1 wdtd1(*dtd1);
     ROOT::Math::WrappedTF1 wdtd2(*dtd2);
@@ -245,22 +247,18 @@ int Model::Compute(const double A){
     igdtd2->SetRelTolerance(0.00001);
     // Physics
     weight = Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
-    ul = sqrt(R*R-x*x-y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
+    ul = sqrt(R*R - x*x - y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
     bool isOutside = false;
     // Next, integrate from the starting vertex up to the end of the production length
     if(z+L < ul) {// endpoint of quark path is within the sphere of integration
       temp = constant*igdtd1->Integral(z,z+L) ; // find partonic lengths
       zrange1 = L;
-      if(m_DoLogBehavior == true) {
-        zrange1 *= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
-      }
+      if(m_DoLogBehavior == true) ApplyLogBehavior(zrange1, L);
     }
     if(z+L >= ul) { // endpoint of quark path is outside the sphere of integration
       temp = constant*igdtd1->Integral(z,ul) ; // find partonic lengths
       zrange1 = ul-z;
-      if(m_DoLogBehavior == true) {
-        zrange1 *= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2)); // log squared term
-      }
+      if(m_DoLogBehavior == true) ApplyLogBehavior(zrange1, L);
     }
     if(z > ul) {// this should not be possible
       std::cout << "Point A: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp << " " << R << " " << x << " " << y << " " << z << " " << R*R-x*x-y*y << std::endl;
@@ -271,30 +269,24 @@ int Model::Compute(const double A){
       zrange1 = 1.; // dummy value
       return 1;
     }
-    if(temp == 0){ 
-      zrange1 = 1.; // dummy value
-    }
-    if(zrange1 > 0){
-      // accumulator1+=zrange1*temp*weight;
-      // accumulator1 += temp*weight;
-      accumulator1 += m_q0*temp*weight; 
-    }
+    if(temp == 0) zrange1 = 1.; // dummy value
+    if(zrange1 > 0) accumulator1 += m_q0*temp*weight;
     else {
       std::cout << "zrange1 of length zero or negative encountered: " << zrange1 << " \n";
       std::cout << "Point B: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp <<" "<< R <<" "<< x <<" "<< y <<" "<< z << " " << R*R-x*x-y*y << std::endl;
     }
     // Next, integrate from the prehadron vertex up to the end of the sphere of integration
-    if (z+L < ul){
+    if (z+L < ul) {
       temp = igdtd2->Integral(z+L,ul); // find hadronic lengths
-      zrange2 = ul-(z+L);
+      zrange2 = ul - (z+L);
       isOutside = false;
     }
-    if (z+L >= ul){ // pre-hadron forms outside nucleus
+    if (z+L >= ul) { // pre-hadron forms outside nucleus
       temp = 0.;
       zrange2 = 1.; // dummy value
       isOutside = true;
     }
-    if(temp < 0){ // this integral should always be positive.
+    if(temp < 0) { // this integral should always be positive.
       std::cout << "igdtd2 is negative!! Error!! \n";
       return 1;
     }
@@ -306,17 +298,15 @@ int Model::Compute(const double A){
         accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
       }
     }
-    else if (isOutside == true) {
-      accumulator2 += 1*weight;
-    }
+    else if (isOutside == true) accumulator2 += 1*weight;
     if (zrange2 == 0) {
-      std::cout <<"Info: zrange2 = 0 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";
+      std::cout << "Info: zrange2 = 0 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";
     }
     if (zrange2 < 0) {
-      std::cout <<"Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";  
+      std::cout << "Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << "\n";  
       return 1;
     }
-    //      normalize+= 1.;
+    // normalize+= 1.;
     normalize += weight; // weight initial interaction by density  
   } // End of big loop     energy loss down here ------------*
   // ADD ENERGY LOSS, From Will's original code:
@@ -341,4 +331,8 @@ void Model::ApplyEnergyLoss(double &temp) {
     else
       temp *= (1.+(m_binratio*m_dz)/m_zbinwidth); // events increase in the lowest z bin.
   }
+}
+
+void Model::ApplyLogBehavior(double &zrange, double L) {
+  zrange *= log(pow(L/m_dlog,2))*log(pow(L/m_dlog,2));
 }

@@ -98,9 +98,9 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
 }
 
 std::vector<myResult*> ifit(myConfig *config) {
-  m = new Model("default");
   std::vector<myResult*> vResult;
   myResult *result = new myResult();
+  m = new Model("default");
   m->Initialization();
   m->DoEnergyLoss(config->m_energyloss);
   m->DoEnergyLossWeighted(config->m_energylossWeighted);
@@ -113,15 +113,15 @@ std::vector<myResult*> ifit(myConfig *config) {
   // xxx[1]=pow(55.845,1./3.);  // Fe
   // xxx[2]=pow(207.2,1./3.); // Pb
   // This is for HERMES
-  xxx[0]=pow(20.1797,1./3.); // Ne   here goes A^1/3
-  xxx[1]=pow(83.7980,1./3.); // Kr
-  xxx[2]=pow(131.293,1./3.); // Xe
-  xxx[3]=xxx[0];
-  xxx[4]=xxx[1];
-  xxx[5]=xxx[2];
-  double input_value=0;
-  double input_error=0;
-  for (int i=0; i<3; ++i) {
+  xxx[0] = pow(20.1797,1./3.); // Ne   here goes A^1/3
+  xxx[1] = pow(83.7980,1./3.); // Kr
+  xxx[2] = pow(131.293,1./3.); // Xe
+  xxx[3] = xxx[0];
+  xxx[4] = xxx[1];
+  xxx[5] = xxx[2];
+  double input_value = 0;
+  double input_error = 0;
+  for (int i = 0; i < 3; ++i) {
     double A = pow(xxx[i],3.0);
     std::cout << "Value of c " << m->GetC((int) A) << " for A " << (int) A << std::endl;
   }
@@ -129,8 +129,8 @@ std::vector<myResult*> ifit(myConfig *config) {
   auto fc = dataHandler(config);
   std::cout << "dataHandler run succesfuly" << std::endl;
   // TFile *fout = new TFile("fullfit.root","RECREATE");
-  for (int iQ2=0; iQ2<Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
-    for (int iz=0; iz<ZDIM; ++iz) {
+  for (int iQ2 = 0; iQ2 < Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
+    for (int iz = 0; iz < ZDIM; ++iz) {
       // Selects and specific z bin to fit.
       std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
       if ((config->m_zBinOfInterest != -1) && ((config->m_zBinOfInterest-1) != iz)) {
