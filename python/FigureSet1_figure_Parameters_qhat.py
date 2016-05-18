@@ -77,8 +77,8 @@ xlabel = "z_{h}"
 ylabel_up = "q_{0} [GeV^{2}fm]_{3P}"
 ylabel_down = "q_{0} [GeV^{2}fm]_{4P}"
 
-# ylabel = "q_{0} [GeV^{2}fm]"
-ylabel = "q_{0} [0.2 GeV^{3}]"
+ylabel = "q_{0} [GeV^{2}fm^{2}]"
+# ylabel = "q_{0} [0.2 GeV^{3}]"
 ylabel_up = ylabel
 ylabel_down = ylabel
 
