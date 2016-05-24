@@ -123,6 +123,7 @@ void makeFigure() {
             filename2[j][i] = "testFit"+basename[j]+"_plot_mr_0_"+std::to_string(i)+".txt";
         }
     }
+
     TGraph* model_pt[6][4];
     TGraph* model_rm[6][4];
     for (int i=0; i<4; ++i) {
