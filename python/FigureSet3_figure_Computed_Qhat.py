@@ -7,7 +7,8 @@ factor = 1.
 from AtlasStyle import SetAtlasStyle, AddLabel
 SetAtlasStyle()
 
-factor = 0.1*3./(4.*3.141592)
+factor = 1.0
+# factor = 0.1*3./(4.*3.141592)
 print "Factor to be removed ",factor
 print "Inverse is ",1/factor
 
