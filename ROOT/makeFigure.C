@@ -109,6 +109,9 @@ float rm_err_neon[4]      = {0.0594409344724,0.0515307622582,0.0634878265064,0.0
 float rm_err_kripton[4]   = {0.0542930099596,0.0447182315218,0.05222907333,0.0527700155986};
 float rm_err_xenon[4]     = {0.0535218789044,0.0411665583174,0.0503850083386,0.0529182285411};
 
+float betagamma[4] = {9.31,8.40,7.94,7.05};
+float betagamma2norm = 8.40;
+
 void makeFigure() {
     gROOT->Reset();
     gROOT->ForceStyle();
@@ -134,6 +137,7 @@ void makeFigure() {
     }
     /** data points **/
     TGraphErrors *data_pt[4];
+    TGraphErrors *data_pt_normalized[4];
     TGraphErrors *data_rm[4];
     float xval[3] = {2.9947753767563916, 4.813606330683598, 5.590790378970299};
     float xerr[3] = {0,0,0};
@@ -147,6 +151,14 @@ void makeFigure() {
         data_rm[i] = new TGraphErrors(3,xval,yval2,xerr,yerr2);
         data_rm[i]->GetYaxis()->SetRangeUser(-0.035,0.035);
         data_rm[i]->GetYaxis()->SetRangeUser(0.35,1.05);
+
+        float yval_normalized[3] = {0.,0.,0.};
+        for (int k = 0; k < 3; ++k) {
+          yval_normalized[k] = yval[k]*betagamma[i]/betagamma2norm;
+          std::cout << "y = " << yval[k] << " changed to y = " << yval_normalized[k] << std::endl;
+        }
+        data_pt_normalized[i] = new TGraphErrors(3,xval,yval_normalized,xerr,yerr);
+        data_pt_normalized[i]->SetMarkerStyle(25);
     }
     /** color and labels **/
     int colors[6] = {1,2,3,4,6,9};
@@ -203,7 +215,9 @@ void makeFigure() {
         }
         // if (i==0) data[i]->Draw();
         data_pt[i]->Draw("AP");
+        data_pt_normalized[i]->Draw("PSAME");
         for (int j = 0; j < 6; ++j) {
+            // if (j==3)
             // if (j == 0) model[j][i]->Draw();
             model_pt[j][i]->Draw("SAME");
         }
@@ -233,7 +247,7 @@ void makeFigure() {
     leg->Draw();
     c1->Print("modelplot_pt.pdf");
 
-    /** MODELPLOT PT2 **/
+    /** MODELPLOT RM **/
     TCanvas* c2 = new TCanvas("c2","c2 title",800,800);
     c2->Divide(2,2,small,small);
     for (int i=0; i<4; ++i) {
