@@ -116,8 +116,8 @@ void doDataPlots(myConfig* config, myData* he, myData* ne, myData* kr, myData* x
     mg[1][i]->Draw("p");
     // line00->Draw("SAME");
     leg[i]->Draw();
-    UTFSMLabel(0.125,0.85,"Internal, work in progress");
-    AddLabel(0.125,0.8,labels[i].c_str());
+    // UTFSMLabel(0.125,0.85,"Internal, work in progress");
+    AddLabel(0.125,0.85,labels[i].c_str());
     // c->SetGrid();
     c->Print(files[i].c_str());
     c->Clear();
@@ -130,8 +130,8 @@ void doDataPlots(myConfig* config, myData* he, myData* ne, myData* kr, myData* x
     mg_corrected[1][i]->Draw("p");
     // line00->Draw("SAME");
     leg[i]->Draw();
-    UTFSMLabel(0.125,0.85,"Internal, work in progress");
-    AddLabel(0.125,0.8,labels2[i].c_str());
+    // UTFSMLabel(0.125,0.85,"Internal, work in progress");
+    AddLabel(0.125,0.85,labels2[i].c_str());
     // c->SetGrid();
     c->Print(files2[i].c_str());
   }

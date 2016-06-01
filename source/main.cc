@@ -10,6 +10,7 @@ int computeComplexFit(int argc, char *argv[]);    // A fit with a complex config
 int printInteractionPoints();
 int computeBand();
 int average_density();
+int plotTool()
 
 
 // ************ main function ************ //
@@ -23,6 +24,18 @@ int main(int argc, char *argv[]) {
   // computeSimpleFit(true, true, -1.0);
   // computeBand();
   // demoPlots();
+  //int foo = average_density();
+  //computeSimpleFit(false,true,0.0);
+  // MODEL TYPE, do subtraction, value
+  computeSimpleFit2("BL", true, 0.0);
+}
+
+int plotTool() {
+  myConfig *config = new myConfig();
+  config->m_subtraction = true;
+  config->m_correlation = -0.5;
+  config->correctionPlots = true;
+  auto fc = dataHandler(config);
   //int foo = average_density();
   //computeSimpleFit(false,true,0.0);
   // MODEL TYPE, do subtraction, value
