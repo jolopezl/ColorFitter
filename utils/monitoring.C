@@ -55,4 +55,31 @@ void monitoring() {
     // h1hl->Draw("SAME");
     // c3->Print("hadron_length_all.pdf");
 
+    // CORRELATIONS
+    TCanvas* c1 = new TCanvas();
+    c1->cd();
+    tree->Draw("hadron_length:parton_length","zbin==3 && nucleus==20 && hadron_length > 0","COLZ");
+    c1->Print("hadron_parton_A20.pdf");
+    tree->Draw("hadron_length:parton_length","zbin==3 && nucleus==83 && hadron_length > 0","COLZ");
+    c1->Print("hadron_parton_A83.pdf");
+    tree->Draw("hadron_length:parton_length","zbin==3 && nucleus==131 && hadron_length > 0","COLZ");
+    c1->Print("hadron_parton_A131.pdf");
+    tree->Draw("xp:yp","zbin==3 && nucleus==20","COLZ");
+    c1->Print("xpyp_A20.pdf");
+    tree->Draw("xp:yp","zbin==3 && nucleus==83","COLZ");
+    c1->Print("xpyp_A83.pdf");
+    tree->Draw("xp:yp","zbin==3 && nucleus==131","COLZ");
+    c1->Print("xpyp_A131.pdf");
+    tree->Draw("xp:zp","zbin==3 && nucleus==20","COLZ");
+    c1->Print("xpzp_A20.pdf");
+    tree->Draw("xp:zp","zbin==3 && nucleus==83","COLZ");
+    c1->Print("xpzp_A83.pdf");
+    tree->Draw("xp:zp","zbin==3 && nucleus==131","COLZ");
+    c1->Print("xpzp_A131.pdf");
+    tree->Draw("yp:zp","zbin==3 && nucleus==20","COLZ");
+    c1->Print("ypzp_A20.pdf");
+    tree->Draw("yp:zp","zbin==3 && nucleus==83","COLZ");
+    c1->Print("ypzp_A83.pdf");
+    tree->Draw("yp:zp","zbin==3 && nucleus==131","COLZ");
+    c1->Print("ypzp_A131.pdf");
 }
