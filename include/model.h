@@ -2,6 +2,8 @@
 #define MODEL_H
 
 #include "TH1.h"
+#include "TFile.h"
+#include "TTree.h"
 #include "TRandom3.h"
 #include "Math/Interpolator.h"
 #include "Math/WrappedTF1.h"
@@ -17,12 +19,14 @@ public:
   void SetParameters(std::string,double);
   void SetBinRatio(int,double,double);
   void SetFermiValues(double,double);
+  void SetMaxMonteCarloSteps(int);
   void DoEnergyLoss(bool);
   void DoEnergyLossWeighted(bool);
   void DoLogBehavior(bool);
   void DoFermiMotion(bool);
   void DoFixedLp(bool);
   void DoCascade(bool);
+  void DoMonitoring(bool);
   void Initialization();
   int Compute(const double);
   void InteractionPoint(double &, double &, double &, const double);
@@ -33,6 +37,22 @@ public:
   std::vector<double> GetResult();
   void GetResult(double&,double&);
   double Fermi(int inucleus);
+
+  // Monitoring code
+  bool m_doMonitoring = false;
+  TFile* fout;
+  TTree* tree;
+  void MonitoringStart();
+  void MonitoringFinish();
+  double m_production_length;
+  double m_parton_length;
+  double m_hadron_length;
+  int m_nucleus;
+  double m_computed_R;
+  int m_zin_monitoring;
+  double m_xp,m_yp,m_zp,m_rr;
+  void defineZbin(int foo) {m_zin_monitoring=foo;}
+
 private:
   // private methods
   double Density(const double, const double, const double, const double);

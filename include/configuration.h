@@ -32,6 +32,8 @@ public:
   bool correctionPlots = false;
   bool fixedLp = false;
 
+  bool monitoring = false;
+
   myConfig();
   ~myConfig();
   void Update();

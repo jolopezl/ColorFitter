@@ -62,6 +62,8 @@ void Model::DoLogBehavior(bool foo)        {m_DoLogBehavior = foo;}
 void Model::DoFermiMotion(bool foo)        {m_DoFermiMotion = foo;}
 void Model::DoFixedLp(bool foo)            {m_doFixedLp = foo;}
 void Model::DoCascade(bool foo)            {m_doCascade = foo;}
+void Model::DoMonitoring(bool foo)         {m_doMonitoring = foo;}
+void Model::SetMaxMonteCarloSteps(int value)    {m_maxmcSteps = value;}
 
 void Model::SetParameters(std::vector<double> parms) {
   m_q0       = parms.at(0);
@@ -73,9 +75,9 @@ void Model::SetParameters(std::vector<double> parms) {
 }
 
 void Model::SetParameters(std::string parameter, double value) {
-  if      (parameter == "q0")              m_q0 = value;
+  if      (parameter == "q0")                m_q0 = value;
   else if (parameter == "lp")                m_lp = value;
-  else if (parameter == "sigma")          m_sigma_ph = value;
+  else if (parameter == "sigma")             m_sigma_ph = value;
   else if (parameter == "dlog")              m_dlog = value;
   else if (parameter == "dz")                m_dz = value;
   else if (parameter == "cascade")           m_cascade = value;
@@ -189,6 +191,10 @@ void Model::InteractionPoint(double &x, double &y, double &z, const double R){
     x = m_random3->Uniform(-R,R);
     y = m_random3->Uniform(-R,R);
     z = m_random3->Uniform(-R,R);
+    m_xp = x;
+    m_yp = y;
+    m_zp = z;
+    m_rr = R;
     if(x*x+y*y+z*z<R*R) break;
   }
 }
@@ -198,7 +204,31 @@ void Model::SortProductionLenght(double &L) {
   else L = m_random3->Exp(m_lp); // exponentially distributed production length
 }
 
+void Model::MonitoringStart() {
+  fout = TFile::Open("monitoring.root","RECREATE");
+  tree = new TTree("tree","tree");
+  tree->Branch("production_length", &m_production_length, "production_length/D");
+  tree->Branch("parton_length", &m_parton_length, "parton_length/D");
+  tree->Branch("hadron_length", &m_hadron_length, "hadron_length/D");
+  tree->Branch("nucleus", &m_nucleus, "nucleus/I");
+  tree->Branch("zbin",&m_zin_monitoring, "zbin/I");
+  tree->Branch("xp",&m_xp,"xp/D");
+  tree->Branch("yp",&m_yp,"yp/D");
+  tree->Branch("zp",&m_zp,"zp/D");
+  tree->Branch("rr",&m_rr,"rr/D");
+}
+
+void Model::MonitoringFinish() {
+  tree->Print();
+  fout->Write();
+  fout->Close();
+}
+
 int Model::Compute(const double A){
+  m_nucleus = (int) A;
+  if (m_doMonitoring) {
+  	std::cout << "Nucleus has A = " << m_nucleus << std::endl;
+  }
   // Computation of both quantities dPt2 and Rm
   // We are doing an MC average
   // TF1 *dtd1 = new TF1("dtd1", "[0]*0.170/(1+exp((sqrt([1]*[1]+[2]*[2]+x*x)-[3])/0.5))", 0.,40.); // pT broadening divided by constant.
@@ -248,6 +278,19 @@ int Model::Compute(const double A){
     // Physics
     weight = Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
     ul = sqrt(R*R - x*x - y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
+
+/* Monitoring varibles */
+    m_production_length = L;
+    if (z+L < ul) { // hadron formed inside.
+      m_hadron_length = ul-(z+L);
+      m_parton_length = L;
+    }
+    else { // hadron formed outsie
+      m_hadron_length = 0;   // hadron path length is zero
+      m_parton_length = ul-z; // parton path length goes up to the surface
+    }
+/*** ***/
+
     bool isOutside = false;
     // Next, integrate from the starting vertex up to the end of the production length
     if(z+L < ul) {// endpoint of quark path is within the sphere of integration
@@ -307,13 +350,19 @@ int Model::Compute(const double A){
       return 1;
     }
     // normalize+= 1.;
-    normalize += weight; // weight initial interaction by density  
+    normalize += weight; // weight initial interaction by density
+    if (m_doMonitoring) {
+      tree->Fill();
+    }
   } // End of big loop     energy loss down here ------------*
   // ADD ENERGY LOSS, From Will's original code:
   temp = accumulator2/normalize;
   if (m_DoEnergyLoss == true) ApplyEnergyLoss(temp);
   m_dPt2 = accumulator1/normalize; //  pT broadening
   m_Rm = temp;                     //  Multiplicity
+  // if (m_doMonitoring) {
+  //   MonitoringFinish();
+  // }
   return 0;
 }
 

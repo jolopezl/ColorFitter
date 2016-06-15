@@ -10,7 +10,8 @@ int computeComplexFit(int argc, char *argv[]);    // A fit with a complex config
 int printInteractionPoints();
 int computeBand();
 int average_density();
-int plotTool()
+int plotTool();
+int monitoring();
 
 
 // ************ main function ************ //
@@ -24,10 +25,39 @@ int main(int argc, char *argv[]) {
   // computeSimpleFit(true, true, -1.0);
   // computeBand();
   // demoPlots();
-  //int foo = average_density();
-  //computeSimpleFit(false,true,0.0);
+  // int foo = average_density();
+  computeSimpleFit(false,true,0.0);
   // MODEL TYPE, do subtraction, value
-  computeSimpleFit2("BL", true, 0.0);
+  // computeSimpleFit2("BL30", true, 0.0);
+  monitoring();
+}
+
+int monitoring() {
+  Model *model = new Model("Monitoring");
+  model->DoMonitoring(true);
+  model->Initialization();
+  // model->DoFixedLp(true);
+  model->DoEnergyLoss(false);
+  model->SetMaxMonteCarloSteps(1e5);
+  model->MonitoringStart();
+  double q0_values[4] = {2.21,2.57,1.15,1.19};
+  double lp_values[4] = {8.15,6.11,4.45,2.35};
+  double A[3];
+  A[0] = 20.1797; // Ne
+  A[1] = 83.7980; // Kr
+  A[2] = 131.293; // Xe
+  for (int zbin=0; zbin<4; ++zbin) {
+    model->defineZbin(zbin+1);
+    model->SetParameters("q0", q0_values[zbin]);
+    model->SetParameters("lp", lp_values[zbin]);
+    model->SetParameters("sigma", 30.);
+    for (int i=0; i<3; ++i) {
+      std::cout << "Calling A = " << A[i] << std::endl;
+      model->Compute(A[i]);
+    }
+  }
+  model->MonitoringFinish();
+  return 0;
 }
 
 int plotTool() {
@@ -40,6 +70,7 @@ int plotTool() {
   //computeSimpleFit(false,true,0.0);
   // MODEL TYPE, do subtraction, value
   computeSimpleFit2("BL", true, 0.0);
+  return 0;
 }
 
 int computeSimpleFit2(const std::string model, const bool iSubt, const double iCorr) {
@@ -83,8 +114,8 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
 int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
   myConfig *config = new myConfig();
   // bins of interest
-  int Q2Int = 3;
-  int izInt = 3;
+  int Q2Int = -1;
+  int izInt = -1;
   // defauls
   bool input_energyloss     = tEnergyLoss;
   bool input_subtraction    = tSubtraction;
@@ -96,12 +127,12 @@ int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const doub
   // Production lenght behaviour
   config->fixedLp = false;
   // Pre-hadron cross section
-  config->m_preh              = true; // usually true
-  config->m_initial_sigma     = 40.0;  // do it < 40 mbarns
+  config->m_preh              = false; // usually true
+  config->m_initial_sigma     = 30.0;  // do it < 40 mbarns
   // more.
   config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
   config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
-  config->m_output_fit        = "testFitBL.csv";
+  config->m_output_fit        = "testFitBL30.csv";
   config->m_input_pt          = "hermesData.txt";
   config->writeCorrectedValues = false; // text file from dataHandler
   config->correctionPlots      = false; // from dataHandler
