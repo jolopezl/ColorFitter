@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   computeSimpleFit(false,true,0.0);
   // MODEL TYPE, do subtraction, value
   // computeSimpleFit2("BL30", true, 0.0);
-  monitoring();
+  // monitoring();
 }
 
 int monitoring() {
@@ -38,7 +38,7 @@ int monitoring() {
   model->Initialization();
   // model->DoFixedLp(true);
   model->DoEnergyLoss(false);
-  model->SetMaxMonteCarloSteps(1e5);
+  model->SetMaxMonteCarloSteps(1e5); // 1e6, 1e7
   model->MonitoringStart();
   double q0_values[4] = {2.21,2.57,1.15,1.19};
   double lp_values[4] = {8.15,6.11,4.45,2.35};
