@@ -51,6 +51,7 @@ public:
   double m_computed_R;
   int m_zin_monitoring;
   double m_xp,m_yp,m_zp,m_rr;
+  double m_theta, m_phi, m_rs;
   void defineZbin(int foo) {m_zin_monitoring=foo;}
 
 private:

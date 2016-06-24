@@ -195,6 +195,12 @@ void Model::InteractionPoint(double &x, double &y, double &z, const double R){
     m_yp = y;
     m_zp = z;
     m_rr = R;
+
+    /* spherical coordinates */
+    m_rs = sqrt(m_xp*m_xp + m_yp*m_yp);
+    m_phi = atan2(y,x);
+    m_theta = acos(z/sqrt(m_xp*m_xp + m_yp*m_yp + m_zp*m_zp));
+
     if(x*x+y*y+z*z<R*R) break;
   }
 }
@@ -216,6 +222,9 @@ void Model::MonitoringStart() {
   tree->Branch("yp",&m_yp,"yp/D");
   tree->Branch("zp",&m_zp,"zp/D");
   tree->Branch("rr",&m_rr,"rr/D");
+  tree->Branch("theta",&m_theta,"theta/D");
+  tree->Branch("phi",&m_phi,"phi/D");
+  tree->Branch("rs",&m_rs,"rs/D");
 }
 
 void Model::MonitoringFinish() {

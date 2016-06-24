@@ -26,10 +26,10 @@ int main(int argc, char *argv[]) {
   // computeBand();
   // demoPlots();
   // int foo = average_density();
-  computeSimpleFit(false,true,0.0);
+  // computeSimpleFit(false,true,0.0);
   // MODEL TYPE, do subtraction, value
   // computeSimpleFit2("BL30", true, 0.0);
-  // monitoring();
+  monitoring();
 }
 
 int monitoring() {
