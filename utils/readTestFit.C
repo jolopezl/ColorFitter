@@ -30,6 +30,7 @@ void readTestFit(std::string filename) {
     double dlog[4], dlog_err[4];
     double dz[4], dz_err[4];
     double casc[4], casc_err[4];
+    double chisq[4];
     std::cout << "Processing " << filename << std::endl;
     std::ifstream file(filename);
     std::string foo,line;
@@ -48,6 +49,7 @@ void readTestFit(std::string filename) {
         dlog[i] = std::stod(words.at(4)); dlog_err[i] = std::stod(words.at(4+6));
         dz[i] = std::stod(words.at(5)); dz_err[i] = std::stod(words.at(5+6));
         casc[i] = std::stod(words.at(6)); casc_err[i] = std::stod(words.at(6+6));
+        chisq[i] = std::stod(words.at(13));
 
         std::cout << "********************************" << std::endl;
         std::cout << "zbin = " << zbin[i] << std::endl;
@@ -57,16 +59,36 @@ void readTestFit(std::string filename) {
         std::cout << "dlog = " << dlog[i] << " +/- " << dlog_err[i] << std::endl;
         std::cout << "dz = " << dz[i] << " +/- " << dz_err[i] << std::endl;
         std::cout << "casc = " << casc[i] << " +/- " << casc_err[i] << std::endl;
+        std::cout << "chisq = " << chisq[i] << std::endl;
         ++i;
     }
 
-    TGraphErrors *gr[6];
+    TGraphErrors *gr[7];
     gr[0] = new TGraphErrors(4, zbin, q0, zbinw, q0_err);
     gr[1] = new TGraphErrors(4, zbin, lp, zbinw, lp_err);
     gr[2] = new TGraphErrors(4, zbin, cs, zbinw, cs_err);
     gr[3] = new TGraphErrors(4, zbin, dlog, zbinw, dlog_err);
     gr[4] = new TGraphErrors(4, zbin, dz, zbinw, dz_err);
     gr[5] = new TGraphErrors(4, zbin, casc, zbinw, casc_err);
+    
+    double zero_errors[4] = {0,0,0,0};
+    int DOF = -99;
+    if (filename == "testFitBL.csv") DOF = 6 - 3;
+    if (filename == "testFitBL.fixedLp.csv") DOF = 6 - 3;
+    if (filename == "testFitBL30.csv") DOF = 6 - 2;
+    if (filename == "testFitBL30.fixedLp.csv") DOF = 6 - 2;
+    if (filename == "testFitBL40.csv") DOF = 6 - 2;
+    if (filename == "testFitBL40.fixedLp.csv") DOF = 6 - 2;
+    if (filename == "testFitBLE.csv") DOF = 6 - 3;
+    if (filename == "testFitBLE.fixedLp.csv") DOF = 6 - 3;
+    if (filename == "testFitBLE30.csv") DOF = 6 - 4;
+    if (filename == "testFitBLE30.fixedLp.csv") DOF = 6 - 4;
+    if (filename == "testFitBLE40.csv") DOF = 6 - 4;
+    if (filename == "testFitBLE40.fixedLp.csv") DOF = 6 - 4;
+    for (int i = 0; i < 4; ++i) {
+        chisq[i] = chisq[i]/DOF;
+    }
+    gr[6] = new TGraphErrors(4, zbin, chisq, zero_errors, zero_errors);
 
     gr[0]->SetName("tg_q0"); gr[0]->SetTitle("tg_q0;z_{h};q_{0} [GeV^{2}fm^{2}]");
     gr[1]->SetName("tg_lp"); gr[1]->SetTitle("tg_lp;z_{h};L_{p} [fm]");
@@ -74,7 +96,23 @@ void readTestFit(std::string filename) {
     gr[3]->SetName("tg_dlog"); gr[3]->SetTitle("tg_dlog;z_{h};dlog behav");
     gr[4]->SetName("tg_dz"); gr[4]->SetTitle("tg_dz;z_{h};#Deltaz");
     gr[5]->SetName("tg_casc"); gr[5]->SetTitle("tg_casc;z_{h};Hadron Cascade Parameter");
+    gr[6]->SetName("tg_chisq"); gr[6]->SetTitle("tg_chisq;z_{h};#chi^{2}/ndf");
 
-    for (int i = 0; i < 6; ++i) {gr[i]->Write();}
+    for (int i = 0; i < 7; ++i) {gr[i]->Write();}
     fout->Close();
+}
+
+void readTestFitAll() {
+    readTestFit("testFitBL.csv");
+    readTestFit("testFitBL.fixedLp.csv");
+    readTestFit("testFitBL30.csv");
+    readTestFit("testFitBL30.fixedLp.csv");
+    readTestFit("testFitBL40.csv");
+    readTestFit("testFitBL40.fixedLp.csv");
+    readTestFit("testFitBLE.csv");
+    readTestFit("testFitBLE.fixedLp.csv");
+    readTestFit("testFitBLE30.csv");
+    readTestFit("testFitBLE30.fixedLp.csv");
+    readTestFit("testFitBLE40.csv");
+    readTestFit("testFitBLE40.fixedLp.csv");
 }
