@@ -1,5 +1,5 @@
-# hermes-figures
-hermes-figures
+# hermes-analysis
+hermes-analysis
 
 ## Authors
 
