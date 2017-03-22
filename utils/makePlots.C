@@ -79,16 +79,22 @@ void makePlots() {
     }
 
     const char* lund = "[0]*x*(log(1/(x*x))-1+x*x)/(1-x*x)";
-    const char* lundlin = "([0]+2*[1]-2*x*[1])/(2*[2])";
-    const char* lunelinfull = "([0]+2*[1]-2*x*[1]+[1]*(sqrt( 1+[3]*[3]/([1]*[1]))-1) )/(2*[2])";
+    const char* LundLinearShort = "([0]+2*[1]-2*x*[1])/(2*[2])";
+    const char* LundLinearLong = "([0]+2*[1]-2*x*[1]+[1]*(sqrt(1+[3]*[3]/([1]*[1]))-1))/(2*[2])";
+/*    
     TF1 *flund = new TF1("flund","[0]*x*(log(1/(x*x))-1+x*x)/(1-x*x)", -0.01, 1.01);
     // ZVTX = (MP + 2*NU - 2*Z*NU)/(2*KAPPA)
     TF1* fg1 = new TF1("fg1", lund,-0.1,1.1);
     TF1* fg2 = new TF1("fg2", lund,-0.1,1.1);
     TF1* fg3 = new TF1("fg3", lund,-0.1,1.1);
     TF1* fg4 = new TF1("fg4", lund,-0.1,1.1);
-    // TF1* fg = new TF1("fg", "([0]+2*[1]-2*x*[1]+[1]*(sqrt( 1+[3]*[3]/([1]*[1]))-1) )/(2*[2])",0,1);
-/*    fg1->SetParName(0,"MP"); fg1->FixParameter(0,0.938272); // 0.9 GeV
+*/
+    // TF1* fg = new TF1("fg", LundLinearLong,0,1);
+    TF1* fg1 = new TF1("fg1", LundLinearLong,-0.1,1.1);
+    TF1* fg2 = new TF1("fg2", LundLinearLong,-0.1,1.1);
+    TF1* fg3 = new TF1("fg3", LundLinearLong,-0.1,1.1);
+    TF1* fg4 = new TF1("fg4", LundLinearLong,-0.1,1.1);
+    fg1->SetParName(0,"MP"); fg1->FixParameter(0,0.938272); // 0.9 GeV
     fg1->SetParName(1,"NU"); fg1->FixParameter(1,13.1);
     fg1->SetParName(2,"KAPPA"); fg1->SetParameter(2,1.0);
     fg1->SetParName(0,"MP"); fg1->FixParameter(0,0.938272); // 0.9 GeV
@@ -103,7 +109,7 @@ void makePlots() {
     fg4->SetParName(2,"KAPPA"); fg4->SetParameter(2,1.0);
     fg4->SetParName(0,"MP"); fg4->FixParameter(0,0.938272); // 0.9 GeV
     fg4->SetParName(1,"NU"); fg4->FixParameter(1,13.1);
-    fg4->SetParName(2,"KAPPA"); fg4->SetParameter(2,1.0);*/
+    fg4->SetParName(2,"KAPPA"); fg4->SetParameter(2,1.0);
     // fg->SetParName(3,"Q2"); fg->FixParameter(3,2.4);
 
     tg1->Fit("fg1","EMN","",0.2,1.0);
@@ -111,15 +117,15 @@ void makePlots() {
     tg3->Fit("fg3","EMN","",0.2,1.0);
     tg4->Fit("fg4","EMN","",0.2,1.0);
 
-    /*std::cout << "BL30.expLp \t Chi^2/ndf = " << fg1->GetChisquare()/fg1->GetNDF() << "\t KAPPA = " << fg1->GetParameter(2) << " +/- " << fg1->GetParError(2) << std::endl;
+    std::cout << "BL30.expLp \t Chi^2/ndf = " << fg1->GetChisquare()/fg1->GetNDF() << "\t KAPPA = " << fg1->GetParameter(2) << " +/- " << fg1->GetParError(2) << std::endl;
     std::cout << "BL40.expLp \t Chi^2/ndf = " << fg2->GetChisquare()/fg2->GetNDF() << "\t KAPPA = " << fg2->GetParameter(2) << " +/- " << fg2->GetParError(2) << std::endl;
     std::cout << "BL30.fixedLp \t Chi^2/ndf = " << fg3->GetChisquare()/fg3->GetNDF() << "\t KAPPA = " << fg3->GetParameter(2) << " +/- " << fg3->GetParError(2) << std::endl;
-    std::cout << "BL40.fixedLp \t Chi^2/ndf = " << fg4->GetChisquare()/fg4->GetNDF() << "\t KAPPA = " << fg4->GetParameter(2) << " +/- " << fg4->GetParError(2) << std::endl;*/
+    std::cout << "BL40.fixedLp \t Chi^2/ndf = " << fg4->GetChisquare()/fg4->GetNDF() << "\t KAPPA = " << fg4->GetParameter(2) << " +/- " << fg4->GetParError(2) << std::endl;
 
-    std::cout << "BL30.expLp \t Chi^2/ndf = " << fg1->GetChisquare()/fg1->GetNDF() << "\t f(Q^2,nu) = " << fg1->GetParameter(0) << " +/- " << fg1->GetParError(0) << std::endl;
+/*    std::cout << "BL30.expLp \t Chi^2/ndf = " << fg1->GetChisquare()/fg1->GetNDF() << "\t f(Q^2,nu) = " << fg1->GetParameter(0) << " +/- " << fg1->GetParError(0) << std::endl;
     std::cout << "BL40.expLp \t Chi^2/ndf = " << fg2->GetChisquare()/fg2->GetNDF() << "\t f(Q^2,nu) = " << fg2->GetParameter(0) << " +/- " << fg2->GetParError(0) << std::endl;
     std::cout << "BL30.fixedLp \t Chi^2/ndf = " << fg3->GetChisquare()/fg3->GetNDF() << "\t f(Q^2,nu) = " << fg3->GetParameter(0) << " +/- " << fg3->GetParError(0) << std::endl;
-    std::cout << "BL40.fixedLp \t Chi^2/ndf = " << fg4->GetChisquare()/fg4->GetNDF() << "\t f(Q^2,nu) = " << fg4->GetParameter(0) << " +/- " << fg4->GetParError(0) << std::endl;
+    std::cout << "BL40.fixedLp \t Chi^2/ndf = " << fg4->GetChisquare()/fg4->GetNDF() << "\t f(Q^2,nu) = " << fg4->GetParameter(0) << " +/- " << fg4->GetParError(0) << std::endl;*/
 
     fg1->SetLineColor(tg1->GetLineColor());
     fg2->SetLineColor(tg2->GetLineColor());
