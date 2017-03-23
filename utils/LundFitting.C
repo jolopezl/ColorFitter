@@ -50,7 +50,7 @@ void LundFitting() {
     const char* LundLog = "[0]*x*(log(1/(x*x))-1+x*x)/(1-x*x)";
     const char* LundLinearShort = "([0]+2*[1]-2*x*[1])/(2*[2])";
     // const char* LundLinearLong = "([0]+2*[1]-2*x*[1]+[1]*(sqrt(1+[3]*[3]/([1]*[1]))-1))/(2*[2])";
-    const char* LundLinearLong = "([0] + [1]*(1 - x) + [1]*(sqrt(1 + [3]*[3]/([1]*[1])) - x))/(2*[2])";
+    const char* LundLinearLong = "(0.5*[0] + [1]*(0.5 + 0.5*sqrt(1 + [3]*[3]/([1]*[1])) - x))/[2]";
 
     TF1* fg1 = new TF1("fg1", LundLinearLong, 0.0, 1.0);
     fg1->SetParName(0,"MP"); fg1->FixParameter(0,0.938272); // 0.9 GeV
@@ -84,15 +84,15 @@ void LundFitting() {
     cout << "Chi^2/NDF = " << fg2->GetChisquare()/fg2->GetNDF() << endl;
     cout << "p-value = " << fg2->GetProb() << endl;
 
-    TLegend* leg = new TLegend(0.2,0.2,0.4,0.6);
+    TLegend* leg = new TLegend(0.2,0.2,0.4,0.35);
     // leg->SetNColumns(2);
     leg->SetTextFont(43);
     leg->SetTextSize(22);
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(tg1,"BL30","pe");
-    leg->AddEntry(fg1,"Linear Fit, #kappa=0.98#pm 0.09, #chi^{2}/NDF=2.1","l");
-    leg->AddEntry(fg2,"Log Fit fit, #chi^{2}/NDF=3.2","l");
+    leg->AddEntry(fg1,"Linear Fit, #chi^{2}/NDF = 2.1, #kappa = 0.98 #pm 0.09","l");
+    leg->AddEntry(fg2,"Log Fit, #chi^{2}/NDF = 3.2","l");
     leg->Draw();
 
     c2->Print("test2.pdf");
