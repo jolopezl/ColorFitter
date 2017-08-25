@@ -5,7 +5,7 @@ CCFLAGS  += -O2
 CCFLAGS  += `root-config --cflags`
 CCFLAGS  += -I./include -I/usr/local/include/
 
-LDFLAGS   = `root-config --libs` -lMinuit -lgsl -lMathMore
+LDFLAGS   = `root-config --libs` -lMinuit -lMathMore
 LDFLAGS  += -L/usr/local/lib
 
 SOURCES  = $(wildcard ./source/*.cc)
