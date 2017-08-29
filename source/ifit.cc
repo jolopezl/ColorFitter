@@ -102,6 +102,9 @@ void callModel(const double A13,double *par){
   std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4],par[5]};
   double nucleus = (double) A13*A13*A13;
   m->SetParameters(my_pars);
+
+  m->SetTestParameter(par[6]);
+
   m->Compute(nucleus);
   func_array[0] = m->Get1(); 
   func_array[1] = m->Get2();
@@ -250,6 +253,9 @@ std::vector<myResult*> ifit(myConfig *config) {
       gMinuit->mnparm(3, "DLOG",  vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
       gMinuit->mnparm(4, "DZ",    vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
       gMinuit->mnparm(5, "CASCAD",vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
+
+      gMinuit->mnparm(6, "FRACTION", 0.1, 0.001, 0, 1, ierflg); // fraction parameter
+
       if (!config->m_qhat)        gMinuit->FixParameter(0); // q-hat
       if (!config->m_lp)          gMinuit->FixParameter(1); // production length
       if (!config->m_preh)        gMinuit->FixParameter(2); // prehadron cross section

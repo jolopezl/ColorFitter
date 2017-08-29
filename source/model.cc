@@ -210,6 +210,13 @@ void Model::SortProductionLenght(double &L) {
   else L = m_random3->Exp(m_lp); // exponentially distributed production length
 }
 
+void Model::SortProductionLenght(double &L, double &fraction, double &path_lenght) {
+	if (m_doFixedLp) {L = m_lp;}
+	else {L = m_random3->Exp(m_lp);}
+	// testing for now, shift of L
+	L *= 1 - fraction*path_lenght;
+}
+
 void Model::MonitoringStart() {
   fout = TFile::Open("monitoring.root","RECREATE");
   tree = new TTree("tree","tree");
@@ -268,7 +275,7 @@ int Model::Compute(const double A){
   // MC part
   for (int mcStep = 0; mcStep < m_maxmcSteps; ++mcStep) {
     InteractionPoint(x,y,z,R);
-    SortProductionLenght(L);
+    // SortProductionLenght(L);
     // First function parameters
     dtd1->SetParameter(0,x); // starting value of longitudinal coordinate  
     dtd1->SetParameter(1,y); // x
@@ -288,7 +295,18 @@ int Model::Compute(const double A){
     weight = Density(A,x,y,z)/max_density; // this is the weight (probability) of the occurrence of the event 
     ul = sqrt(R*R - x*x - y*y); // We should never integrate beyond this value, which is the surface of the sphere of integration
 
-/* Monitoring varibles */
+    if (L < ul) {
+    	path_lenght=L-z;
+    }
+    else {
+    	path_lenght=ul-z;
+    }
+    SortProductionLenght(L);
+    // L *= 1 - fraction*path_lenght;
+    L *= 1 - fraction;
+    // SortProductionLenght(L,fraction,path_lenght);
+
+		/* Monitoring varibles */
     m_production_length = L;
     if (z+L < ul) { // hadron formed inside.
       m_hadron_length = ul-(z+L);
@@ -298,7 +316,7 @@ int Model::Compute(const double A){
       m_hadron_length = 0;   // hadron path length is zero
       m_parton_length = ul-z; // parton path length goes up to the surface
     }
-/*** ***/
+		/*** ***/
 
     bool isOutside = false;
     // Next, integrate from the starting vertex up to the end of the production length

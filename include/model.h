@@ -54,11 +54,14 @@ public:
   double m_theta, m_phi, m_rs;
   void defineZbin(int foo) {m_zin_monitoring=foo;}
 
+  void SetTestParameter(double test) {fraction=test;}
+
 private:
   // private methods
   double Density(const double, const double, const double, const double);
   double FindR(const double, const double);
   void SortProductionLenght(double &);
+  void SortProductionLenght(double &, double &, double&);
   void ApplyEnergyLoss(double &);
   //void InteractionPoint(double &, double &, double &, const double);
   void ApplyLogBehavior(double &, double);
@@ -73,6 +76,10 @@ private:
   double m_dlog; // log description?
   double m_dz; // energy loss parameter
   double m_cascade;
+
+  double fraction=0;
+  double path_lenght;
+
   // for the nuclear density
   double m_rho0 = 0.170; // nucleons/fm^3
   double m_a = 0.5; //fm should be 0.54 fm

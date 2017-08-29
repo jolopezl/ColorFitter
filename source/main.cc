@@ -28,12 +28,12 @@ int main(int argc, char *argv[]) {
     // int foo = average_density();
     // computeSimpleFit(false,true,0.0);
     // MODEL TYPE, do subtraction, value
-    computeSimpleFit2("BL",    true, 0.0);
+    // computeSimpleFit2("BL",    true, 0.0);
     computeSimpleFit2("BL30",  true, 0.0);
-    computeSimpleFit2("BL40",  true, 0.0);
-    computeSimpleFit2("BLE",   true, 0.0);
-    computeSimpleFit2("BLE30", true, 0.0);
-    computeSimpleFit2("BLE40", true, 0.0);
+    // computeSimpleFit2("BL40",  true, 0.0);
+    // computeSimpleFit2("BLE",   true, 0.0);
+    // computeSimpleFit2("BLE30", true, 0.0);
+    // computeSimpleFit2("BLE40", true, 0.0);
     // monitoring();
 }
 
