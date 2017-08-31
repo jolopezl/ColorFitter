@@ -24,53 +24,53 @@
 #include "configuration.h"
 
 class myResult {
-  /*
-  Class storing the resulting parameters of the fit
-  This shoudl come out from ifit(), and be built from the minuit object
-  */
+    /*
+    Class storing the resulting parameters of the fit
+    This should come out from ifit(), and be built from the minuit object
+    */
 private:
-  std::string m_name = "default result";
+    std::string m_name = "default result";
 public:
-  double m_zbin;
-  double m_qhat;
-  double m_lp;
-  double m_sigma_ph;
-  double m_dz;
-  double m_qhat_err;
-  double m_lp_err;
-  double m_sigma_ph_err;
-  double m_dz_err;
-  double m_log;
-  double m_log_err;
-  double m_cascade;
-  double m_cascade_err;
-  double m_chi2;
-  // constructor
-  myResult();
-  ~myResult();
+    double m_zbin;
+    double m_qhat;
+    double m_lp;
+    double m_sigma_ph;
+    double m_dz;
+    double m_qhat_err;
+    double m_lp_err;
+    double m_sigma_ph_err;
+    double m_dz_err;
+    double m_log;
+    double m_log_err;
+    double m_cascade;
+    double m_cascade_err;
+    double m_chi2;
+    // constructor
+    myResult();
+    ~myResult();
 };
 
 class myData {
 private:
-  std::string m_name;
+    std::string m_name;
 public:
-  std::vector<double> m_zbin = {0.32, 0.53, 0.75, 0.94};
-  std::vector<double> m_wbin = {0.20/2.0,0.22/2.0,0.22/2.0,0.16/2.0};
-  std::vector<double> m_value; 
-  std::vector<double> m_value_corrected;
-  std::vector<double> m_stat; 
-  std::vector<double> m_stat_corrected;
-  std::vector<double> m_syst; 
-  std::vector<double> m_syst_corrected;
-  std::vector<double> m_err; 
-  std::vector<double> m_err_corrected;
-  std::vector<TGraphErrors*> m_tge; //m_tge[6];
-  myData(std::string);
-  ~myData();
-  void applyCorrection(myData*,double);
-  void fill(int,double,double,double);
-  void doTGraphErrors();
-  std::string name();
+    std::vector<double> m_zbin = {0.32, 0.53, 0.75, 0.94};
+    std::vector<double> m_wbin = {0.20/2.0,0.22/2.0,0.22/2.0,0.16/2.0};
+    std::vector<double> m_value; 
+    std::vector<double> m_value_corrected;
+    std::vector<double> m_stat; 
+    std::vector<double> m_stat_corrected;
+    std::vector<double> m_syst; 
+    std::vector<double> m_syst_corrected;
+    std::vector<double> m_err; 
+    std::vector<double> m_err_corrected;
+    std::vector<TGraphErrors*> m_tge; //m_tge[6];
+    myData(std::string);
+    ~myData();
+    void applyCorrection(myData*,double);
+    void fill(int,double,double,double);
+    void doTGraphErrors();
+    std::string name();
 };
 
 std::vector<myData*> dataHandler(myConfig*);
