@@ -45,6 +45,11 @@ public:
     double m_cascade;
     double m_cascade_err;
     double m_chi2;
+    double m_c1, m_c2, m_c1_err, m_c2_err;
+    TGraphErrors m_tg_pT;
+    TGraphErrors m_tg_Rm;
+    TGraphErrors m_tg_pT_extrapolation;
+    TGraphErrors m_tg_Rm_extrapolation;
     // constructor
     myResult();
     ~myResult();

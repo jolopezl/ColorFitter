@@ -215,8 +215,8 @@ void Model::InteractionPoint(double &x, double &y, double &z, const double R){
 }
 
 void Model::SortProductionLength(double &L) {
-    double mean = m_lp - m_coeff_1*m_A13 - m_coeff_2*m_A23;
-    // double mean = m_lp;
+    double mean = m_lp + m_coeff_1*m_A13 + m_coeff_2*m_A23; // testing idea
+    // double mean = m_lp; // original idea
     if (m_doFixedLp) L = mean;
     else L = m_random3->Exp(mean); // exponentially distributed production length
 }
@@ -329,6 +329,7 @@ int Model::Compute(const double A){
             std::cout << "igdtd1 is negative!! Error!! \n";
             temp = 0.;
             zrange1 = 1.; // dummy value
+            m_dPt2 = -99; m_Rm = -99;
             return 1;
         }
         if(temp == 0) zrange1 = 1.; // dummy value
@@ -350,6 +351,7 @@ int Model::Compute(const double A){
         }
         if(temp < 0) { // this integral should always be positive.
             std::cout << "igdtd2 is negative!! Error!! \n";
+            m_dPt2 = -99; m_Rm = -99;
             return 1;
         }
         if(zrange2 > 0 && (isOutside == false)) {
@@ -366,6 +368,7 @@ int Model::Compute(const double A){
         }
         if (zrange2 < 0) {
             std::cout << "Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << std::endl;  
+            m_dPt2 = -99; m_Rm = -99;
             return 1;
         }
         // normalize+= 1.;

@@ -16,6 +16,7 @@ public:
     bool m_qhat         = true;
     bool m_lp           = true;
     bool m_preh         = true;
+    bool m_testing = false;
     double m_initial_sigma = 40.0;
     bool m_subtraction  = true;
     double m_correlation = 0.0;

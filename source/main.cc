@@ -124,13 +124,75 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
     config->m_input_pt          = "hermesData.txt";
     config->writeCorrectedValues = false; // text file from dataHandler
     config->correctionPlots      = false; // from dataHandler
-    config->outputPlots          = false; // model and data
+    config->outputPlots          = true; // model and data
     config->doMINOSErrors        = false; // usually false
     config->Update();
+
     std::cout << "Running iFit now:" << std::endl;
-    auto fitOutput = ifit(config);
+    config->m_testing = true;
+    std::vector<myResult> resultCont = ifit(config);
+
+    std::cout << "Fit is done." << std::endl;
+
+    double z[4], q0[4], lp[4], sigma[4], dz[4], c1[4], c2[4];
+    double zErr[4], q0Err[4], lpErr[4], sigmaErr[4], dzErr[4], c1Err[4], c2Err[4];
+    double chisquared[4];
+    if (resultCont.size() != 4) {
+        std::cout << "I cannot produce a ROOT output file." << std::endl;
+        return 0;
+    }
+    else {
+        std::cout << "I will produce a ROOT out file..." << std::endl;
+        for (int i=0; i<4; ++i) {
+            std::cout << "Fetching result container for element " << i << std::endl;
+            z[i] = resultCont.at(i).m_zbin;         zErr[i] = 0;
+            q0[i] = resultCont.at(i).m_qhat;        q0Err[i] = resultCont.at(i).m_qhat_err;
+            lp[i] = resultCont.at(i).m_lp;          lpErr[i] = resultCont.at(i).m_lp_err;
+            sigma[i] = resultCont.at(i).m_sigma_ph; sigmaErr[i] = resultCont.at(i).m_sigma_ph_err;
+            dz[i] = resultCont.at(i).m_dz;          dzErr[i] = resultCont.at(i).m_dz_err;
+            c1[i] = resultCont.at(i).m_c1;          c1Err[i] = resultCont.at(i).m_c1_err;
+            c2[i] = resultCont.at(i).m_c2;          c2Err[i] = resultCont.at(i).m_c2_err;
+            chisquared[i] = resultCont.at(i).m_chi2;
+            std::cout << "z = " << z[i] << std::endl;
+        }
+        TFile *OutputROOT = new TFile("OutputROOT.root", "RECREATE");
+        std::cout << "Output file created" << std::endl;
+        OutputROOT->cd();
+        std::cout << "Making plots of everything" << std::endl;
+        TGraphErrors *tg_q0 = new TGraphErrors(4, z, q0, zErr, q0Err); tg_q0->SetName("tg_q0");
+        TGraphErrors *tg_lp = new TGraphErrors(4, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp");
+        TGraphErrors *tg_c1 = new TGraphErrors(4, z, c1, zErr, c1Err); tg_c1->SetName("tg_c1");
+        TGraphErrors *tg_c2 = new TGraphErrors(4, z, c2, zErr, c2Err); tg_c2->SetName("tg_c2");
+        TGraph *tg_chisquared = new TGraph(4, z, chisquared); tg_chisquared->SetName("tg_chisquared");
+        std::cout << "Writing first set of plots" << std::endl;
+        tg_q0->Write();
+        tg_lp->Write();
+        tg_c1->Write();
+        tg_c2->Write();
+        tg_chisquared->Write();
+        std::cout << "Creating model plots" << std::endl;
+        TGraphErrors *tg_model_pT[4];
+        TGraphErrors *tg_model_Rm[4];
+        TGraphErrors *tg_model_pT_extrapolation[4];
+        TGraphErrors *tg_model_Rm_extrapolation[4];
+        const char* title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
+        for (int i=0; i<4; ++i) {
+            std::cout << "Creating model plots for element " << i << std::endl;
+            tg_model_pT[i] = &(resultCont.at(i).m_tg_pT); tg_model_pT[i]->SetName(Form("tg_model_pT_%d",i)); tg_model_pT[i]->SetTitle(title);
+            tg_model_Rm[i] = &(resultCont.at(i).m_tg_Rm); tg_model_Rm[i]->SetName(Form("tg_model_Rm_%d",i)); tg_model_Rm[i]->SetTitle(title);
+            tg_model_pT_extrapolation[i] = &(resultCont.at(i).m_tg_pT_extrapolation); tg_model_pT_extrapolation[i]->SetName(Form("tg_model_pT_extrapolation_%d",i)); tg_model_pT_extrapolation[i]->SetTitle(title);
+            tg_model_Rm_extrapolation[i] = &(resultCont.at(i).m_tg_Rm_extrapolation); tg_model_Rm_extrapolation[i]->SetName(Form("tg_model_Rm_extrapolation_%d",i)); tg_model_Rm_extrapolation[i]->SetTitle(title);
+            tg_model_pT[i]->Write();
+            tg_model_Rm[i]->Write();
+            tg_model_pT_extrapolation[i]->Write();
+            tg_model_Rm_extrapolation[i]->Write();
+        }
+        std::cout << "Done." << std::endl;
+        OutputROOT->Close();
+    }
     return 0;
 }
+
 
 // **************** Compute a Simple Fit **************** //
 int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
@@ -373,26 +435,26 @@ int computeComplexFit(int argc, char *argv[]) {
             int count = 1;
             for (const auto &v : fitOutput) {
                 std::cout << "Info: Run #" << mc << " element " << count << " of " << (int)fitOutput.size() << std::endl;
-                std::cout << "Info:       z-bin    = " << v->m_zbin << std::endl;
-                std::cout << "Info: Value q-hat    = " << v->m_qhat << std::endl;
-                std::cout << "Info: Value l_p      = " << v->m_lp << std::endl;
-                std::cout << "Info: Value sigma_ph = " << v->m_sigma_ph << std::endl;
-                std::cout << "Info: Value dz       = " << v->m_dz << std::endl;
-                std::cout << "Info: Error q-hat    = " << v->m_qhat_err << std::endl;
-                std::cout << "Info: Error l_p      = " << v->m_lp_err << std::endl;
-                std::cout << "Info: Error sigma_ph = " << v->m_sigma_ph_err << std::endl;
-                std::cout << "Info: Error dz       = " << v->m_dz_err << std::endl;
-                std::cout << "Info:       chi2     = " << v->m_chi2 << std::endl;
-                f.m_zbin = v->m_zbin;
-                f.m_qhat = v->m_qhat;
-                f.m_lp = v->m_lp;
-                f.m_sigma_ph = v->m_sigma_ph;
-                f.m_dz = v->m_dz;
-                f.m_qhat_err = v->m_qhat_err;
-                f.m_lp_err = v->m_lp_err;
-                f.m_sigma_ph_err = v->m_sigma_ph_err;
-                f.m_dz_err = v->m_dz_err;
-                f.m_chi2 = v->m_chi2;
+                std::cout << "Info:       z-bin    = " << v.m_zbin << std::endl;
+                std::cout << "Info: Value q-hat    = " << v.m_qhat << std::endl;
+                std::cout << "Info: Value l_p      = " << v.m_lp << std::endl;
+                std::cout << "Info: Value sigma_ph = " << v.m_sigma_ph << std::endl;
+                std::cout << "Info: Value dz       = " << v.m_dz << std::endl;
+                std::cout << "Info: Error q-hat    = " << v.m_qhat_err << std::endl;
+                std::cout << "Info: Error l_p      = " << v.m_lp_err << std::endl;
+                std::cout << "Info: Error sigma_ph = " << v.m_sigma_ph_err << std::endl;
+                std::cout << "Info: Error dz       = " << v.m_dz_err << std::endl;
+                std::cout << "Info:       chi2     = " << v.m_chi2 << std::endl;
+                f.m_zbin = v.m_zbin;
+                f.m_qhat = v.m_qhat;
+                f.m_lp = v.m_lp;
+                f.m_sigma_ph = v.m_sigma_ph;
+                f.m_dz = v.m_dz;
+                f.m_qhat_err = v.m_qhat_err;
+                f.m_lp_err = v.m_lp_err;
+                f.m_sigma_ph_err = v.m_sigma_ph_err;
+                f.m_dz_err = v.m_dz_err;
+                f.m_chi2 = v.m_chi2;
                 tt->Fill();
                 count++;
             }

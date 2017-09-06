@@ -140,9 +140,8 @@ void fcn(int &NPAR, double *gin, double &f, double *par, int iflag) {
     f = chisq(par);
 }
 
-std::vector<myResult*> ifit(myConfig *config) {
-    std::vector<myResult*> resultCont;
-    myResult *result = new myResult();
+std::vector<myResult> ifit(myConfig *config) {
+    std::vector<myResult> resultCont;
     m = new Model("default");
     m->Initialization();
     m->DoEnergyLoss(config->m_energyloss);
@@ -245,14 +244,16 @@ std::vector<myResult*> ifit(myConfig *config) {
                 lim_lo[4] = -10.0;
                 lim_hi[4] = +10.0;
             }
-            gMinuit->mnparm(0, "Q0",    vstart[0], step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
-            gMinuit->mnparm(1, "LP",    vstart[1], step[1], lim_lo[1],lim_hi[1],ierflg); // production length
+            gMinuit->mnparm(0, "Q0",    2.286, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
+            gMinuit->mnparm(1, "LP",    0.0, step[1], lim_lo[1],lim_hi[1],ierflg); // production length
             gMinuit->mnparm(2, "SIGMA", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
             gMinuit->mnparm(3, "DLOG",  vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
             gMinuit->mnparm(4, "DZ",    vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
             gMinuit->mnparm(5, "CASCAD",vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
-            gMinuit->mnparm(6, "C1", 0.015, 0.001, -0.025, 0.1, ierflg); // new coeff 1
-            gMinuit->mnparm(7, "C2", 0.025, 0.001, -0.025, 0.1, ierflg); // new coeff 2
+            // gMinuit->mnparm(6, "C1", 0, 0.0001, -10, 2, ierflg); // new coeff 1
+            // gMinuit->mnparm(7, "C2", 0, 0.0001, -10, 2, ierflg); // new coeff 2
+            gMinuit->mnparm(6, "C1", 1.5, 0.0001, -1, 10, ierflg); // new coeff 1
+            gMinuit->mnparm(7, "C2", 0.4, 0.0001, -1, 10, ierflg); // new coeff 2
             // Parameter fixing
             if (!config->m_qhat)        gMinuit->FixParameter(0); // q-hat
             if (!config->m_lp)          gMinuit->FixParameter(1); // production length
@@ -260,12 +261,27 @@ std::vector<myResult*> ifit(myConfig *config) {
             if (!config->m_logbehavior) gMinuit->FixParameter(3); // Log description
             if (!config->m_energyloss)  gMinuit->FixParameter(4); // Energy Loss
             if (!config->m_cascade)     gMinuit->FixParameter(5); // Cascade Parameter
+            if (!config->m_testing) gMinuit->FixParameter(6);
+            if (!config->m_testing) gMinuit->FixParameter(7);
+            
+            /* Testing new parameters */
+            // gMinuit->SetParameter(0,2.286);
+            gMinuit->FixParameter(0);
+            gMinuit->FixParameter(1);
+            // gMinuit->FixParameter(7);
+            /**************************/
+
             // Now ready for minimization step
             arglist[0] = 500;
             arglist[1] = 1.;
-            gMinuit->mnexcm("MIGRAD", arglist, 6,ierflg);
-            gMinuit->mnexcm("HESSE", arglist, 6,ierflg);
-            // gMinuit->mnexcm("MINOS", arglist, 6,ierflg);
+            gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
+            gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
+            // gMinuit->mnexcm("IMPROVE", arglist, 8,ierflg);
+            // double p0[10];
+            // p0[1]=1; gMinuit->mnexcm("MINOS", p0, 6,ierflg);
+            // p0[1]=2; gMinuit->mnexcm("MINOS", p0, 6,ierflg);
+            // p0[1]=7; gMinuit->mnexcm("MINOS", p0, 6,ierflg);
+            // p0[1]=8; gMinuit->mnexcm("MINOS", p0, 6,ierflg);
             if (config->doMINOSErrors == true) {
                 double p0[10];
                 for (int i=1; i<=3; i++) {
@@ -281,6 +297,7 @@ std::vector<myResult*> ifit(myConfig *config) {
             std::string bin_info = config->m_comment; // dummy value for HERMES
             double xB = -1; // dummy value for HERMES
             double Q2 = -1; // dummy value for HERMES
+            myResult result = myResult();
             modelplot(gMinuit,config,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit,result);
             resultCont.push_back(result);
             // fout->Write();
@@ -295,7 +312,7 @@ std::vector<myResult*> ifit(myConfig *config) {
 // this will be moved away someday to graphics.cc
 void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
                              int iQ2x, int iz, double Q2, double xB, double z,  
-                             std::string filename, myResult *result) {
+                             std::string filename, myResult &result) {
     double z1[3],x1[3],errorz1[3];  
     double z2[3],x2[3],errorz2[3];
     z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -309,7 +326,7 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
     double xlolim=0; 
     double xuplim=0; 
     int iuint=0;
-    int NPAR = 6;
+    int NPAR = 8;
     TString chnam;
     double par[NPAR], par_errors[NPAR];
     std::ostringstream out;
@@ -322,20 +339,25 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
         par_errors[parNo] = err;
     }
     const double chisquared = chisq(par);
-    result->m_zbin         = z;
-    result->m_qhat         = par[0];
-    result->m_lp           = par[1];
-    result->m_sigma_ph     = par[2];
-    result->m_log          = par[3];
-    result->m_dz           = par[4];
-    result->m_cascade      = par[5];
-    result->m_qhat_err     = par_errors[0];
-    result->m_lp_err       = par_errors[1];
-    result->m_sigma_ph_err = par_errors[2];
-    result->m_log_err      = par_errors[3];
-    result->m_dz_err       = par_errors[4];
-    result->m_cascade      = par_errors[5];
-    result->m_chi2         = chisquared;
+    result.m_zbin         = z;
+    result.m_qhat         = par[0];
+    result.m_lp           = par[1];
+    result.m_sigma_ph     = par[2];
+    result.m_log          = par[3];
+    result.m_dz           = par[4];
+    result.m_cascade      = par[5];
+    result.m_c1           = par[6];
+    result.m_c2           = par[7];
+    result.m_qhat_err     = par_errors[0];
+    result.m_lp_err       = par_errors[1];
+    result.m_sigma_ph_err = par_errors[2];
+    result.m_log_err      = par_errors[3];
+    result.m_dz_err       = par_errors[4];
+    result.m_cascade      = par_errors[5];
+    result.m_c1_err       = par_errors[6];
+    result.m_c2_err       = par_errors[7];
+    result.m_chi2         = chisquared;
+
     // At this point, we know the parameters, so let's write them out
     bool doCSVFile = true;
     std::string myDelimeter;
@@ -366,13 +388,13 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
     fout.close();
     if (config->outputPlots) { // plots 
         std::cout << "Now doing fit plots with model " << std::endl;
-        int nbins = 40;
-        double pt_fit[40];
-        double pt_fiterr[40];
-        double pt_x[40];
-        double mr_fit[40];
-        double mr_fiterr[40];
-        double mr_x[40];
+        const int nbins = 39;
+        double pt_fit[nbins];
+        double pt_fiterr[nbins];
+        double pt_x[nbins];
+        double mr_fit[nbins];
+        double mr_fiterr[nbins];
+        double mr_x[nbins];
         for (int i=12;i<nbins; ++i) {
             std::cout << "Modelplot " << i << " A^1/3 = " << i/6. << std::endl;
             callModel(i/6.,par);
@@ -383,6 +405,7 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
             mr_fiterr[i]=0.;
             mr_x[i] = i/6.;
         }
+/*
         std::string basename = filename;
         basename.erase(basename.find_last_of("."), std::string::npos);
         std::string mrname;
@@ -473,6 +496,15 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
         else {
             std::cerr << "ERROR from ifit, A problem ocurred when opening a file" << std::endl;
         }
+*/
+        result.m_tg_pT = TGraphErrors(3,x1,z1,errorz1,errorz1);
+        result.m_tg_Rm = TGraphErrors(3,x2,z2,errorz2,errorz2);
+        result.m_tg_pT_extrapolation = TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
+        result.m_tg_Rm_extrapolation = TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
+        // result->m_tg_pT.SetName("tg_pT");
+        // result->m_tg_Rm.SetName("tg_Rm");
+        // result->m_tg_pT_extrapolation.SetName("tg_pT_extrapolation");
+        // result->m_tg_Rm_extrapolation.SetName("tg_Rm_extrapolation");
     }
 }
 
