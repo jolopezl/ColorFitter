@@ -17,15 +17,14 @@ void plot () {
     double z12[8] = {1.97,3.66,1.53,2.82,9.66,10.26,38.99,39.17};
     double z13[8] = {1.21,2.33,0.77,1.11,3.49,3.14,12.39,10.67};
 
-    TGraph *g00 = new TGraph(8,nu,z00); g00->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g00->SetMarkerColor(kRed);
-    TGraph *g01 = new TGraph(8,nu,z01); g01->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g01->SetMarkerColor(kRed);
-    TGraph *g02 = new TGraph(8,nu,z02); g02->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g02->SetMarkerColor(kRed);
-    TGraph *g03 = new TGraph(8,nu,z03); g03->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g03->SetMarkerColor(kRed);
-    
-    TGraph *g10 = new TGraph(8,nu,z10); g10->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g10->SetMarkerColor(kBlue);
-    TGraph *g11 = new TGraph(8,nu,z11); g11->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g11->SetMarkerColor(kBlue);
-    TGraph *g12 = new TGraph(8,nu,z12); g12->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g12->SetMarkerColor(kBlue);
-    TGraph *g13 = new TGraph(8,nu,z13); g13->SetTitle("Plot of L_{p};#nu [GeV];L_{p} [fm]"); g13->SetMarkerColor(kBlue);
+    TGraph *g00 = new TGraph(8,nu,z00); g00->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g00->SetMarkerColor(kRed);
+    TGraph *g01 = new TGraph(8,nu,z01); g01->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g01->SetMarkerColor(kRed);
+    TGraph *g02 = new TGraph(8,nu,z02); g02->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g02->SetMarkerColor(kRed);
+    TGraph *g03 = new TGraph(8,nu,z03); g03->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g03->SetMarkerColor(kRed);
+    TGraph *g10 = new TGraph(8,nu,z10); g10->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g10->SetMarkerColor(kBlue);
+    TGraph *g11 = new TGraph(8,nu,z11); g11->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g11->SetMarkerColor(kBlue);
+    TGraph *g12 = new TGraph(8,nu,z12); g12->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g12->SetMarkerColor(kBlue);
+    TGraph *g13 = new TGraph(8,nu,z13); g13->SetTitle("Plot of Production Length;#nu [GeV];Production Length [fm]"); g13->SetMarkerColor(kBlue);
 
     // TCanvas *c0 = new TCanvas(); c0->cd(); g00->Draw("AP");  g10->Draw("PSAME");
     // TCanvas *c1 = new TCanvas(); c1->cd(); g01->Draw("AP");  g11->Draw("PSAME");
