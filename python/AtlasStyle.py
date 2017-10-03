@@ -34,7 +34,7 @@ def AtlasStyle():
   # use large fonts
   #Int_t font=72 # Helvetica italics
   font=43 # Helvetica
-  tsize=28#0.05
+  tsize=28 #0.05
   atlasStyle.SetTextFont(font)
 
   atlasStyle.SetTextSize(tsize)

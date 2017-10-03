@@ -7,8 +7,8 @@ factor = 1.
 from AtlasStyle import SetAtlasStyle, AddLabel
 SetAtlasStyle()
 
-factor = 1.0
-# factor = 0.1*3./(4.*3.141592)
+# factor = 1.0
+factor = 0.1*3./(4.*3.141592)
 print "Factor to be removed ",factor
 print "Inverse is ",1/factor
 
@@ -106,11 +106,15 @@ g3.GetYaxis().SetTitleOffset(1.75)
 g1.GetYaxis().SetNdivisions(5+100*5);
 g2.GetYaxis().SetNdivisions(5+100*5);
 
+print "q-hat(Neon)    = ", g1.GetMean(2)
+print "q-hat(Krypton) = ", g2.GetMean(2)
+print "q-hat(Xenon)   = ", g3.GetMean(2)
+print "average = ", (g1.GetMean(2)+g2.GetMean(2)+g3.GetMean(2))/3
 
 fontAxesSize = 28
 fontAxesCode = 43
 # axes range
-g1.GetXaxis().SetRangeUser(0.01,0.99)
+g1.GetXaxis().SetLimits(0.24,0.99)
 g1.GetYaxis().SetRangeUser(ylo,yhi)
 g1.GetYaxis().SetTitleOffset(1.5)
 
@@ -129,10 +133,32 @@ leg.AddEntry(g1,"Neon","ep")
 leg.AddEntry(g2,"Krypton","ep")
 leg.AddEntry(g3,"Xenon","ep")
 
+theoretical_qhat = 0.075
+lxmin=0.24
+lxmax=0.99
+line = ROOT.TLine(lxmin, theoretical_qhat, lxmax, theoretical_qhat)
+# line.SetLineWidth(2)
+line.SetLineStyle(2)
+
 g1.Draw("AP")
+
+
+box = ROOT.TBox(lxmin,theoretical_qhat-0.005,lxmax,theoretical_qhat+0.015)
+box.SetFillColorAlpha(13,0.5)
+box.Draw("SAME")
+
+g1.Draw("P SAME")
 g2.Draw("P SAME")
 g3.Draw("P SAME")
+
+line.Draw("SAME")
+# line1.Draw("SAME")
+# line2.Draw("SAME")
+
+
 leg.Draw()
-AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{t}^{2}#GT/L_{p} with a 3 Parameter Fit")
-AddLabel(0.2, 0.82, "Fixed cross section #sigma_{ph} = 40 [mbarn]")
+
+
+AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{T}^{2}#GT/L_{p} with 3 parameter fit")
+AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 40 [mb]")
 c.Print(fileout)
