@@ -58,7 +58,6 @@ void Model::GetResult(double &dPT2,double &Rm) {
 
 double Model::Get1()      {return m_dPt2;}
 double Model::Get2()      {return m_Rm;}
-double Model::GetC(int A) {return m_c_interpolation[A];}
 
 void Model::DoEnergyLoss(bool foo)         {m_DoEnergyLoss = foo;}
 void Model::DoEnergyLossWeighted(bool foo) {m_DoEnergyLossWeighted = foo;}
@@ -106,7 +105,6 @@ void Model::SetFermiValues(double xb, double z) {
 }
 
 void Model::Initialization() {
-    // This will do the interpolation in the future
     m_c_interpolation = {0, 0, 0, 0, 1.321, 1.46802, 1.61163, 1.74843, 1.875, 1.98877, 2.09042, 2.18148, 2.26346, 2.33789, 2.40628, \
         2.47014, 2.531, 2.59013, 2.64781, 2.70407, 2.75897, 2.81252, 2.86478, 2.91577, 2.96554, 3.01412, 3.06154, 3.10785, 3.15309, 3.19728, \
         3.24048, 3.2827, 3.324, 3.3644, 3.40394, 3.44263, 3.48049, 3.51755, 3.55382, 3.58934, 3.62412, 3.65819, 3.69156, 3.72426, 3.75632, \
@@ -144,6 +142,10 @@ double Model::FindR(const double A, const double density_threshold){
         }
     }
     return r;
+    /* using the mathematica notebook */
+    if (A == (int) 20.1797)  {return 4.52791;}
+    if (A == (int) 83.7980)  {return 6.48089;}
+    if (A == (int) 131.293)  {return 7.29538;}
 }
 
 double Model::GetR(const double A, const double density_threshold) {
@@ -151,11 +153,19 @@ double Model::GetR(const double A, const double density_threshold) {
     return R;
 }
 
+double Model::GetC(int A) {
+    return m_c_interpolation[A];
+    /* using the mathematica notebook */
+    if (A == (int) 20.1797)  {return 2.77966;}
+    if (A == (int) 83.7980)  {return 4.73264;}
+    if (A == (int) 131.293)  {return 5.54713;}
+}
+
 double Model::Density(const double A, const double xx, const double yy, const double zz){
     // Ref. Henk Blok article, Phys Rev. C73, 038201 (2006)
     double rho0 = m_rho0; // 0.170
     double a = m_a; // 0.5
-    double c = m_c_interpolation[(int) A]; // Change to m_c?
+    double c = GetC(A);
     double r = sqrt(xx*xx+yy*yy+zz*zz);
     double rho = rho0/(1.0+exp((r-c)/a));
     return rho;
@@ -260,13 +270,14 @@ int Model::Compute(const double A){
     m_random3->SetSeed(2053);
     double R = FindR(A,m_density_threshold); // this has to be done somewhere else since it takes time
     if (irun == -1) {
-        std::cout << "Model-Info: R = " << R << " [fm] \t A = " << A << "\t 1.1*A^(1/3) = " << 1.1*pow(A,1/3.) << " [fm]" << std::endl;
+        std::cout << "Model-Info: R(out)  = " << R << " [fm] \t A = " << A << "\t 1.1*A^(1/3) = " << 1.1*pow(A,1/3.) << " [fm]" << std::endl;
+        std::cout << "Model-Info: c = " << GetC(A) << std::endl;
         irun = 1;
     }
     m_A13 = pow(A,1/3.);
     m_A23 = pow(A,2/3.);
     double max_density = Density(A,0.,0.,0.);
-    double rc = m_c_interpolation[(int) A];
+    double rc = GetC(A);
     double x, y, z;
     double L;
     double weight, ul;

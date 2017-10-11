@@ -250,10 +250,9 @@ std::vector<myResult> ifit(myConfig *config) {
             gMinuit->mnparm(3, "DLOG",  vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
             gMinuit->mnparm(4, "DZ",    vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
             gMinuit->mnparm(5, "CASCAD",vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
-            gMinuit->mnparm(6, "C1", 0, 0.0001, -10, 2, ierflg); // new coeff 1
-            // gMinuit->mnparm(7, "C2", 0, 0.0001, -10, 2, ierflg); // new coeff 2
-            // gMinuit->mnparm(6, "C1", 1.2, 0.0001, -5, 10, ierflg); // new coeff 1
-            gMinuit->mnparm(7, "C2", 0.4, 0.0001, -5, 10, ierflg); // new coeff 2
+            // New parameters that should be treated perturbatively
+            gMinuit->mnparm(6, "C1", 0, 0.0001, -10, 10, ierflg); // new coeff 1
+            gMinuit->mnparm(7, "C2", 0, 0.0001, -10, 10, ierflg); // new coeff 2
             // Parameter fixing
             if (!config->m_qhat)        gMinuit->FixParameter(0); // q-hat
             if (!config->m_lp)          gMinuit->FixParameter(1); // production length
@@ -267,8 +266,8 @@ std::vector<myResult> ifit(myConfig *config) {
             /* Testing new parameters */
             // gMinuit->SetParameter(0,2.286);
             // gMinuit->FixParameter(0);
-            // gMinuit->FixParameter(1);
             gMinuit->FixParameter(6);
+            gMinuit->FixParameter(7);
             /**************************/
 
             // Now ready for minimization step
@@ -276,6 +275,14 @@ std::vector<myResult> ifit(myConfig *config) {
             arglist[1] = 1.;
             gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
             gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
+/*
+            std::cout << "STARTING TO SEARCH FOR A FIT IMPROVEMENT" << std::endl;
+            gMinuit->FixParameter(0);
+            gMinuit->FixParameter(1);
+            gMinuit->Release(7);
+            gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
+            gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
+*/
             // gMinuit->mnexcm("IMPROVE", arglist, 8,ierflg);
             // double p0[10];
             // p0[1]=1; gMinuit->mnexcm("MINOS", p0, 6,ierflg);

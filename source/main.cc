@@ -80,8 +80,8 @@ int plotTool() {
 
 int computeSimpleFit2(const std::string model, const bool iSubt, const double iCorr) {
     myConfig *config = new myConfig();
-    int Q2Int = -1;
-    int izInt = -1;
+    int Q2Int = 1;
+    int izInt = 1;
     config->m_subtraction = iSubt; // false;
     config->m_correlation = iCorr; // for physics -1.0 < rho < 0.0
 
@@ -129,7 +129,7 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
     config->Update();
 
     std::cout << "Running iFit now:" << std::endl;
-    config->m_testing = true;
+    config->m_testing = false;
     std::vector<myResult> resultCont = ifit(config);
 
     std::cout << "Fit is done." << std::endl;
