@@ -2,6 +2,7 @@
 #include <TMatrixD.h>
 #include <TVectorD.h>
 #include <TF2.h>
+#include <TH2.h>
 
 #define RUN 1
 
@@ -273,7 +274,8 @@ double fcn_gaus_2d_cov(double *x, double *par) {
 
 int ComputeBand() {
 
-    int MCSTEPS = 1000;
+    int MCSTEPS = 250;
+    std::cout << "ComputeBand will use " << MCSTEPS << " MCSTEPS" << std::endl;
 
     double lp_values[4] = {8.14841,6.11502,4.45919,2.35369};
     double lp_errors[4] = {1.76831,0.941073,0.774482,0.450974};
@@ -293,7 +295,7 @@ int ComputeBand() {
     my_func += "/(pow([2],2)*pow([3],2) - pow([4],2))";
     my_func += ")";
 
-    TF2 *func = new TF2("func", "ROOT::Math::bigaussian_pdf(x, y, [2], [3], [4], [0], [1])", 0, 12, -2, 4);
+    TF2 *func = new TF2("func", "ROOT::Math::bigaussian_pdf(x, y, [2], [3], [4], [0], [1])", -5, 12, -2, 16);
 
 // [0] : q0
 // [1] : lp
@@ -309,7 +311,8 @@ int ComputeBand() {
     int zbin, StatusCode;
     double PT2, RM;
     double A13 = 2.5;
-    double dA13 = (6.2-2.5)/20;
+    double A13Max = 6.0;
+    double dA13 = (A13Max - 2.5)/35;
     double q0, lp;
 
     TFile *fout = new TFile("ToyMC.root","RECREATE");
@@ -322,13 +325,6 @@ int ComputeBand() {
     tree->Branch("lp", &lp, "lp/D");
     tree->Branch("StatusCode", &StatusCode, "StatusCode/I");
 
-    // TTree *parameters = new TTree("parameters", "Tree of Parameters");
-    // parameters->Branch("zbin", &zbin, "zbin/I");
-    // parameters->Branch("A13", &A13, "A13/D");
-    // parameters->Branch("q0", &q0, "q0/D");
-    // parameters->Branch("lp", &lp, "lp/D");
-    // parameters->Branch("StatusCode", &StatusCode, "StatusCode/I");
-
     for (int ibin=0; ibin < 4; ibin++) {
         zbin = ibin + 1;
         std::cout << "Computign z-bin #" << zbin << std::endl;
@@ -338,7 +334,7 @@ int ComputeBand() {
         func->SetParameter(3, lp_errors[ibin]);
         func->SetParameter(4, correlation_factor[ibin]);
         // for (int i=0; i<50; ++i) {
-        while (A13 <= 6.2) {
+        while (A13 <= A13Max) {
             PT2 = 0;
             RM = 0;
             double nucleus = pow(A13, 3);
@@ -358,9 +354,9 @@ int ComputeBand() {
         }
         A13 = 2.5;
     }
+
     tree->Write();
-    // parameters->Write();
-    fout->Write();
+    fout->Close();
     return 0;
 }
 
