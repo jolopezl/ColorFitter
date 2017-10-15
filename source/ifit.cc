@@ -12,7 +12,7 @@ double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
 // double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.95}; // pi-
 // double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05}; // Approx.
 // double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
-double func_array[2] = {0,0};
+double func_array[4] = {0,0,0,0};
 double zzz[6] = {0,0,0,0,0,0};
 double errorzzz[6] = {0,0,0,0,0,0};
 double xxx[6] = {0,0,0,0,0,0};
@@ -106,6 +106,8 @@ void callModel(const double A13,double *par){
     m->Compute(nucleus);
     func_array[0] = m->Get1(); 
     func_array[1] = m->Get2();
+    func_array[2] = m->Get3();
+    func_array[3] = m->Get4();
 }
 
 // I will write the Chi-Squared and some other functions here
@@ -320,6 +322,17 @@ std::vector<myResult> ifit(myConfig *config) {
 void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
                              int iQ2x, int iz, double Q2, double xB, double z,  
                              std::string filename, myResult &result) {
+
+    /* should be read from gMinuit */
+    // double correlation_matrix[2][2];
+    // gMinuit->mnemat(&correlation_matrix[0][0], 4);
+    // std::cout << correlation_matrix[0][0] << "\t" << correlation_matrix[0][1] << std::endl;
+    // std::cout << correlation_matrix[1][0] << "\t" << correlation_matrix[1][1] << std::endl;
+
+    double correlation_factor[4] = {0.557,0.321,-0.074,-0.056};
+    TRandom3 *rr = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
+    rr->SetSeed(9234);
+
     double z1[3],x1[3],errorz1[3];  
     double z2[3],x2[3],errorz2[3];
     z1[0]=zzz[0];z1[1]=zzz[1];z1[2]=zzz[2];
@@ -395,123 +408,88 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
     fout.close();
     if (config->outputPlots) { // plots 
         std::cout << "Now doing fit plots with model " << std::endl;
-        const int nbins = 39;
-        double pt_fit[nbins];
-        double pt_fiterr[nbins];
-        double pt_x[nbins];
-        double mr_fit[nbins];
-        double mr_fiterr[nbins];
-        double mr_x[nbins];
-        for (int i=12;i<nbins; ++i) {
-            std::cout << "Modelplot " << i << " A^1/3 = " << i/6. << std::endl;
-            callModel(i/6.,par);
-            pt_fit[i]=func_array[0];
-            pt_fiterr[i]=0.;
-            pt_x[i] = i/6.;
-            mr_fit[i]=func_array[1];
-            mr_fiterr[i]=0.;
-            mr_x[i] = i/6.;
-        }
+        std::vector<double> pt_fit;
+        std::vector<double> pt_fit_up;
+        std::vector<double> pt_fit_down;
+        std::vector<double> pt_fiterr;
+        std::vector<double> pt_x;
+        std::vector<double> rm_fit;
+        std::vector<double> rm_fit_up;
+        std::vector<double> rm_fit_down;
+        std::vector<double> rm_fiterr;
+        std::vector<double> rm_x;
+
+        double q0 = result.m_qhat;
+        std::vector<double> d_pT_dq0;
+        std::vector<double> d_pT_dL;
+
+        int i=0;
+        double x = 2.5;
+        double dx = (6.2-2.5)/25;
+        while(x < 6.2) {
+            std::cout << "Modelplot for A^1/3 = " << x << std::endl;
+            callModel(x,par);
+
+            double pT2 = func_array[0];
+            double RM = func_array[1];
+            double average_density = func_array[2];
+            double multiplicty_density = func_array[3];
+
+            pt_fit.push_back(pT2);
+            pt_fiterr.push_back(0);
+            pt_x.push_back(x);
+            rm_fit.push_back(RM);
+            rm_fiterr.push_back(0);
+            rm_x.push_back(x);
+            /* return also the plots for model uncertainties */
+            
+            d_pT_dq0.push_back(pT2/q0);
+            d_pT_dL.push_back(q0*average_density);
+
+            double uncertainty = 0;
+            uncertainty += pow(pT2/q0*result.m_qhat_err,2);
+            uncertainty += pow(q0*average_density*result.m_lp_err, 2);
+            uncertainty += 2*pT2*average_density*correlation_factor[iz];
+            uncertainty = sqrt(uncertainty);
+            pt_fit_up.push_back(pT2 + uncertainty);
+            pt_fit_down.push_back(pT2 - uncertainty);
+
+            double uncertainty2 = 0;
+            uncertainty2 += pow(multiplicty_density*(result.m_lp_err), 2);
+            uncertainty2 = sqrt(uncertainty2);
+            rm_fit_up.push_back(RM + uncertainty2);
+            rm_fit_down.push_back(RM - uncertainty2);
 /*
-        std::string basename = filename;
-        basename.erase(basename.find_last_of("."), std::string::npos);
-        std::string mrname;
-        std::string ptname;
-        std::ostringstream out_mr, out_pt;
-        out_mr << basename << "_plot_" << "mr_" << iQ2x << "_" << iz;
-        mrname = out_mr.str();
-        out_pt << basename << "_plot_" << "pt_" << iQ2x << "_" << iz;
-        ptname = out_pt.str();
-        TCanvas *c1 = new TCanvas(ptname.c_str(),"pT Broadening",800,600);
-        TCanvas *c2 = new TCanvas(mrname.c_str(),"Multiplicity Ratio",800,600);
-        c1->SetGrid();
-        c2->SetGrid();
-        TGraphErrors *pt_broadening = new TGraphErrors(3,x1,z1,errorz1,errorz1);
-        TGraphErrors *ptfit         = new TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
-        TGraphErrors *mult_ratio    = new TGraphErrors(3,x2,z2,errorz2,errorz2);
-        TGraphErrors *mrfit         = new TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
-        c1->cd();
-        pt_broadening->SetTitle(out_pt.str().c_str());
-        pt_broadening->GetXaxis()->SetTitle("A^{1/3}");
-        pt_broadening->GetYaxis()->SetTitle("#Delta #LT p_{t}^{2} #GT");
-        pt_broadening->GetYaxis()->SetTitleOffset(1.5);
-        pt_broadening->SetMarkerColor(kRed);
-        pt_broadening->SetMarkerStyle(21);
-        pt_broadening->SetLineWidth(2);
-        const int fontAxesSize = 28;
-        const int fontAxesCode = 43;
-        pt_broadening->GetXaxis()->SetTitleFont(fontAxesCode);
-        pt_broadening->GetXaxis()->SetTitleSize(fontAxesSize);
-        pt_broadening->GetXaxis()->SetLabelFont(fontAxesCode);
-        pt_broadening->GetXaxis()->SetLabelSize(fontAxesSize);
-        pt_broadening->GetYaxis()->SetTitleFont(fontAxesCode);
-        pt_broadening->GetYaxis()->SetTitleSize(fontAxesSize);
-        pt_broadening->GetYaxis()->SetLabelFont(fontAxesCode);
-        pt_broadening->GetYaxis()->SetLabelSize(fontAxesSize);
-        pt_broadening->Draw("APE");
-        ptfit->SetLineColor(kRed);
-        ptfit->SetMarkerStyle(21);
-        ptfit->SetLineWidth(2);
-        ptfit->Draw("L SAME");
-        // c1->Write();
-        out_pt << ".pdf";
-        c1->Print(out_pt.str().c_str());
-        // Now do multiplicity ratio plot
-        c2->cd();
-        mult_ratio->SetTitle(out_mr.str().c_str());
-        mult_ratio->GetXaxis()->SetTitle("A^{1/3}");
-        mult_ratio->GetYaxis()->SetTitle("R_{m}");
-        mult_ratio->GetYaxis()->SetTitleOffset(1.5);
-        mult_ratio->SetMarkerColor(kBlue);
-        mult_ratio->SetMarkerStyle(21);
-        mult_ratio->SetLineWidth(2);
-        mult_ratio->GetXaxis()->SetTitleFont(fontAxesCode);
-        mult_ratio->GetXaxis()->SetTitleSize(fontAxesSize);
-        mult_ratio->GetXaxis()->SetLabelFont(fontAxesCode);
-        mult_ratio->GetXaxis()->SetLabelSize(fontAxesSize);
-        mult_ratio->GetYaxis()->SetTitleFont(fontAxesCode);
-        mult_ratio->GetYaxis()->SetTitleSize(fontAxesSize);
-        mult_ratio->GetYaxis()->SetLabelFont(fontAxesCode);
-        mult_ratio->GetYaxis()->SetLabelSize(fontAxesSize);
-        mult_ratio->Draw("APE");
-        mrfit->SetLineColor(kBlue);
-        mrfit->SetMarkerStyle(21);
-        mrfit->SetLineWidth(2);
-        mrfit->Draw("L SAME");
-        // c2->Write();
-        out_mr << ".pdf";
-        c2->Print(out_mr.str().c_str());
-        // ***** print to file ***** //
-        std::string ptname_fout = ptname.substr(0, ptname.find(".", 0));
-        std::string mrname_fout = mrname.substr(0, mrname.find(".", 0));
-        ptname_fout+=".txt";
-        mrname_fout+=".txt";
-        std::ofstream fout_pt, fout_mr;
-        fout_pt.open(ptname_fout, std::ios::out);
-        fout_mr.open(mrname_fout, std::ios::out);
-        std::cout << "now printing to file " << std::endl;
-        if (fout_pt.is_open() && fout_mr.is_open()) {
-            fout_pt.precision(10);
-            fout_mr.precision(10);
-            for (int i = 12; i < 40; ++i) {
-                fout_pt << pt_x[i] << "\t" << pt_fit[i] << "\n";
-                fout_mr << mr_x[i] << "\t" << mr_fit[i] << "\n";
+            TH1F *histo = new TH1F("histo",";R_{M};Counts",25,0.5,1);
+            int MCSTEPS = 50;
+            for (int im = 0; im < MCSTEPS; ++im) {
+                par[1] = rr->Gaus(result.m_lp,result.m_lp_err);
+                callModel(x,par);
+                histo->Fill(func_array[1]);
             }
-            fout_pt.close();
-            fout_mr.close();
-        }
-        else {
-            std::cerr << "ERROR from ifit, A problem ocurred when opening a file" << std::endl;
-        }
+            TCanvas *c = new TCanvas("c","title",600,450);
+            histo->Draw();
+            c->Print(Form("hist_zbin_%d_A13_%.1f.pdf",iz,x));
+            uncertainty2 = histo->GetStdDev(1);
+            rm_fit_up.push_back(RM + uncertainty2);
+            rm_fit_down.push_back(RM - uncertainty2);
+            histo=nullptr; delete histo;
+            c=nullptr; delete c;
 */
+            /* done */
+            i++;
+            x+=dx;
+        }
+
         result.m_tg_pT = TGraphErrors(3,x1,z1,errorz1,errorz1);
         result.m_tg_Rm = TGraphErrors(3,x2,z2,errorz2,errorz2);
-        result.m_tg_pT_extrapolation = TGraphErrors(nbins,pt_x,pt_fit,pt_fiterr,pt_fiterr);
-        result.m_tg_Rm_extrapolation = TGraphErrors(nbins,mr_x,mr_fit,mr_fiterr,mr_fiterr);
-        // result->m_tg_pT.SetName("tg_pT");
-        // result->m_tg_Rm.SetName("tg_Rm");
-        // result->m_tg_pT_extrapolation.SetName("tg_pT_extrapolation");
-        // result->m_tg_Rm_extrapolation.SetName("tg_Rm_extrapolation");
+        int npoints = pt_x.size();
+        result.m_tg_pT_extrapolation = TGraphErrors(npoints,pt_x.data(),pt_fit.data(),pt_fiterr.data(),pt_fiterr.data());
+        result.m_tg_pT_extrapolation_up = TGraphErrors(npoints,pt_x.data(),pt_fit_up.data(),pt_fiterr.data(),pt_fiterr.data());
+        result.m_tg_pT_extrapolation_down = TGraphErrors(npoints,pt_x.data(),pt_fit_down.data(),pt_fiterr.data(),pt_fiterr.data());
+        result.m_tg_Rm_extrapolation = TGraphErrors(npoints,rm_x.data(),rm_fit.data(),rm_fiterr.data(),rm_fiterr.data());
+        result.m_tg_Rm_extrapolation_up = TGraphErrors(npoints,rm_x.data(),rm_fit_up.data(),rm_fiterr.data(),rm_fiterr.data());
+        result.m_tg_Rm_extrapolation_down = TGraphErrors(npoints,rm_x.data(),rm_fit_down.data(),rm_fiterr.data(),rm_fiterr.data());
     }
 }
 

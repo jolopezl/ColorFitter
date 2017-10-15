@@ -56,8 +56,10 @@ void Model::GetResult(double &dPT2,double &Rm) {
     Rm   = m_Rm;
 }
 
-double Model::Get1()      {return m_dPt2;}
-double Model::Get2()      {return m_Rm;}
+double Model::Get1() {return m_dPt2;}
+double Model::Get2() {return m_Rm;}
+double Model::Get3() {return m_average_density;}
+double Model::Get4() {return m_multip_density;}
 
 void Model::DoEnergyLoss(bool foo)         {m_DoEnergyLoss = foo;}
 void Model::DoEnergyLossWeighted(bool foo) {m_DoEnergyLossWeighted = foo;}
@@ -122,6 +124,7 @@ void Model::Initialization() {
         6.52559, 6.53623, 6.54684, 6.55742, 6.56798, 6.57851, 6.58901, 6.5995, 6.60995, 6.62039, 6.6308, 6.64119, 6.65156, 6.66191, 6.67224, \
         6.68254, 6.69284, 6.70311, 6.71336, 6.7236, 6.73382, 6.74403, 6.75422, 6.7644, 6.77456, 6.78471, 6.79485, 6.80498, 6.8151, 6.8252, \
         6.8353, 6.84539, 6.85547, 6.86554, 6.8756, 6.88566, 6.89571, 6.90576, 6.9158, 6.92584, 6.93588, 6.94591, 6.95594, 6.96597, 6.976};
+    m_random3 = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
 }
 
 double Model::FindR(const double A, const double density_threshold){
@@ -266,7 +269,7 @@ int Model::Compute(const double A){
     TF1 *dtd2 = new TF1("dtd2", "0.170/(1+exp((sqrt([0]*[0]+[1]*[1]+x*x)-[2])/0.5))", 0.,40.); // multiplicity ratio
     ROOT::Math::GSLIntegrator *igdtd1 = new ROOT::Math::GSLIntegrator(ROOT::Math::IntegrationOneDim::kADAPTIVE);
     ROOT::Math::GSLIntegrator *igdtd2 = new ROOT::Math::GSLIntegrator(ROOT::Math::IntegrationOneDim::kADAPTIVE);
-    m_random3 = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
+    // m_random3 = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
     m_random3->SetSeed(2053);
     double R = FindR(A,m_density_threshold); // this has to be done somewhere else since it takes time
     if (irun == -1) {
@@ -289,6 +292,8 @@ int Model::Compute(const double A){
     // * Constant to be removed
     double constant = 0.1*3./(4.*3.141592); // alpha_s * N_c / 4pi, the prefix of the formula for delta pT^2 = 0.02387
     // MC part
+    double average_density = 0;
+    double multiplicity_density = 0;
     for (int mcStep = 0; mcStep < m_maxmcSteps; ++mcStep) {
         InteractionPoint(x,y,z,R);
         SortProductionLength(L);
@@ -387,7 +392,19 @@ int Model::Compute(const double A){
         if (m_doMonitoring) {
             tree->Fill();
         }
+        if (!isOutside) {
+            average_density += dtd1->Eval(z+L);
+            multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*average_density;
+        }
+        if (ul - (z+L) < 0.1) { // choos a a suuuper threshold
+            multiplicity_density += 1;
+            multiplicity_density += exp(-temp*m_sigma_ph/10.);
+        }
+        average_density *= weight;
+        multiplicity_density *= weight;
     } // End of big loop     energy loss down here ------------*
+    m_average_density = average_density/normalize;
+    m_multip_density = multiplicity_density/normalize;
     // ADD ENERGY LOSS, From Will's original code:
     temp = accumulator2/normalize;
     if (m_DoEnergyLoss == true) ApplyEnergyLoss(temp);

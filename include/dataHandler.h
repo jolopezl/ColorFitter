@@ -49,7 +49,11 @@ public:
     TGraphErrors m_tg_pT;
     TGraphErrors m_tg_Rm;
     TGraphErrors m_tg_pT_extrapolation;
+    TGraphErrors m_tg_pT_extrapolation_up;
+    TGraphErrors m_tg_pT_extrapolation_down;
     TGraphErrors m_tg_Rm_extrapolation;
+    TGraphErrors m_tg_Rm_extrapolation_up;
+    TGraphErrors m_tg_Rm_extrapolation_down;
     // constructor
     myResult();
     ~myResult();

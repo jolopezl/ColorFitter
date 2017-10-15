@@ -1,4 +1,7 @@
 #include "main.h"
+#include <TMatrixD.h>
+#include <TVectorD.h>
+#include <TF2.h>
 
 #define RUN 1
 
@@ -8,7 +11,10 @@ int computeSimpleFit(const bool, const bool, const double);                     
 int computeSimpleFit2(const std::string, const bool, const double);
 int computeComplexFit(int argc, char *argv[]);    // A fit with a complex configuration
 int printInteractionPoints();
-int computeBand();
+
+double fcn_gaus_2d_cov(double *x, double *par);
+int ComputeBand();
+
 int average_density();
 int plotTool();
 int monitoring();
@@ -23,13 +29,16 @@ int main(int argc, char *argv[]) {
     // computeSimpleFit(true, true,  0.0);
     // computeSimpleFit(true, true, -0.5);
     // computeSimpleFit(true, true, -1.0);
-    // computeBand();
+    // ComputeBand();
     // demoPlots();
     // int foo = average_density();
     // computeSimpleFit(false,true,0.0);
     // MODEL TYPE, do subtraction, value
     // computeSimpleFit2("BL",    true, 0.0);
-    computeSimpleFit2("BL30",  true, 0.0);
+    
+    // computeSimpleFit2("BL30",  true, 0.0);
+    ComputeBand();
+    
     // computeSimpleFit2("BL40",  true, 0.0);
     // computeSimpleFit2("BLE",   true, 0.0);
     // computeSimpleFit2("BLE30", true, 0.0);
@@ -80,8 +89,8 @@ int plotTool() {
 
 int computeSimpleFit2(const std::string model, const bool iSubt, const double iCorr) {
     myConfig *config = new myConfig();
-    int Q2Int = 1;
-    int izInt = 1;
+    int Q2Int = -1;
+    int izInt = -1;
     config->m_subtraction = iSubt; // false;
     config->m_correlation = iCorr; // for physics -1.0 < rho < 0.0
 
@@ -174,18 +183,34 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         TGraphErrors *tg_model_pT[4];
         TGraphErrors *tg_model_Rm[4];
         TGraphErrors *tg_model_pT_extrapolation[4];
+        TGraphErrors *tg_model_pT_extrapolation_up[4];
+        TGraphErrors *tg_model_pT_extrapolation_down[4];
         TGraphErrors *tg_model_Rm_extrapolation[4];
-        const char* title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
+        TGraphErrors *tg_model_Rm_extrapolation_up[4];
+        TGraphErrors *tg_model_Rm_extrapolation_down[4];
+        char* title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
         for (int i=0; i<4; ++i) {
             std::cout << "Creating model plots for element " << i << std::endl;
+            title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
             tg_model_pT[i] = &(resultCont.at(i).m_tg_pT); tg_model_pT[i]->SetName(Form("tg_model_pT_%d",i)); tg_model_pT[i]->SetTitle(title);
-            tg_model_Rm[i] = &(resultCont.at(i).m_tg_Rm); tg_model_Rm[i]->SetName(Form("tg_model_Rm_%d",i)); tg_model_Rm[i]->SetTitle(title);
             tg_model_pT_extrapolation[i] = &(resultCont.at(i).m_tg_pT_extrapolation); tg_model_pT_extrapolation[i]->SetName(Form("tg_model_pT_extrapolation_%d",i)); tg_model_pT_extrapolation[i]->SetTitle(title);
+            tg_model_pT_extrapolation_up[i] = &(resultCont.at(i).m_tg_pT_extrapolation_up); tg_model_pT_extrapolation_up[i]->SetName(Form("tg_model_pT_extrapolation_up_%d",i)); tg_model_pT_extrapolation_up[i]->SetTitle(title);
+            tg_model_pT_extrapolation_down[i] = &(resultCont.at(i).m_tg_pT_extrapolation_down); tg_model_pT_extrapolation_down[i]->SetName(Form("tg_model_pT_extrapolation_down_%d",i)); tg_model_pT_extrapolation_down[i]->SetTitle(title);
+            
+            title = ";A^{1/3};R_{M}";
+            tg_model_Rm[i] = &(resultCont.at(i).m_tg_Rm); tg_model_Rm[i]->SetName(Form("tg_model_Rm_%d",i)); tg_model_Rm[i]->SetTitle(title);
             tg_model_Rm_extrapolation[i] = &(resultCont.at(i).m_tg_Rm_extrapolation); tg_model_Rm_extrapolation[i]->SetName(Form("tg_model_Rm_extrapolation_%d",i)); tg_model_Rm_extrapolation[i]->SetTitle(title);
+            tg_model_Rm_extrapolation_up[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_up); tg_model_Rm_extrapolation_up[i]->SetName(Form("tg_model_Rm_extrapolation_up_%d",i)); tg_model_Rm_extrapolation_up[i]->SetTitle(title);
+            tg_model_Rm_extrapolation_down[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_down); tg_model_Rm_extrapolation_down[i]->SetName(Form("tg_model_Rm_extrapolation_down_%d",i)); tg_model_Rm_extrapolation_down[i]->SetTitle(title);
+
             tg_model_pT[i]->Write();
             tg_model_Rm[i]->Write();
             tg_model_pT_extrapolation[i]->Write();
+            tg_model_pT_extrapolation_up[i]->Write();
+            tg_model_pT_extrapolation_down[i]->Write();
             tg_model_Rm_extrapolation[i]->Write();
+            tg_model_Rm_extrapolation_up[i]->Write();
+            tg_model_Rm_extrapolation_down[i]->Write();
         }
         std::cout << "Done." << std::endl;
         OutputROOT->Close();
@@ -229,54 +254,112 @@ int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const doub
 }
 
 // **** computations of the model **** //
-int computeBand() {
-    Model *model = new Model("computeBand");
+double fcn_gaus_2d_cov(double *x, double *par) {
+    /* par = q0, l, sigma_q0, sigma_l, correlation */
+    TMatrixD SIGMA(2,2);
+    TVectorD X(2);
+    X(0) = x[0] - par[0];
+    X(1) = x[1] - par[1];
+    SIGMA(0,0) = pow(par[2],2);
+    SIGMA(1,1) = pow(par[3],2);
+    SIGMA(0,1) = par[2]*par[3]*par[4];
+    SIGMA(1,0) = SIGMA(0,1);
+    double det = SIGMA.Determinant();
+    SIGMA.Invert();
+    double ans = exp(-0.5*X*(SIGMA*X));
+    ans /= 2*M_PI*sqrt(det);
+    return ans;
+}
+
+int ComputeBand() {
+
+    int MCSTEPS = 1000;
+
+    double lp_values[4] = {8.14841,6.11502,4.45919,2.35369};
+    double lp_errors[4] = {1.76831,0.941073,0.774482,0.450974};
+    double q0_values[4] = {2.21332,2.57039,1.15617,1.19488};
+    double q0_errors[4] = {0.239578,0.425666,1.11605,2.2417};
+    double correlation_factor[4] = {0.557,0.321,-0.074,-0.056};
+
+    double covariance[4];
+    for (int i=0; i<4; ++i) {
+        covariance[i] = correlation_factor[i]*lp_errors[i]*q0_errors[i];
+    }
+
+    // TF2 *func = new TF2("func", fcn_gaus_2d_cov, 0, 12, -2, 4);
+
+    TString my_func = "1/(2*pi*(pow([2],2 ) + pow([3], 2) - pow([4], 2)))*exp(";
+    my_func += "(pow(x - [0], 2)*pow([3], 2) + pow(y - [1], 2)*pow([2], 2) - 2*(x - [0])*(y - [1])*[4])";
+    my_func += "/(pow([2],2)*pow([3],2) - pow([4],2))";
+    my_func += ")";
+
+    TF2 *func = new TF2("func", "ROOT::Math::bigaussian_pdf(x, y, [2], [3], [4], [0], [1])", 0, 12, -2, 4);
+
+// [0] : q0
+// [1] : lp
+// [2] : q0_err
+// [3] : lp_err
+// [4] : covariance
+
+
+    Model *model = new Model("ComputeBand");
     model->Initialization();
     model->DoFixedLp(false);
-    // Calculated values for z=0.75 with 3P Fit
-    const double values[] = {1.39305676,  3.02980576,  19.51217989}; // qhat, lp, cross-section
-    const double errors[] = {1.71818655,  4.670434572, 26.69759973};
-    double qhat = -1.0, lp = -1.0, sigma = -1.0;
-    TRandom3 random;
-    double nucleus   = 83.7980;
-    double delta_pT2 = -1.0;
-    double Rm        = -1.0;
-    double acc1 = 0., acc2 = 0;
-    int sc = -1; // status code
 
-    TFile *fout = new TFile("fullfit2.root","RECREATE");
-    TTree *tree = new TTree("tree", "fits");
-    tree->Branch("qhat",  &qhat,      "qhat/D"  );
-    tree->Branch("lp",    &lp,        "lp/D"    );
-    tree->Branch("sigma", &sigma,     "sigma/D" );
-    tree->Branch("pT2",   &delta_pT2, "pT2/D"   );
-    tree->Branch("Rm",    &Rm,        "Rm/D"    );
-    tree->Branch("SC",    &sc,        "SC/I"    );
+    int zbin, StatusCode;
+    double PT2, RM;
+    double A13 = 2.5;
+    double dA13 = (6.2-2.5)/20;
+    double q0, lp;
 
-    int mcsteps = 5000;
-    for (int i = 0; i < mcsteps; i++) {
-        qhat  = random.Gaus(values[0], errors[0]/2.0);
-        lp    = random.Gaus(values[1], errors[1]/2.0);
-        sigma = random.Gaus(values[2], errors[2]/2.0);
-        model->SetParameters("q0",     qhat  );
-        model->SetParameters("lp",       lp    );
-        model->SetParameters("sigma", sigma );
-        sc = model->Compute(nucleus);
-        // if (sc == 1) continue;
-        delta_pT2 = model->Get1();
-        Rm = model->Get2();
-        // std::cout << "         QHAT VALUE=" << values[0] << "+/-" << errors[0] << " SORTED=" << parameter[0] << std::endl;
-        // std::cout << "           LP VALUE=" << values[1] << "+/-" << errors[1] << " SORTED=" << parameter[1] << std::endl;
-        // std::cou t << "CROSS-SECTION VALUE=" << values[2] << "+/-" << errors[2] << " SORTED=" << parameter[2] << std::endl;
-        // std::cout << i << "\t" << delta_pT2 << "\t" << Rm << std::endl;
-        tree->Fill();
-        acc1+=delta_pT2;
-        acc2+=Rm;
+    TFile *fout = new TFile("ToyMC.root","RECREATE");
+    TTree *tree = new TTree("tree", "Tree of ToyMC");
+    tree->Branch("zbin", &zbin, "zbin/I");
+    tree->Branch("A13", &A13, "A13/D");
+    tree->Branch("PT2", &PT2, "PT2/D");
+    tree->Branch("RM", &RM, "RM/D");
+    tree->Branch("q0", &q0, "q0/D");
+    tree->Branch("lp", &lp, "lp/D");
+    tree->Branch("StatusCode", &StatusCode, "StatusCode/I");
+
+    // TTree *parameters = new TTree("parameters", "Tree of Parameters");
+    // parameters->Branch("zbin", &zbin, "zbin/I");
+    // parameters->Branch("A13", &A13, "A13/D");
+    // parameters->Branch("q0", &q0, "q0/D");
+    // parameters->Branch("lp", &lp, "lp/D");
+    // parameters->Branch("StatusCode", &StatusCode, "StatusCode/I");
+
+    for (int ibin=0; ibin < 4; ibin++) {
+        zbin = ibin + 1;
+        std::cout << "Computign z-bin #" << zbin << std::endl;
+        func->SetParameter(0, q0_values[ibin]);
+        func->SetParameter(1, lp_values[ibin]);
+        func->SetParameter(2, q0_errors[ibin]);
+        func->SetParameter(3, lp_errors[ibin]);
+        func->SetParameter(4, correlation_factor[ibin]);
+        // for (int i=0; i<50; ++i) {
+        while (A13 <= 6.2) {
+            PT2 = 0;
+            RM = 0;
+            double nucleus = pow(A13, 3);
+            std::cout << "Running Toy MC for A^1/3 = " << A13 << std::endl;
+            for (int mc=0; mc<MCSTEPS; ++mc) {
+                if (mc%100 == 0) {std::cout << "MC Step = " << mc+1 << " of " << MCSTEPS << std:: endl;}
+                func->GetRandom2(q0,lp);
+                model->SetParameters("q0", q0);
+                model->SetParameters("lp", lp);
+                model->SetParameters("sigma", 30);
+                StatusCode = model->Compute(nucleus);
+                PT2 = model->Get1();
+                RM = model->Get2();
+                tree->Fill();
+            }
+            A13 += dA13; // go to next nucleus
+        }
+        A13 = 2.5;
     }
-    delta_pT2 = acc1/mcsteps;
-    Rm = acc2/mcsteps;
-    std::cout << "AVERAGE VALUES " << delta_pT2 << "\t" << Rm << std::endl;
     tree->Write();
+    // parameters->Write();
     fout->Write();
     return 0;
 }

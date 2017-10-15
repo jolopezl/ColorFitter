@@ -34,6 +34,8 @@ public:
     double GetR(const double, const double);
     double Get1();
     double Get2();
+    double Get3();
+    double Get4();
     double GetC(int);
     std::vector<double> GetResult();
     void GetResult(double&,double&);
@@ -67,6 +69,8 @@ private:
     std::string m_ModelName;
     double m_dPt2;
     double m_Rm;
+    double m_average_density;
+    double m_multip_density;
     // physical input parameters
     double m_q0;
     double m_lp; // production lenght
