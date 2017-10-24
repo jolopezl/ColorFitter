@@ -115,6 +115,11 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
     }
+    else if (model == "BL30h") {
+        config->m_preh = false;
+        config->m_initial_sigma = 30.0;
+        config->m_cascade = true;
+    }
     else if (model == "BLE") {
         config->m_energyloss = true;
     }
@@ -144,8 +149,8 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
 
     std::cout << "Fit is done." << std::endl;
 
-    double z[4], q0[4], lp[4], sigma[4], dz[4], c1[4], c2[4];
-    double zErr[4], q0Err[4], lpErr[4], sigmaErr[4], dzErr[4], c1Err[4], c2Err[4];
+    double z[4], q0[4], lp[4], sigma[4], dz[4], c1[4], c2[4], cascade[4];
+    double zErr[4], q0Err[4], lpErr[4], sigmaErr[4], dzErr[4], c1Err[4], c2Err[4], cascade_err[4];
     double chisquared[4];
     if (resultCont.size() != 4) {
         std::cout << "I cannot produce a ROOT output file." << std::endl;
@@ -162,10 +167,12 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
             dz[i] = resultCont.at(i).m_dz;          dzErr[i] = resultCont.at(i).m_dz_err;
             c1[i] = resultCont.at(i).m_c1;          c1Err[i] = resultCont.at(i).m_c1_err;
             c2[i] = resultCont.at(i).m_c2;          c2Err[i] = resultCont.at(i).m_c2_err;
+            cascade[i] = resultCont.at(i).m_cascade;          cascade_err[i] = resultCont.at(i).m_cascade;
             chisquared[i] = resultCont.at(i).m_chi2;
             std::cout << "z = " << z[i] << std::endl;
         }
-        TFile *OutputROOT = new TFile("OutputROOT.root", "RECREATE");
+        std::string ffout = "OutputROOT."+model+".root";
+        TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
         std::cout << "Output file created" << std::endl;
         OutputROOT->cd();
         std::cout << "Making plots of everything" << std::endl;
@@ -173,12 +180,14 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         TGraphErrors *tg_lp = new TGraphErrors(4, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp");
         TGraphErrors *tg_c1 = new TGraphErrors(4, z, c1, zErr, c1Err); tg_c1->SetName("tg_c1");
         TGraphErrors *tg_c2 = new TGraphErrors(4, z, c2, zErr, c2Err); tg_c2->SetName("tg_c2");
+        TGraphErrors *tg_cascade = new TGraphErrors(4, z, cascade, zErr, cascade_err); tg_cascade->SetName("tg_cascade");
         TGraph *tg_chisquared = new TGraph(4, z, chisquared); tg_chisquared->SetName("tg_chisquared");
         std::cout << "Writing first set of plots" << std::endl;
         tg_q0->Write();
         tg_lp->Write();
         tg_c1->Write();
         tg_c2->Write();
+        tg_cascade->Write();
         tg_chisquared->Write();
         std::cout << "Creating model plots" << std::endl;
         TGraphErrors *tg_model_pT[4];

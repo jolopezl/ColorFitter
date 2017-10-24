@@ -455,10 +455,18 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
             pt_fit_down.push_back(pT2 - uncertainty);
 
             double uncertainty2 = 0;
-            uncertainty2 += pow(multiplicty_density*(result.m_lp_err), 2);
-            uncertainty2 = sqrt(uncertainty2);
+            // uncertainty2 += pow(multiplicty_density*(result.m_lp_err), 2);
+            // uncertainty2 = sqrt(uncertainty2);
+            // uncertainty2 += 9*pow(RM,2)*pow(average_density,2)*pow(result.m_lp_err,2);
+            uncertainty2 = 3*RM*0.11*result.m_lp_err;
+            // uncertainty2 = sqrt(uncertainty2);
             rm_fit_up.push_back(RM + uncertainty2);
             rm_fit_down.push_back(RM - uncertainty2);
+
+            std::cout << "Average density " << average_density << std::endl;
+
+            std::cout << "p_T^2 = " << pT2 << " +/- " << uncertainty << "GeV^2" << std::endl;
+            std::cout << "R_M = " << RM << " +/- " << uncertainty2 << std::endl;
 /*
             TH1F *histo = new TH1F("histo",";R_{M};Counts",25,0.5,1);
             int MCSTEPS = 50;
