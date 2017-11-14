@@ -12,12 +12,25 @@ factor = 0.1*3./(4.*3.141592)
 print "Factor to be removed ",factor
 print "Inverse is ",1/factor
 
-val1 = array("f",[0.000979387,0.002160808,0.001637914,0.002576695])  
-val2 = array("f",[0.001714001,0.003582285,0.002536743,0.003642609])  
-val3 = array("f",[0.001998672,0.004087083,0.002822044,0.003937508])   
-err1 = array("f",[0.000798121,0.000960257,0.000825269,0.002039819])
-err2 = array("f",[0.001396773,0.001591958,0.001278147,0.002883641])
-err3 = array("f",[0.001628757,0.001816288,0.001421897,0.003117095]) 
+# BLE40
+# val1 = array("f",[0.000979387,0.002160808,0.001637914,0.002576695])  
+# val2 = array("f",[0.001714001,0.003582285,0.002536743,0.003642609])  
+# val3 = array("f",[0.001998672,0.004087083,0.002822044,0.003937508])   
+# err1 = array("f",[0.000798121,0.000960257,0.000825269,0.002039819])
+# err2 = array("f",[0.001396773,0.001591958,0.001278147,0.002883641])
+# err3 = array("f",[0.001628757,0.001816288,0.001421897,0.003117095]) 
+
+# BL30
+val1 = array("f",[0.00149515055464036,0.00216943165895517,0.00121563139420037,0.00182171613293309])  
+val2 = array("f",[0.00254336705492006,0.00359529131794448,0.00194656579376391,0.00268632623709582])  
+val3 = array("f",[0.00293177851834213,0.00410133953717724,0.00219169224687009,0.00294113660645655])   
+# err1 = array("f",[0.000322458404009397,0.000334661567553983,0.000210530767651046,0.000349064796067011])
+# err2 = array("f",[0.000548526754576147,0.000554617990988482,0.000337118630531875,0.000514735475615264])
+# err3 = array("f",[0.000632295268860757,0.000632682164896546,0.000379571186948426,0.000563560497257607]) 
+err1 = array("f",[0.000296773,0.000395372,0.001178313,0.003395732])
+err2 = array("f",[0.000505189,0.000659603,0.001907591,0.005056599])
+err3 = array("f",[0.00058228,0.000751837,0.002144761,0.005530273])
+
 
 xval  = array("f",[0.32,0.53,0.75,0.94])
 xerr  = array("f",[0,0,0,0])
@@ -62,13 +75,13 @@ xlabel = "z_{h}"
 # L_P configuration
 ylabel = "#hat{q}_{h} [GeV^{2}/fm] "
 
-fileout = "fig06a_qhat.pdf" #sys.argv[3]
+fileout = "fig06a_qhat_BL30.pdf" #sys.argv[3]
 
 ylo = 0.0
 yhi = 0.01/factor
 
-0.000979387
-0.004087083
+# 0.000979387
+# 0.004087083
 
 markerSize = 2.0
 lineWidth = 3
@@ -109,7 +122,31 @@ g2.GetYaxis().SetNdivisions(5+100*5);
 print "q-hat(Neon)    = ", g1.GetMean(2)
 print "q-hat(Krypton) = ", g2.GetMean(2)
 print "q-hat(Xenon)   = ", g3.GetMean(2)
-print "average = ", (g1.GetMean(2)+g2.GetMean(2)+g3.GetMean(2))/3
+print "Global average = ", (g1.GetMean(2)+g2.GetMean(2)+g3.GetMean(2))/3
+print "--------------------------------"
+
+ll = ["Neon","Krypton","Xenon"]
+il=0
+ave = 0
+norm = 0
+error = 0
+for gg in [g1,g2,g3]:
+    y1 = gg.GetY()
+    ye1 = gg.GetEY()
+    ave1 = 0
+    norm1 = 0
+    for i in range(len(y1)):
+        ave1 += y1[i]/ye1[i]
+        norm1 += 1/ye1[i]
+        ave += ave1
+        norm += norm1
+    # print "q-hat("+ll[il]+") = "+str(ave1/norm1)+" +/- "+str(1/norm1)
+    print ("q-hat("+ll[il]+") = %.3f +/- %.3f" % (ave1/norm1,1/norm1))
+    error += (1/norm1)**2
+    il+=1
+average = ave/norm
+# print "Global average = "+str(ave/norm)+" +/- "+str(ROOT.TMath.Sqrt(error)/3) 
+print ("Global average = %.3f +/- %.3f" % (average,ROOT.TMath.Sqrt(error)/3))
 
 fontAxesSize = 28
 fontAxesCode = 43
@@ -127,7 +164,8 @@ leg.SetTextFont(43)
 leg.SetTextSize(28)
 leg.SetBorderSize(0)
 leg.SetFillStyle(0)
-leg.SetHeader("  BLE40")
+# leg.SetHeader("  BLE40")
+leg.SetHeader("  BL30")
 # leg.SetNColumns(3);
 leg.AddEntry(g1,"Neon","ep")
 leg.AddEntry(g2,"Krypton","ep")
@@ -139,6 +177,12 @@ lxmax=0.99
 line = ROOT.TLine(lxmin, theoretical_qhat, lxmax, theoretical_qhat)
 # line.SetLineWidth(2)
 line.SetLineStyle(2)
+
+lxmin=0.24
+lxmax=0.99
+line2 = ROOT.TLine(lxmin, average, lxmax, average)
+# line.SetLineWidth(2)
+line2.SetLineStyle(3)
 
 g1.Draw("AP")
 
@@ -159,6 +203,8 @@ line.Draw("SAME")
 leg.Draw()
 
 
-AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{T}^{2}#GT/L_{p} with 3 parameter fit")
-AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 40 [mb]")
+# AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{T}^{2}#GT/L_{p} with 3 parameter fit")
+# AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 40 [mb]")
+AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{T}^{2}#GT/L_{p} with 2 parameter fit")
+AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 30 [mb]")
 c.Print(fileout)
