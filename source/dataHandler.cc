@@ -70,9 +70,13 @@ void myData::fill(int i, double val, double stat, double syst) {
 void myData::applyCorrection(myData* nucl, double rho) { // nucl is the bkg
     for (int i=0; i<=DIM; ++i) {
         m_value_corrected[i] = m_value[i] - nucl->m_value[i];
+        // testing January 3, 2018
+        // if (m_value_corrected[i] < 0) {
+        //     m_value_corrected[i] = 0;
+        // }
         m_stat_corrected[i] = sqrt(pow2(m_stat[i]) + pow2(nucl->m_stat[i]));
         m_syst_corrected[i] = sqrt(pow2(m_syst[i]) + pow2(nucl->m_syst[i]) + 2*rho*m_syst[i]*nucl->m_syst[i]);
-        m_err_corrected[i] = sqrt(pow2(m_stat_corrected[i])+pow2(m_syst_corrected[i]));
+        m_err_corrected[i] = sqrt(pow2(m_stat_corrected[i]) + pow2(m_syst_corrected[i]));
     }
 }
 

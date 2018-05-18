@@ -1,14 +1,25 @@
 #include "ifit.h"
 
 #include <time.h>
+#include "TMatrixD.h"
+#include "TVectorD.h"
 
 // const double SYSTEMATIC_DPT2 = 0.04;
+
+const double SYSTEMATIC_DPT2 = 0.04;
+const double SYSTEMATIC_RM = 0.03;
 
 
 const int ZDIM  = 4;
 const int Q2DIM = 1;
 double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.94}; // pi+
 double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
+
+// const int ZDIM  = 10;
+// const int Q2DIM = 1;
+// double zbin[ZDIM]      = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95}; // pi+
+// double zbinw[ZDIM]     = {0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1}; // Approx.
+
 // double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.95}; // pi-
 // double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05}; // Approx.
 // double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
@@ -97,6 +108,11 @@ K+ multiplicty ratio (Xenon/Deuterium) as a function of Z.
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model *m;
 
+const int DIM = 6;
+TMatrixD V(DIM,DIM);
+TVectorD data(DIM);
+TVectorD model(DIM);
+
 void callModel(const double A13,double *par){
     // qhat, lp, pre-hadron cross-section, log behaviour, energy loss, cascade
     std::vector<double> my_pars = {par[0],par[1],par[2],par[3],par[4],par[5]};
@@ -123,6 +139,16 @@ double chisq(double *par){
     callModel(xxx[2],par);
     pT2[2] = func_array[0];
     Rm[2] = func_array[1];
+
+    model(0) = pT2[0];
+    model(1) = pT2[1];
+    model(2) = pT2[2];
+    model(3) = Rm[0];
+    model(4) = Rm[1];
+    model(5) = Rm[2];
+
+    chisq = (data - model) * (V * (data - model));
+    /*
     delta = (zzz[0]-pT2[0])/errorzzz[0];
     chisq += delta*delta;
     delta = (zzz[1]-pT2[1])/errorzzz[1];
@@ -135,6 +161,7 @@ double chisq(double *par){
     chisq += delta*delta;
     delta = (zzz[5]-Rm[2])/errorzzz[5];
     chisq += delta*delta;
+    */
     return chisq;
 }
 
@@ -153,9 +180,9 @@ std::vector<myResult> ifit(myConfig *config) {
     m->DoFixedLp(config->fixedLp);
     // m->DoFermiMotion(config->m_fermimotion);
     // This is for Jlab
-    // xxx[0]=pow(12.0107,1./3.); // C
-    // xxx[1]=pow(55.845,1./3.);  // Fe
-    // xxx[2]=pow(207.2,1./3.); // Pb
+/*    xxx[0]=pow(12.0107,1./3.); // C
+    xxx[1]=pow(55.845,1./3.);  // Fe
+    xxx[2]=pow(207.2,1./3.); // Pb*/
     // This is for HERMES
     xxx[0] = pow(20.1797,1./3.); // Ne   here goes A^1/3
     xxx[1] = pow(83.7980,1./3.); // Kr
@@ -173,8 +200,39 @@ std::vector<myResult> ifit(myConfig *config) {
     auto fc = dataHandler(config);
     std::cout << "dataHandler run succesfuly" << std::endl;
     // TFile *fout = new TFile("fullfit.root","RECREATE");
+
+    // TFile *fInputData = new TFile("InputData-JLab.root","READ");
+    // std::pair<TGraphErrors*,TGraphErrors*> tge;
+    
     for (int iQ2 = 0; iQ2 < Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
         for (int iz = 0; iz < ZDIM; ++iz) {
+            std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
+            if ((config->m_zBinOfInterest != -1) && ((config->m_zBinOfInterest-1) != iz)) {
+                std::cout << "Ignoring this bin" << std::endl;
+                continue;
+            }
+
+/*            tge.first = (TGraphErrors*)fInputData->Get(Form("tge_PT2_slice_9_zbin_%d",iz+1));
+            tge.second = (TGraphErrors*)fInputData->Get(Form("tge_RM_slice_9_zbin_%d",iz+1));
+            double *p1 = tge.first->GetY();
+            double *p2 = tge.second->GetY();
+            double *pe1 = tge.first->GetEY();
+            double *pe2 = tge.second->GetEY();
+            zzz[0] = p1[0];
+            zzz[1] = p1[1];
+            zzz[2] = p1[2];
+            zzz[3] = p2[0];
+            zzz[4] = p2[1];
+            zzz[5] = p2[2];
+            // sqrt(pow(dPt2_errors[a][iz],2)+pow(SYSTEMATIC_DPT2*dPt2_values[a][iz],2));
+            errorzzz[0] = sqrt(pow(pe1[0],2) + pow(SYSTEMATIC_DPT2*p1[0],2));
+            errorzzz[1] = sqrt(pow(pe1[1],2) + pow(SYSTEMATIC_DPT2*p1[1],2));
+            errorzzz[2] = sqrt(pow(pe1[2],2) + pow(SYSTEMATIC_DPT2*p1[2],2));
+            errorzzz[3] = sqrt(pow(pe2[0],2) + pow(SYSTEMATIC_RM*p2[0],2));
+            errorzzz[4] = sqrt(pow(pe2[1],2) + pow(SYSTEMATIC_RM*p2[1],2));
+            errorzzz[5] = sqrt(pow(pe2[2],2) + pow(SYSTEMATIC_RM*p2[2],2));
+*/
+  // Lines that worked for HERMES    
             // Selects and specific z bin to fit.
             std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
             if ((config->m_zBinOfInterest != -1) && ((config->m_zBinOfInterest-1) != iz)) {
@@ -229,6 +287,35 @@ std::vector<myResult> ifit(myConfig *config) {
                     errorzzz[a+3] = rmerr[a][iz];
                 }
             }
+
+            data(0) = zzz[0];
+            data(1) = zzz[1];
+            data(2) = zzz[2];
+            data(3) = zzz[3];
+            data(4) = zzz[4];
+            data(5) = zzz[5];
+
+            V(0,0) = TMath::Power(errorzzz[0], 2);
+            V(1,1) = TMath::Power(errorzzz[1], 2);
+            V(2,2) = TMath::Power(errorzzz[2], 2);
+            V(3,3) = TMath::Power(errorzzz[3], 2);
+            V(4,4) = TMath::Power(errorzzz[4], 2);
+            V(5,5) = TMath::Power(errorzzz[5], 2);
+
+            const double rho = 0.0;
+            V(0,3) = rho*errorzzz[0]*errorzzz[3];
+            V(1,4) = rho*errorzzz[1]*errorzzz[4];
+            V(2,5) = rho*errorzzz[2]*errorzzz[5];
+            V(3,0) = V(0,3);
+            V(4,1) = V(1,4);
+            V(5,2) = V(2,5);
+
+            V.Print();
+            V.Invert();
+            V.Print();
+            data.Print();
+
+
             TMinuit *gMinuit = new TMinuit(8);  //initialize TMinuit with a maximum of N params
             gMinuit->SetFCN(fcn);      
             double arglist[10];
@@ -240,14 +327,15 @@ std::vector<myResult> ifit(myConfig *config) {
             const double sigma0 = config->m_initial_sigma;
             double vstart[] = {0.4775, 1.6,     sigma0, 2.5,    0.0,     0.2};
             double step[]   = {0.01,   0.01,    0.01,   0.5,    0.00001, 0.01};
-            double lim_lo[] = {0.,     0.0001, -0.01,   0.1,   -1.0,    -0.01};
-            double lim_hi[] = {10.,    400.,    400.,   100.0,  1.0,     100.0}; 
+            double lim_lo[] = {0.,     0.0001, -0.01,   0.1,   -1.0,    -0.1};
+            double lim_hi[] = {10.,    400.,    400.,   100.0,  1.0,     10.0}; 
             if (false) {
                 lim_lo[4] = -10.0;
                 lim_hi[4] = +10.0;
             }
-            gMinuit->mnparm(0, "Q0",    2.286, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
-            gMinuit->mnparm(1, "LP",    0.0, step[1], lim_lo[1],lim_hi[1],ierflg); // production length
+            // gMinuit->mnparm(0, "Q0",    2.286, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
+            gMinuit->mnparm(0, "Q0",    0.7, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
+            gMinuit->mnparm(1, "LP",    1.6, step[1], lim_lo[1],lim_hi[1],ierflg); // production length
             gMinuit->mnparm(2, "SIGMA", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
             gMinuit->mnparm(3, "DLOG",  vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
             gMinuit->mnparm(4, "DZ",    vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
@@ -276,7 +364,7 @@ std::vector<myResult> ifit(myConfig *config) {
             arglist[0] = 500;
             arglist[1] = 1.;
             gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
-            gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
+            // gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
 /*
             std::cout << "STARTING TO SEARCH FOR A FIT IMPROVEMENT" << std::endl;
             gMinuit->FixParameter(0);

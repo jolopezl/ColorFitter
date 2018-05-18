@@ -372,7 +372,8 @@ int Model::Compute(const double A){
         }
         if(zrange2 > 0 && (isOutside == false)) {
             if (m_doCascade == true) {
-                accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(temp*m_cascade/10.))*weight;
+                accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(-temp*m_cascade/10.))*weight;
+                // accumulator2 += (exp(-temp*m_sigma_ph/10.) + log(m_cascade))*weight;
             }
             else {
                 accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;

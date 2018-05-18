@@ -1,50 +1,57 @@
 void LundFitting() {
     SetAtlasStyle();
-    std::string models[12] = {"BL","BL30","BL40","BLE","BLE30","BLE40",
-                              "BL.fixedLp","BL30.fixedLp","BL40.fixedLp","BLE.fixedLp","BLE30.fixedLp","BLE40.fixedLp"};
+    // std::string models[12] = {"BL","BL30","BL40","BLE","BLE30","BLE40",
+    //                           "BL.fixedLp","BL30.fixedLp","BL40.fixedLp","BLE.fixedLp","BLE30.fixedLp","BLE40.fixedLp"};
 
-    std::map<std::string,TFile*> fin;
-    for (int i = 0; i < 12; ++i) {
-        std:string ifile = "testFit"+models[i]+".root";
-        fin[models[i]] = TFile::Open(ifile.c_str(), "READ");
-    }
-    std::string plotsNames[7] = {"tg_q0","tg_lp","tg_cs","tg_dlog","tg_dz","tg_casc","tg_chisq"};
+    TFile *fin = TFile::Open("OutputROOT.BL30-Nominal.root", "READ");
+
+    TCanvas *c2 = new TCanvas("c2","c2 title",600,450);
+    auto tg1 = (TGraphErrors*) fin->Get("tg_lp");
+
+    // std::map<std::string,TFile*> fin;
+    // for (int i = 0; i < 12; ++i) {
+    //     std:string ifile = "testFit"+models[i]+".root";
+    //     fin[models[i]] = TFile::Open(ifile.c_str(), "READ");
+    // }
+    // std::string plotsNames[7] = {"tg_q0","tg_lp","tg_cs","tg_dlog","tg_dz","tg_casc","tg_chisq"};
 
     // gStyle->SetEndErrorSize(5);
     // gStyle->SetErrorX(0.);
 
-    TCanvas *c2 = new TCanvas();
-    const char *key2 = "tg_lp";
-    auto tg1 = (TGraphErrors*) fin["BL30"]->Get(key2); tg1->SetMarkerStyle(20); tg1->SetMarkerColor(kAzure); tg1->SetLineColor(kAzure); 
-    auto tg2 = (TGraphErrors*) fin["BL40"]->Get(key2); tg2->SetMarkerStyle(24); tg2->SetMarkerColor(kAzure - 1); tg2->SetLineColor(kAzure - 1); 
-    auto tg3 = (TGraphErrors*) fin["BL30.fixedLp"]->Get(key2); tg3->SetMarkerStyle(21); tg3->SetMarkerColor(kOrange); tg3->SetLineColor(kOrange); 
-    auto tg4 = (TGraphErrors*) fin["BL40.fixedLp"]->Get(key2); tg4->SetMarkerStyle(25); tg4->SetMarkerColor(kOrange - 1); tg4->SetLineColor(kOrange - 1); 
+    // const char *key2 = "tg_lp";
+    // auto tg1 = (TGraphErrors*) fin["BL30"]->Get(key2); tg1->SetMarkerStyle(20); tg1->SetMarkerColor(kAzure); tg1->SetLineColor(kAzure); 
+    // auto tg2 = (TGraphErrors*) fin["BL40"]->Get(key2); tg2->SetMarkerStyle(24); tg2->SetMarkerColor(kAzure - 1); tg2->SetLineColor(kAzure - 1); 
+    // auto tg3 = (TGraphErrors*) fin["BL30.fixedLp"]->Get(key2); tg3->SetMarkerStyle(21); tg3->SetMarkerColor(kOrange); tg3->SetLineColor(kOrange); 
+    // auto tg4 = (TGraphErrors*) fin["BL40.fixedLp"]->Get(key2); tg4->SetMarkerStyle(25); tg4->SetMarkerColor(kOrange - 1); tg4->SetLineColor(kOrange - 1); 
 
     // Remember to apply scale factors
-    // double SF[4] = {9.31,8.40,7.94,7.05};
-    double SF[4] = {8.40,8.40,8.40,8.40};
+    double SF[4] = {9.31,8.40,7.94,7.05};
+    double SFref = 8.40;
+    // double SF[4] = {8.40,8.40,8.40,8.40};
     for (int i = 0; i < 4; ++i) {
-        double x,y, xerr, yerr;
-        tg1->GetPoint(i, x, y);
-        xerr = 0;//tg1->GetErrorX(i);
-        yerr = tg1->GetErrorY(i);
-        tg1->SetPoint(i, x, y*SF[i]/8.4);
-        tg1->SetPointError(i, xerr, yerr*SF[i]/8.4);
-        tg2->GetPoint(i, x, y);
-        xerr = 0;//tg2->GetErrorX(i);
-        yerr = tg2->GetErrorY(i);
-        tg2->SetPoint(i, x, y*SF[i]/8.4);
-        tg2->SetPointError(i, xerr, yerr*SF[i]/8.4);
-        tg3->GetPoint(i, x, y);
-        xerr = 0;//tg3->GetErrorX(i);
-        yerr = tg3->GetErrorY(i);
-        tg3->SetPoint(i, x, y*SF[i]/8.4);
-        tg3->SetPointError(i, xerr, yerr*SF[i]/8.4);
-        tg4->GetPoint(i, x, y);
-        xerr = 0;//tg4->GetErrorX(i);
-        yerr = tg4->GetErrorY(i);
-        tg4->SetPoint(i, x, y*SF[i]/8.4);
-        tg4->SetPointError(i, xerr, yerr*SF[i]/8.4);
+        tg1->GetY()[i] *= SF[i]/SFref;
+        tg1->GetEY()[i] *= SF[i]/SFref;
+        // double x,y, xerr, yerr;
+        // tg1->GetPoint(i, x, y);
+        // xerr = 0;//tg1->GetErrorX(i);
+        // yerr = tg1->GetErrorY(i);
+        // tg1->SetPoint(i, x, y*SF[i]/8.4);
+        // tg1->SetPointError(i, xerr, yerr*SF[i]/8.4);
+        // tg2->GetPoint(i, x, y);
+        // xerr = 0;//tg2->GetErrorX(i);
+        // yerr = tg2->GetErrorY(i);
+        // tg2->SetPoint(i, x, y*SF[i]/8.4);
+        // tg2->SetPointError(i, xerr, yerr*SF[i]/8.4);
+        // tg3->GetPoint(i, x, y);
+        // xerr = 0;//tg3->GetErrorX(i);
+        // yerr = tg3->GetErrorY(i);
+        // tg3->SetPoint(i, x, y*SF[i]/8.4);
+        // tg3->SetPointError(i, xerr, yerr*SF[i]/8.4);
+        // tg4->GetPoint(i, x, y);
+        // xerr = 0;//tg4->GetErrorX(i);
+        // yerr = tg4->GetErrorY(i);
+        // tg4->SetPoint(i, x, y*SF[i]/8.4);
+        // tg4->SetPointError(i, xerr, yerr*SF[i]/8.4);
     }
 
     const char* LundLog = "[0]*x*(log(1/(x*x))-1+x*x)/(1-x*x)";
@@ -63,37 +70,57 @@ void LundFitting() {
 
     tg1->SetMarkerColor(kBlack);
     tg1->SetLineColor(kBlack); 
-    fg1->SetLineStyle(2);     fg1->SetLineColor(kBlue);
-    fg2->SetLineStyle(2);     fg2->SetLineColor(kRed);
+    tg1->SetLineWidth(2); 
+    fg1->SetLineStyle(2);     //fg1->SetLineColor(kBlue);
+    fg2->SetLineStyle(2);     //fg2->SetLineColor(kRed);
 
     tg1->Fit("fg1", "EMN", "", 0.0, 1.0);
-    tg1->Fit("fg2", "EMN", "", 0.0, 1.0);
+    // tg1->Fit("fg2", "EMN", "", 0.0, 1.0);
 
-    tg1->GetXaxis()->SetLimits(0.0,1.0);
+    // tg1->GetXaxis()->SetLimits(0.0,1.0);
+    tg1->GetYaxis()->SetRangeUser(0.0001,13.0);
+    tg1->SetTitle(";z_{h};L_{p} [fm]");
     tg1->Draw("APE"); 
     fg1->Draw("SAME");
-    fg2->Draw("SAME");
+    // fg2->Draw("SAME");
+
+    // int npoints = 100;
+    // TH1F *hh = new TH1F("hh","auxs",npoints+1,0,1);
+    // auto gg = TH1TOTGraph(hh);
+    // TGraphErrors *grint = new TGraphErrors(99);
+    // grint->SetTitle("Fitted line with .95 conf. band");
+    // for (int i=0; i<npoints; i++)
+    //     grint->SetPoint(i, gg->GetX()[i], 0);
+    // //Compute the confidence intervals at the x points of the created graph
+    // (TVirtualFitter::GetFitter())->GetConfidenceIntervals(grint,0.6827);
+    // grint->SetLineColor(kRed);
+    // grint->SetFillColorAlpha(kOrange,0.75);
+    // grint->Draw("SAME 4");
+
 
     cout << "Chi^2 = " << fg1->GetChisquare() << endl;
     cout << "NDF = " << fg1->GetNDF() << endl;
     cout << "Chi^2/NDF = " << fg1->GetChisquare()/fg1->GetNDF() << endl;
     cout << "p-value = " << fg1->GetProb() << endl;
 
-    cout << "Chi^2 = " << fg2->GetChisquare() << endl;
-    cout << "NDF = " << fg2->GetNDF() << endl;
-    cout << "Chi^2/NDF = " << fg2->GetChisquare()/fg2->GetNDF() << endl;
-    cout << "p-value = " << fg2->GetProb() << endl;
+    // cout << "Chi^2 = " << fg2->GetChisquare() << endl;
+    // cout << "NDF = " << fg2->GetNDF() << endl;
+    // cout << "Chi^2/NDF = " << fg2->GetChisquare()/fg2->GetNDF() << endl;
+    // cout << "p-value = " << fg2->GetProb() << endl;
 
-    TLegend* leg = new TLegend(0.2,0.2,0.4,0.35);
-    // leg->SetNColumns(2);
-    leg->SetTextFont(43);
-    leg->SetTextSize(22);
-    leg->SetBorderSize(0);
-    leg->SetFillStyle(0);
-    leg->AddEntry(tg1,"BL30","pe");
-    leg->AddEntry(fg1,"Linear Fit, #chi^{2}/NDF = 2.1, #kappa = 0.98 #pm 0.09","l");
-    leg->AddEntry(fg2,"Log Fit, #chi^{2}/NDF = 3.2","l");
-    leg->Draw();
+    // TLegend* leg = new TLegend(0.2,0.2,0.4,0.35);
+    // // leg->SetNColumns(2);
+    // leg->SetTextFont(43);
+    // leg->SetTextSize(22);
+    // leg->SetBorderSize(0);
+    // leg->SetFillStyle(0);
+    // leg->AddEntry(tg1,"BL30","pe");
+    // leg->AddEntry(fg1,"Linear Fit, #chi^{2}/NDF = 2.1, #kappa = 0.98 #pm 0.09","l");
+    // leg->AddEntry(fg2,"Log Fit, #chi^{2}/NDF = 3.2","l");
+    // leg->Draw();
+    myText(0.32, 0.85, kBlack, "L_{p} = #frac{1}{2#kappa}#(){M_{p}+#nu#(){1+#sqrt{1+(Q/#nu)^{2}}} - 2#nuz}",0.05);
+    myText(0.32, 0.75, kBlack, "#kappa = 0.98 #pm 0.09 GeV/fm, #chi^{2}/dof = 1.09",0.05);
+    myText(0.2, 0.23, kBlack, "Q^{2} = 2.4 GeV^{2}, #nu = 13.1 GeV",0.05);
 
     c2->Print("test2.pdf");
 

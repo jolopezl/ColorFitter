@@ -13,8 +13,9 @@ float rm_err_neon[4]      = {0.0594409344724,0.0515307622582,0.0634878265064,0.0
 float rm_err_kripton[4]   = {0.0542930099596,0.0447182315218,0.05222907333,0.0527700155986};
 float rm_err_xenon[4]     = {0.0535218789044,0.0411665583174,0.0503850083386,0.0529182285411};
 
-void makeFigure(int plot=2) {
+void makeFigure(int plot=1) {
     SetAtlasStyle();
+    gStyle->SetEndErrorSize(0);
     TFile *fin = TFile::Open("OutputROOT.BL30-Nominal.root");
     TFile *fin_uncertainties = TFile::Open("OutputROOT_ToyMC_ModelUncertianties.root");
     TGraphErrors *tg[4];
@@ -47,7 +48,7 @@ void makeFigure(int plot=2) {
         tg_down[i]->SetLineColor(kRed);
         tg_down[i]->SetLineWidth(2);
         tg_down[i]->SetLineStyle(kDashed);
-        band[i]->SetFillColorAlpha(kOrange,0.5);
+        band[i]->SetFillColorAlpha(kOrange,0.75);
         tg_toy_up[i]->SetLineWidth(2);
         tg_toy_up[i]->SetLineStyle(kDashed);
         tg_toy_down[i]->SetLineWidth(2);

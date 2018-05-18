@@ -35,10 +35,10 @@ int main(int argc, char *argv[]) {
     // int foo = average_density();
     // computeSimpleFit(false,true,0.0);
     // MODEL TYPE, do subtraction, value
-    // computeSimpleFit2("BL",    true, 0.0);
+    computeSimpleFit2(argv[1], true, -1.0);
     
-    // computeSimpleFit2("BL30",  true, 0.0);
-    ComputeBand();
+    // computeSimpleFit2("BL30c",  true, 0.0);
+    // ComputeBand();
     
     // computeSimpleFit2("BL40",  true, 0.0);
     // computeSimpleFit2("BLE",   true, 0.0);
@@ -91,7 +91,7 @@ int plotTool() {
 int computeSimpleFit2(const std::string model, const bool iSubt, const double iCorr) {
     myConfig *config = new myConfig();
     int Q2Int = -1;
-    int izInt = -1;
+    int izInt = -1; // 4 for bin #83
     config->m_subtraction = iSubt; // false;
     config->m_correlation = iCorr; // for physics -1.0 < rho < 0.0
 
@@ -103,8 +103,9 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_output_fit = "testFit"+model+".csv";
     }
 
-    if (model == "BL") {
-//        config->m_output_fit = "testFit"+model+".csv";
+    if (model == "BLC") {
+       config->m_output_fit = "testFit"+model+".csv";
+       config->m_cascade = true;
 //        if (config->fixedLp == true) "testFit"+model+"fixedLp.csv";
     }
     else if (model == "BL40") {
@@ -115,7 +116,7 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
     }
-    else if (model == "BL30h") {
+    else if (model == "BL30C") {
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
         config->m_cascade = true;
@@ -149,16 +150,18 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
 
     std::cout << "Fit is done." << std::endl;
 
-    double z[4], q0[4], lp[4], sigma[4], dz[4], c1[4], c2[4], cascade[4];
-    double zErr[4], q0Err[4], lpErr[4], sigmaErr[4], dzErr[4], c1Err[4], c2Err[4], cascade_err[4];
-    double chisquared[4];
-    if (resultCont.size() != 4) {
+    const int fNzbins = 4; // 10 for JLab and 4 for HERMES !
+
+    double z[fNzbins], q0[fNzbins], lp[fNzbins], sigma[fNzbins], dz[fNzbins], c1[fNzbins], c2[fNzbins], cascade[fNzbins];
+    double zErr[fNzbins], q0Err[fNzbins], lpErr[fNzbins], sigmaErr[fNzbins], dzErr[fNzbins], c1Err[fNzbins], c2Err[fNzbins], cascade_err[fNzbins];
+    double chisquared[fNzbins];
+    if (resultCont.size() != fNzbins) {
         std::cout << "I cannot produce a ROOT output file." << std::endl;
         return 0;
     }
     else {
         std::cout << "I will produce a ROOT out file..." << std::endl;
-        for (int i=0; i<4; ++i) {
+        for (int i=0; i<fNzbins; ++i) {
             std::cout << "Fetching result container for element " << i << std::endl;
             z[i] = resultCont.at(i).m_zbin;         zErr[i] = 0;
             q0[i] = resultCont.at(i).m_qhat;        q0Err[i] = resultCont.at(i).m_qhat_err;
@@ -176,30 +179,32 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         std::cout << "Output file created" << std::endl;
         OutputROOT->cd();
         std::cout << "Making plots of everything" << std::endl;
-        TGraphErrors *tg_q0 = new TGraphErrors(4, z, q0, zErr, q0Err); tg_q0->SetName("tg_q0");
-        TGraphErrors *tg_lp = new TGraphErrors(4, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp");
-        TGraphErrors *tg_c1 = new TGraphErrors(4, z, c1, zErr, c1Err); tg_c1->SetName("tg_c1");
-        TGraphErrors *tg_c2 = new TGraphErrors(4, z, c2, zErr, c2Err); tg_c2->SetName("tg_c2");
-        TGraphErrors *tg_cascade = new TGraphErrors(4, z, cascade, zErr, cascade_err); tg_cascade->SetName("tg_cascade");
-        TGraph *tg_chisquared = new TGraph(4, z, chisquared); tg_chisquared->SetName("tg_chisquared");
+        TGraphErrors *tg_q0 = new TGraphErrors(fNzbins, z, q0, zErr, q0Err); tg_q0->SetName("tg_q0"); tg_q0->SetTitle(";z;q_{0} [GeV^{2}fm^{2}]");
+        TGraphErrors *tg_lp = new TGraphErrors(fNzbins, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp"); tg_lp->SetTitle(";z;L_{p} [fm]");
+        TGraphErrors *tg_sigma = new TGraphErrors(fNzbins, z, sigma, zErr, sigmaErr); tg_sigma->SetName("tg_sigma"); tg_sigma->SetTitle(";z;#sigma [mbarn]");
+        TGraphErrors *tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err); tg_c1->SetName("tg_c1");
+        TGraphErrors *tg_c2 = new TGraphErrors(fNzbins, z, c2, zErr, c2Err); tg_c2->SetName("tg_c2");
+        TGraphErrors *tg_cascade = new TGraphErrors(fNzbins, z, cascade, zErr, cascade_err); tg_cascade->SetName("tg_cascade");
+        TGraph *tg_chisquared = new TGraph(fNzbins, z, chisquared); tg_chisquared->SetName("tg_chisquared");
         std::cout << "Writing first set of plots" << std::endl;
         tg_q0->Write();
         tg_lp->Write();
+        tg_sigma->Write();
         tg_c1->Write();
         tg_c2->Write();
         tg_cascade->Write();
         tg_chisquared->Write();
         std::cout << "Creating model plots" << std::endl;
-        TGraphErrors *tg_model_pT[4];
-        TGraphErrors *tg_model_Rm[4];
-        TGraphErrors *tg_model_pT_extrapolation[4];
-        TGraphErrors *tg_model_pT_extrapolation_up[4];
-        TGraphErrors *tg_model_pT_extrapolation_down[4];
-        TGraphErrors *tg_model_Rm_extrapolation[4];
-        TGraphErrors *tg_model_Rm_extrapolation_up[4];
-        TGraphErrors *tg_model_Rm_extrapolation_down[4];
+        TGraphErrors *tg_model_pT[fNzbins];
+        TGraphErrors *tg_model_Rm[fNzbins];
+        TGraphErrors *tg_model_pT_extrapolation[fNzbins];
+        TGraphErrors *tg_model_pT_extrapolation_up[fNzbins];
+        TGraphErrors *tg_model_pT_extrapolation_down[fNzbins];
+        TGraphErrors *tg_model_Rm_extrapolation[fNzbins];
+        TGraphErrors *tg_model_Rm_extrapolation_up[fNzbins];
+        TGraphErrors *tg_model_Rm_extrapolation_down[fNzbins];
         char* title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
-        for (int i=0; i<4; ++i) {
+        for (int i=0; i<fNzbins; ++i) {
             std::cout << "Creating model plots for element " << i << std::endl;
             title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
             tg_model_pT[i] = &(resultCont.at(i).m_tg_pT); tg_model_pT[i]->SetName(Form("tg_model_pT_%d",i)); tg_model_pT[i]->SetTitle(title);
