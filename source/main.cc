@@ -35,15 +35,17 @@ int main(int argc, char *argv[]) {
     // int foo = average_density();
     // computeSimpleFit(false,true,0.0);
     // MODEL TYPE, do subtraction, value
-    computeSimpleFit2(argv[1], true, -1.0);
-    
-    // computeSimpleFit2("BL30c",  true, 0.0);
+    // computeSimpleFit2(argv[1], true, -1.0);
     // ComputeBand();
     
+    // computeSimpleFit2("BL30",  true, 0.0);
+    // computeSimpleFit2("BL35",  true, 0.0);
     // computeSimpleFit2("BL40",  true, 0.0);
     // computeSimpleFit2("BLE",   true, 0.0);
-    // computeSimpleFit2("BLE30", true, 0.0);
+    computeSimpleFit2("BLE30", true, 0.0);
+    // computeSimpleFit2("BLE35", true, 0.0);
     // computeSimpleFit2("BLE40", true, 0.0);
+    // computeSimpleFit2("BL", true, 0.0);
     // monitoring();
 }
 
@@ -116,6 +118,10 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
     }
+    else if (model == "BL35") {
+        config->m_preh = false;
+        config->m_initial_sigma = 35.0;
+    }
     else if (model == "BL30C") {
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
@@ -133,6 +139,16 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
         config->m_energyloss = true;
+    }
+    else if (model == "BLE35") {
+        config->m_preh = false;
+        config->m_initial_sigma = 35.0;
+        config->m_energyloss = true;
+    }
+    else if (model == "BL") {
+        config->m_preh = true;
+        config->m_initial_sigma = 30.0;
+        config->m_energyloss = false;
     }
     else {return -1;}
     config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
@@ -174,7 +190,7 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
             chisquared[i] = resultCont.at(i).m_chi2;
             std::cout << "z = " << z[i] << std::endl;
         }
-        std::string ffout = "OutputROOT."+model+".root";
+        std::string ffout = "OutputROOT.20180806."+model+".root";
         TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
         std::cout << "Output file created" << std::endl;
         OutputROOT->cd();
@@ -182,6 +198,7 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         TGraphErrors *tg_q0 = new TGraphErrors(fNzbins, z, q0, zErr, q0Err); tg_q0->SetName("tg_q0"); tg_q0->SetTitle(";z;q_{0} [GeV^{2}fm^{2}]");
         TGraphErrors *tg_lp = new TGraphErrors(fNzbins, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp"); tg_lp->SetTitle(";z;L_{p} [fm]");
         TGraphErrors *tg_sigma = new TGraphErrors(fNzbins, z, sigma, zErr, sigmaErr); tg_sigma->SetName("tg_sigma"); tg_sigma->SetTitle(";z;#sigma [mbarn]");
+        TGraphErrors *tg_dz = new TGraphErrors(fNzbins, z, dz, zErr, dzErr); tg_dz->SetName("tg_dz");
         TGraphErrors *tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err); tg_c1->SetName("tg_c1");
         TGraphErrors *tg_c2 = new TGraphErrors(fNzbins, z, c2, zErr, c2Err); tg_c2->SetName("tg_c2");
         TGraphErrors *tg_cascade = new TGraphErrors(fNzbins, z, cascade, zErr, cascade_err); tg_cascade->SetName("tg_cascade");
@@ -190,6 +207,7 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         tg_q0->Write();
         tg_lp->Write();
         tg_sigma->Write();
+        tg_dz->Write();
         tg_c1->Write();
         tg_c2->Write();
         tg_cascade->Write();
@@ -203,20 +221,20 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         TGraphErrors *tg_model_Rm_extrapolation[fNzbins];
         TGraphErrors *tg_model_Rm_extrapolation_up[fNzbins];
         TGraphErrors *tg_model_Rm_extrapolation_down[fNzbins];
-        char* title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
+        std::string title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
         for (int i=0; i<fNzbins; ++i) {
             std::cout << "Creating model plots for element " << i << std::endl;
             title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
-            tg_model_pT[i] = &(resultCont.at(i).m_tg_pT); tg_model_pT[i]->SetName(Form("tg_model_pT_%d",i)); tg_model_pT[i]->SetTitle(title);
-            tg_model_pT_extrapolation[i] = &(resultCont.at(i).m_tg_pT_extrapolation); tg_model_pT_extrapolation[i]->SetName(Form("tg_model_pT_extrapolation_%d",i)); tg_model_pT_extrapolation[i]->SetTitle(title);
-            tg_model_pT_extrapolation_up[i] = &(resultCont.at(i).m_tg_pT_extrapolation_up); tg_model_pT_extrapolation_up[i]->SetName(Form("tg_model_pT_extrapolation_up_%d",i)); tg_model_pT_extrapolation_up[i]->SetTitle(title);
-            tg_model_pT_extrapolation_down[i] = &(resultCont.at(i).m_tg_pT_extrapolation_down); tg_model_pT_extrapolation_down[i]->SetName(Form("tg_model_pT_extrapolation_down_%d",i)); tg_model_pT_extrapolation_down[i]->SetTitle(title);
+            tg_model_pT[i] = &(resultCont.at(i).m_tg_pT); tg_model_pT[i]->SetName(Form("tg_model_pT_%d",i)); tg_model_pT[i]->SetTitle(title.c_str());
+            tg_model_pT_extrapolation[i] = &(resultCont.at(i).m_tg_pT_extrapolation); tg_model_pT_extrapolation[i]->SetName(Form("tg_model_pT_extrapolation_%d",i)); tg_model_pT_extrapolation[i]->SetTitle(title.c_str());
+            tg_model_pT_extrapolation_up[i] = &(resultCont.at(i).m_tg_pT_extrapolation_up); tg_model_pT_extrapolation_up[i]->SetName(Form("tg_model_pT_extrapolation_up_%d",i)); tg_model_pT_extrapolation_up[i]->SetTitle(title.c_str());
+            tg_model_pT_extrapolation_down[i] = &(resultCont.at(i).m_tg_pT_extrapolation_down); tg_model_pT_extrapolation_down[i]->SetName(Form("tg_model_pT_extrapolation_down_%d",i)); tg_model_pT_extrapolation_down[i]->SetTitle(title.c_str());
             
             title = ";A^{1/3};R_{M}";
-            tg_model_Rm[i] = &(resultCont.at(i).m_tg_Rm); tg_model_Rm[i]->SetName(Form("tg_model_Rm_%d",i)); tg_model_Rm[i]->SetTitle(title);
-            tg_model_Rm_extrapolation[i] = &(resultCont.at(i).m_tg_Rm_extrapolation); tg_model_Rm_extrapolation[i]->SetName(Form("tg_model_Rm_extrapolation_%d",i)); tg_model_Rm_extrapolation[i]->SetTitle(title);
-            tg_model_Rm_extrapolation_up[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_up); tg_model_Rm_extrapolation_up[i]->SetName(Form("tg_model_Rm_extrapolation_up_%d",i)); tg_model_Rm_extrapolation_up[i]->SetTitle(title);
-            tg_model_Rm_extrapolation_down[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_down); tg_model_Rm_extrapolation_down[i]->SetName(Form("tg_model_Rm_extrapolation_down_%d",i)); tg_model_Rm_extrapolation_down[i]->SetTitle(title);
+            tg_model_Rm[i] = &(resultCont.at(i).m_tg_Rm); tg_model_Rm[i]->SetName(Form("tg_model_Rm_%d",i)); tg_model_Rm[i]->SetTitle(title.c_str());
+            tg_model_Rm_extrapolation[i] = &(resultCont.at(i).m_tg_Rm_extrapolation); tg_model_Rm_extrapolation[i]->SetName(Form("tg_model_Rm_extrapolation_%d",i)); tg_model_Rm_extrapolation[i]->SetTitle(title.c_str());
+            tg_model_Rm_extrapolation_up[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_up); tg_model_Rm_extrapolation_up[i]->SetName(Form("tg_model_Rm_extrapolation_up_%d",i)); tg_model_Rm_extrapolation_up[i]->SetTitle(title.c_str());
+            tg_model_Rm_extrapolation_down[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_down); tg_model_Rm_extrapolation_down[i]->SetName(Form("tg_model_Rm_extrapolation_down_%d",i)); tg_model_Rm_extrapolation_down[i]->SetTitle(title.c_str());
 
             tg_model_pT[i]->Write();
             tg_model_Rm[i]->Write();
@@ -321,6 +339,7 @@ int ComputeBand() {
     Model *model = new Model("ComputeBand");
     model->Initialization();
     model->DoFixedLp(false);
+    model->DoEnergyLoss(true);
 
     int zbin, StatusCode;
     double PT2, RM;
@@ -359,6 +378,7 @@ int ComputeBand() {
                 model->SetParameters("q0", q0);
                 model->SetParameters("lp", lp);
                 model->SetParameters("sigma", 30);
+                model->SetParameters("dz", -0.024);
                 StatusCode = model->Compute(nucleus);
                 PT2 = model->Get1();
                 RM = model->Get2();
@@ -412,7 +432,7 @@ int average_density() {
 int demoPlots() {
     Model *model = new Model("demoPlots");
     model->Initialization();
-    // model->DoFixedLp(true); 
+    model->DoFixedLp(true); 
     model->SetParameters("q0", 1.0);
     // To run and produce full list of files at once.
     std::vector<double> lpList = {1.0,2.0,3.0,4.0,5.0,7.0,9.0,10.0,20.0};
@@ -424,7 +444,7 @@ int demoPlots() {
             //* Print to file **//
             std::ofstream fout;
             std::string str = boost::lexical_cast<std::string>(lp);
-            std::string filename = "input-exp-lp="+str+".txt";
+            std::string filename = "input-exp-fixed-lp="+str+".txt";
             fout.open(filename, std::ios::out | std::ios::app);
             fout.precision(10);
             fout << pow(nucleus,1./3.) << '\t' << model->Get1() << '\n';
@@ -432,6 +452,32 @@ int demoPlots() {
         }
     }
     return 0;
+    // std::vector<std::string> foo;
+    // std::for_each(
+    //     std::execution::par_unseq,
+    //     foo.begin(),
+    //     foo.end(),
+    //     [](auto&& item)
+    //     {
+    //         //do stuff with item
+    //     });
+    // std::for_each(std::execution::par_unseq,lpList.begin(),lpList.end(),
+    //     [](auto&& item) {
+    //         for (int nucleus = 12; nucleus <= 240; ++nucleus) {
+    //             std::cout << "Computing " << nucleus << " of 240 for lp = " << lp << std::endl;
+    //             model->SetParameters("lp", lp);   //* <------!!! *//
+    //             model->Compute(nucleus);          //* <------!!! *//
+    //             //* Print to file **//
+    //             std::ofstream fout;
+    //             std::string str = boost::lexical_cast<std::string>(lp);
+    //             std::string filename = "input-exp-lp="+str+".txt";
+    //             fout.open(filename, std::ios::out | std::ios::app);
+    //             fout.precision(10);
+    //             fout << pow(nucleus,1./3.) << '\t' << model->Get1() << '\n';
+    //             fout.close();
+    //         }
+    //     }
+    // )
 }
 
 // ************ This is used for model plots ************ //

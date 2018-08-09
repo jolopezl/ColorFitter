@@ -55,7 +55,7 @@ def AtlasStyle():
   # use bold lines and markers
   atlasStyle.SetMarkerStyle(20)
   # atlasStyle.SetMarkerSize(1.2)
-  atlasStyle.SetMarkerSize(2)
+  atlasStyle.SetMarkerSize(1.5)
   atlasStyle.SetHistLineWidth(2)
   atlasStyle.SetLineStyleString(2,"[12 12]") # postscript dashes
 

@@ -13,10 +13,10 @@ float rm_err_neon[4]      = {0.0594409344724,0.0515307622582,0.0634878265064,0.0
 float rm_err_kripton[4]   = {0.0542930099596,0.0447182315218,0.05222907333,0.0527700155986};
 float rm_err_xenon[4]     = {0.0535218789044,0.0411665583174,0.0503850083386,0.0529182285411};
 
-void makeFigure(int plot=1) {
-    SetAtlasStyle();
+void makeFigure(int plot=2) {
+    SetAtlasStyle(43,32);
     gStyle->SetEndErrorSize(0);
-    TFile *fin = TFile::Open("OutputROOT.BL30-Nominal.root");
+    TFile *fin = TFile::Open("OutputROOT.20180806.BL30.root");
     TFile *fin_uncertainties = TFile::Open("OutputROOT_ToyMC_ModelUncertianties.root");
     TGraphErrors *tg[4];
     TGraphErrors *tg_up[4];
@@ -76,13 +76,15 @@ void makeFigure(int plot=1) {
     }
     if (plot == 1) {data[0]->GetYaxis()->SetTitle("#Delta #LT p_{T}^{2} #GT [GeV^{2}]");}
     else {data[0]->GetYaxis()->SetTitle("R_{M}");}
-    data[0]->GetYaxis()->SetTitleOffset(3);
+    data[0]->GetYaxis()->SetTitleOffset(2.5);
     data[3]->GetXaxis()->SetTitle("A^{1/3}");
-    data[3]->GetXaxis()->SetTitleOffset(3);
+    data[3]->GetXaxis()->SetTitleOffset(2);
 
     float small = 1e-5;;
     float big = 0.25;
     TCanvas* c1 = new TCanvas("c1","c1 title",800,800);
+    c1->SetLeftMargin(0.21);
+    c1->SetBottomMargin(0.15);
     // c1->Divide(2,2,small,small);
     // c1->Divide(2,2,0,0);
     c1->DivideSquare(4,0,0);
@@ -125,7 +127,7 @@ void makeFigure(int plot=1) {
     }
     
     c1->cd(1);
-    myText(0.25,0.925,1,"z-bin #1",22);
+    myText(0.3,0.925,1,"z-bin #1",22);
     myMarkerText(0.35, 0.2, kWhite, kFullCircle, "Data", 1, 22);
     myMarkerText(0.3325, 0.2, kBlack, kFullCircle, "", 1, 22);
     myBoxText(0.35, 0.14, 0.05, kOrange, "BL30 + MC Uncertainties",kRed);
@@ -134,7 +136,7 @@ void makeFigure(int plot=1) {
     c1->cd(2);
     myText(0.075,0.925,1,"z-bin #2",22);
     c1->cd(3);
-    myText(0.25,0.925,1,"z-bin #3",22);
+    myText(0.3,0.925,1,"z-bin #3",22);
     c1->cd(4);
     myText(0.075,0.925,1,"z-bin #4",22);
     if (plot == 1) {

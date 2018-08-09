@@ -9,27 +9,27 @@ err = []
 
 labels = ['BL','BLE','BL40','BL30','BLE40','BLE30']
 
-xlabel = 'z_{h}'
+xlabel = 'z'
 ylabel = 'L_{p} [fm]'
 filename = 'test_Lp'
 
 # VALUES
-val.append(array("f",[14.89191345,7.080143499,3.029804261,1.992745574]))   # BL
-val.append(array("f",[13.93688552,7.766694217,4.681843459,2.833307188]))  # BLE
-val.append(array("f",[9.50174555,7.239484549,5.388096332,3.033429451]))  # BL40
-val.append(array("f",[8.156268927,6.11454026,4.45823924,2.352734198]))   # BL30
-val.append(array("f",[12.12615213,6.136720473,3.404236507,1.694836305]))  # BLE40
-val.append(array("f",[11.52592869,5.508979276,2.84003639,1.121133062]))  # BLE30
+val.append(array("f",[9.08462,5.39494,2.80624,1.96209]))   # BL
+val.append(array("f",[9.39309,7.21143,4.54394,3.12418]))  # BLE
+val.append(array("f",[8.11446,7.02926,5.20119,3.00113]))  # BL40
+val.append(array("f",[6.8853,5.91803,4.29427,2.31287]))   # BL30
+val.append(array("f",[7.63051,5.60696,3.35716,1.95077]))  # BLE40
+val.append(array("f",[6.93319,4.95501,2.79043,1.38668]))  # BLE30
 # ERRORS
-err.append(array("f",[15.58210515,5.559773446,4.6716252,2.849262832]))  # BL
-err.append(array("f",[17.15041095,2.937900015,2.582794139,2.203179308]))  # BLE
-err.append(array("f",[1.970533965,1.064247156,0.869821482,0.497393965]))  # BL40
-err.append(array("f",[1.759058613,0.943243185,0.772106194,0.450814849]))  # BL30
-err.append(array("f",[9.881838808,2.727141719,1.715237301,1.34170283]))  # BLE40
-err.append(array("f",[9.417060244,2.603135902,1.625346778,1.488339746]))  # BLE30
+err.append(array("f",[4.723,3.51195,2.35571,2.23841]))  # BL
+err.append(array("f",[2.88202,1.66983,1.63229,1.22972]))  # BLE
+err.append(array("f",[0.90411,0.646415,0.531775,0.351992]))  # BL40
+err.append(array("f",[0.801357,0.571775,0.473234,0.318382]))  # BL30
+err.append(array("f",[2.59589,1.48544,1.08585,0.94542]))  # BLE40
+err.append(array("f",[2.47533,1.42262,1.0399,1.02507]))  # BLE30
 
 # Prepare xaxis points
-xval = array("f",[0.32,0.53,0.75,0.94])
+xval = array("f",[0.31,0.54,0.75,0.94])
 xerr = array("f",[0,0,0,0])
 xvaloff = []
 offset = 0.01
@@ -71,7 +71,10 @@ leg.SetFillStyle(0)
 for i in range(6):
     leg.AddEntry(g[i],labels[i],"ep")
 
-# ROOT.gStyle.SetEndErrorSize(7.5)
+g[0].GetXaxis().SetLimits(0,1)
+g[0].GetYaxis().SetRangeUser(0.0001,14)
+g[0].GetXaxis().SetNdivisions(505);
+# ROOT.gStyle.SetEndErrorSize(5)
 c = ROOT.TCanvas("c","title",800,600)
 line00 = ROOT.TF1("line00","00",0.0,1.0);
 line00.SetLineWidth(2);
@@ -83,9 +86,9 @@ for i in range(6):
         # line00.Draw("SAME")
     else:
         g[i].Draw("P SAME")
-AddLabel(0.2,0.88,"He subtracted #rho = 0.0")
+AddLabel(0.2,0.2,"He subtracted #rho = 0.0")
 leg.Draw()
 
 c.Print(filename+".pdf")
-c.SetGrayscale()
-c.Print(filename+"_gray.pdf")
+# c.SetGrayscale()
+# c.Print(filename+"_gray.pdf")

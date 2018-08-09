@@ -19,7 +19,7 @@ void analysis(int opt=1, int zbin=1) {
     TH1::SetDefaultSumw2();
     SetAtlasStyle();
 
-    TFile *data = TFile::Open("OutputROOT.root","READ");
+    TFile *data = TFile::Open("OutputROOT.BL30-Nominal.root","READ");
     TGraphErrors *tg_data = nullptr;
     TGraphErrors *tg_model = nullptr;
     TGraphErrors *tg_model_up = nullptr;
