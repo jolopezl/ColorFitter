@@ -1,4 +1,5 @@
 #include "main.h"
+#include "MultiGaus.h"
 #include <TMatrixD.h>
 #include <TVectorD.h>
 #include <TF2.h>
@@ -14,7 +15,7 @@ int computeComplexFit(int argc, char *argv[]);    // A fit with a complex config
 int printInteractionPoints();
 
 double fcn_gaus_2d_cov(double *x, double *par);
-int ComputeBand();
+int ComputeBand(int);
 
 int average_density();
 int plotTool();
@@ -36,13 +37,13 @@ int main(int argc, char *argv[]) {
     // computeSimpleFit(false,true,0.0);
     // MODEL TYPE, do subtraction, value
     // computeSimpleFit2(argv[1], true, -1.0);
-    // ComputeBand();
+    ComputeBand(4);
     
     // computeSimpleFit2("BL30",  true, 0.0);
     // computeSimpleFit2("BL35",  true, 0.0);
     // computeSimpleFit2("BL40",  true, 0.0);
     // computeSimpleFit2("BLE",   true, 0.0);
-    computeSimpleFit2("BLE30", true, 0.0);
+    // computeSimpleFit2("BLE30", true, 0.0);
     // computeSimpleFit2("BLE35", true, 0.0);
     // computeSimpleFit2("BLE40", true, 0.0);
     // computeSimpleFit2("BL", true, 0.0);
@@ -304,51 +305,31 @@ double fcn_gaus_2d_cov(double *x, double *par) {
     return ans;
 }
 
-int ComputeBand() {
+int ComputeBand(int zbin = 1) {
 
-    int MCSTEPS = 250;
+    int MCSTEPS = 1500;
     std::cout << "ComputeBand will use " << MCSTEPS << " MCSTEPS" << std::endl;
-
-    double lp_values[4] = {8.14841,6.11502,4.45919,2.35369};
-    double lp_errors[4] = {1.76831,0.941073,0.774482,0.450974};
-    double q0_values[4] = {2.21332,2.57039,1.15617,1.19488};
-    double q0_errors[4] = {0.239578,0.425666,1.11605,2.2417};
-    double correlation_factor[4] = {0.557,0.321,-0.074,-0.056};
-
-    double covariance[4];
-    for (int i=0; i<4; ++i) {
-        covariance[i] = correlation_factor[i]*lp_errors[i]*q0_errors[i];
-    }
-
-    // TF2 *func = new TF2("func", fcn_gaus_2d_cov, 0, 12, -2, 4);
-
-    TString my_func = "1/(2*pi*(pow([2],2 ) + pow([3], 2) - pow([4], 2)))*exp(";
-    my_func += "(pow(x - [0], 2)*pow([3], 2) + pow(y - [1], 2)*pow([2], 2) - 2*(x - [0])*(y - [1])*[4])";
-    my_func += "/(pow([2],2)*pow([3],2) - pow([4],2))";
-    my_func += ")";
-
-    TF2 *func = new TF2("func", "ROOT::Math::bigaussian_pdf(x, y, [2], [3], [4], [0], [1])", -5, 12, -2, 16);
-
-// [0] : q0
-// [1] : lp
-// [2] : q0_err
-// [3] : lp_err
-// [4] : covariance
-
 
     Model *model = new Model("ComputeBand");
     model->Initialization();
     model->DoFixedLp(false);
     model->DoEnergyLoss(true);
 
-    int zbin, StatusCode;
+    // If not here, model returns a bug, it is set in ifit when running the fitting
+    int iz = zbin-1;
+    const int ZDIM = 4;
+    double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
+    double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
+    model->SetBinRatio(iz,zbinw[iz],binratios[iz]);
+
+    int StatusCode;
     double PT2, RM;
     double A13 = 2.5;
     double A13Max = 6.0;
     double dA13 = (A13Max - 2.5)/35;
-    double q0, lp;
+    double q0, lp, dz;
 
-    TFile *fout = new TFile("ToyMC.root","RECREATE");
+    TFile *fout = new TFile(Form("ToyMC_%d.root",zbin),"RECREATE");
     TTree *tree = new TTree("tree", "Tree of ToyMC");
     tree->Branch("zbin", &zbin, "zbin/I");
     tree->Branch("A13", &A13, "A13/D");
@@ -356,37 +337,105 @@ int ComputeBand() {
     tree->Branch("RM", &RM, "RM/D");
     tree->Branch("q0", &q0, "q0/D");
     tree->Branch("lp", &lp, "lp/D");
+    tree->Branch("dz", &dz, "dz/D");
     tree->Branch("StatusCode", &StatusCode, "StatusCode/I");
 
-    for (int ibin=0; ibin < 4; ibin++) {
-        zbin = ibin + 1;
-        std::cout << "Computign z-bin #" << zbin << std::endl;
-        func->SetParameter(0, q0_values[ibin]);
-        func->SetParameter(1, lp_values[ibin]);
-        func->SetParameter(2, q0_errors[ibin]);
-        func->SetParameter(3, lp_errors[ibin]);
-        func->SetParameter(4, correlation_factor[ibin]);
-        // for (int i=0; i<50; ++i) {
-        while (A13 <= A13Max) {
-            PT2 = 0;
-            RM = 0;
-            double nucleus = pow(A13, 3);
-            std::cout << "Running Toy MC for A^1/3 = " << A13 << std::endl;
-            for (int mc=0; mc<MCSTEPS; ++mc) {
-                if (mc%100 == 0) {std::cout << "MC Step = " << mc+1 << " of " << MCSTEPS << std:: endl;}
-                func->GetRandom2(q0,lp);
-                model->SetParameters("q0", q0);
-                model->SetParameters("lp", lp);
-                model->SetParameters("sigma", 30);
-                model->SetParameters("dz", -0.024);
-                StatusCode = model->Compute(nucleus);
-                PT2 = model->Get1();
-                RM = model->Get2();
-                tree->Fill();
+    int nDim = 3;
+    TVectorD parMeans(nDim);
+    TVectorD parErrors(nDim);
+    TMatrixDSym covMatrix(nDim);
+    TVectorD genPars(nDim);
+
+    if (zbin == 1) {
+        parMeans(0) = 2.32139e+00;
+        parMeans(1) = 6.93319e+00;
+        parMeans(2) = -6.16009e-04;
+        parErrors(0) = 3.34446e-01;
+        parErrors(1) = 2.47533e+00;
+        parErrors(2) = 2.97718e-02;
+        covMatrix(0,0) = parErrors(0)*parErrors(0); covMatrix(0,1) = -0.781*parErrors(0)*parErrors(1); covMatrix(0,2) = 0.738*parErrors(0)*parErrors(2);
+        covMatrix(1,0) = covMatrix(0,1);            covMatrix(1,1) = parErrors(1)*parErrors(1);        covMatrix(1,2) = -0.945*parErrors(1)*parErrors(2);
+        covMatrix(2,0) = covMatrix(0,2);            covMatrix(2,1) = covMatrix(1,2);                   covMatrix(2,2) = parErrors(2)*parErrors(2);
+    }
+    if (zbin == 2) {
+        parMeans(0) = 2.78111e+00;
+        parMeans(1) = 4.95501e+00;
+        parMeans(2) = -1.82998e-02;
+        parErrors(0) = 5.41974e-01;
+        parErrors(1) = 1.42262e+00;
+        parErrors(2) = 2.97642e-02;
+        covMatrix(0,0) = parErrors(0)*parErrors(0); covMatrix(0,1) = -0.592*parErrors(0)*parErrors(1); covMatrix(0,2) = -0.563*parErrors(0)*parErrors(2);
+        covMatrix(1,0) = covMatrix(0,1);            covMatrix(1,1) = parErrors(1)*parErrors(1);        covMatrix(1,2) = 0.951*parErrors(1)*parErrors(2);
+        covMatrix(2,0) = covMatrix(0,2);            covMatrix(2,1) = covMatrix(1,2);                   covMatrix(2,2) = parErrors(2)*parErrors(2);
+    }
+    if (zbin == 3) {
+        parMeans(0) = 1.45245e+00;
+        parMeans(1) = 2.79043e+00;
+        parMeans(2) = -3.88610e-02;
+        parErrors(0) = 1.44045e+00;
+        parErrors(1) = 1.03990e+00;
+        parErrors(2) = 3.51889e-02;
+        covMatrix(0,0) = parErrors(0)*parErrors(0); covMatrix(0,1) = -0.203*parErrors(0)*parErrors(1); covMatrix(0,2) = -0.196*parErrors(0)*parErrors(2);
+        covMatrix(1,0) = covMatrix(0,1);            covMatrix(1,1) = parErrors(1)*parErrors(1);        covMatrix(1,2) = 0.963*parErrors(1)*parErrors(2);
+        covMatrix(2,0) = covMatrix(0,2);            covMatrix(2,1) = covMatrix(1,2);                   covMatrix(2,2) = parErrors(2)*parErrors(2);
+    }
+    if (zbin ==4) {
+        parMeans(0) = 1.71481e+00;
+        parMeans(1) = 1.38668e+00;
+        parMeans(2) = -2.39079e-02;
+        parErrors(0) = 3.16320e+00;
+        parErrors(1) = 1.02507e+00;
+        parErrors(2) = 3.32699e-02;
+        covMatrix(0,0) = parErrors(0)*parErrors(0); covMatrix(0,1) = -0.255*parErrors(0)*parErrors(1); covMatrix(0,2) = -0.250*parErrors(0)*parErrors(2);
+        covMatrix(1,0) = covMatrix(0,1);            covMatrix(1,1) = parErrors(1)*parErrors(1);        covMatrix(1,2) = 0.978*parErrors(1)*parErrors(2);
+        covMatrix(2,0) = covMatrix(0,2);            covMatrix(2,1) = covMatrix(1,2);                   covMatrix(2,2) = parErrors(2)*parErrors(2);
+    }
+    covMatrix.Print();
+    TMatrixD invCovMatrix = covMatrix;
+    double determinant;
+    invCovMatrix.Invert(&determinant);
+
+    std::cout << "Computign z-bin #" << zbin << std::endl;
+    while (A13 <= A13Max) {
+        PT2 = 0;
+        RM = 0;
+        double nucleus = pow(A13, 3);
+        std::cout << "Running Toy MC for A^1/3 = " << A13 << std::endl;
+        for (int mc=0; mc<MCSTEPS; ++mc) {
+            if (mc%100 == 0) {std::cout << "MC Step = " << mc+1 << " of " << MCSTEPS << std:: endl;}
+            // while (true) {
+                MultiGaus(parMeans, covMatrix, genPars);
+                q0 = genPars(0);
+                lp = genPars(1);
+                dz = genPars(2);
+            //     if (q0 > 0 && lp > 0) {
+            //         break;
+            //     }
+            // }
+
+
+
+            model->SetParameters("q0", q0);
+            model->SetParameters("lp", lp);
+            model->SetParameters("sigma", 30);
+            model->SetParameters("dz", dz);
+            
+            StatusCode = model->Compute(nucleus);
+            PT2 = model->Get1();
+            RM = model->Get2();
+
+            if (isnan(RM)) {
+                std::cout << "PROBLEM HERE" << std::endl;
+                std::cout << "MultiGaus Result" << std::endl;
+                std::cout << "Q0 = " << q0 << "\t LP = " << lp << "\t DZ = " << dz << std::endl;
+                std::cout << "PT2 = " << PT2 << std::endl;
+                std::cout << "RM = " << RM << std::endl; 
+                break;
             }
-            A13 += dA13; // go to next nucleus
+
+            tree->Fill();
         }
-        A13 = 2.5;
+        A13 += dA13; // go to next nucleus
     }
 
     tree->Write();

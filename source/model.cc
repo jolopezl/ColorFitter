@@ -146,9 +146,9 @@ double Model::FindR(const double A, const double density_threshold){
     }
     return r;
     /* using the mathematica notebook */
-    if (A == (int) 20.1797)  {return 4.52791;}
-    if (A == (int) 83.7980)  {return 6.48089;}
-    if (A == (int) 131.293)  {return 7.29538;}
+    // if (A == (int) 20.1797)  {return 4.52791;}
+    // if (A == (int) 83.7980)  {return 6.48089;}
+    // if (A == (int) 131.293)  {return 7.29538;}
 }
 
 double Model::GetR(const double A, const double density_threshold) {
@@ -159,9 +159,9 @@ double Model::GetR(const double A, const double density_threshold) {
 double Model::GetC(int A) {
     return m_c_interpolation[A];
     /* using the mathematica notebook */
-    if (A == (int) 20.1797)  {return 2.77966;}
-    if (A == (int) 83.7980)  {return 4.73264;}
-    if (A == (int) 131.293)  {return 5.54713;}
+    // if (A == (int) 20.1797)  {return 2.77966;}
+    // if (A == (int) 83.7980)  {return 4.73264;}
+    // if (A == (int) 131.293)  {return 5.54713;}
 }
 
 double Model::Density(const double A, const double xx, const double yy, const double zz){
