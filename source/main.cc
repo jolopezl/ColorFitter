@@ -37,7 +37,9 @@ int main(int argc, char *argv[]) {
     // computeSimpleFit(false,true,0.0);
     // MODEL TYPE, do subtraction, value
     // computeSimpleFit2(argv[1], true, -1.0);
-    ComputeBand(4);
+    long conv = strtol(argv[1], nullptr, 10);
+    // long nn = strtol(argv[2], nullptr,10);
+    ComputeBand(conv);
     
     // computeSimpleFit2("BL30",  true, 0.0);
     // computeSimpleFit2("BL35",  true, 0.0);
@@ -306,8 +308,9 @@ double fcn_gaus_2d_cov(double *x, double *par) {
 }
 
 int ComputeBand(int zbin = 1) {
+    // x is A^1/3
 
-    int MCSTEPS = 1500;
+    int MCSTEPS = 2500;
     std::cout << "ComputeBand will use " << MCSTEPS << " MCSTEPS" << std::endl;
 
     Model *model = new Model("ComputeBand");
@@ -326,10 +329,13 @@ int ComputeBand(int zbin = 1) {
     double PT2, RM;
     double A13 = 2.5;
     double A13Max = 6.0;
-    double dA13 = (A13Max - 2.5)/35;
+    double dA13 = (A13Max - 2.5)/70;
     double q0, lp, dz;
 
-    TFile *fout = new TFile(Form("ToyMC_%d.root",zbin),"RECREATE");
+    // A13 = x/10.;
+    int nabins = 70;
+    
+    TFile *fout = new TFile(Form("ToyMC_A13_%d_bin_%d.root",nabins,zbin),"RECREATE");
     TTree *tree = new TTree("tree", "Tree of ToyMC");
     tree->Branch("zbin", &zbin, "zbin/I");
     tree->Branch("A13", &A13, "A13/D");
@@ -339,13 +345,13 @@ int ComputeBand(int zbin = 1) {
     tree->Branch("lp", &lp, "lp/D");
     tree->Branch("dz", &dz, "dz/D");
     tree->Branch("StatusCode", &StatusCode, "StatusCode/I");
-
+    // Setup for the Toy MC with random generation
     int nDim = 3;
     TVectorD parMeans(nDim);
     TVectorD parErrors(nDim);
     TMatrixDSym covMatrix(nDim);
     TVectorD genPars(nDim);
-
+    // Numbers obtained from fit to BLE30
     if (zbin == 1) {
         parMeans(0) = 2.32139e+00;
         parMeans(1) = 6.93319e+00;
@@ -394,7 +400,6 @@ int ComputeBand(int zbin = 1) {
     TMatrixD invCovMatrix = covMatrix;
     double determinant;
     invCovMatrix.Invert(&determinant);
-
     std::cout << "Computign z-bin #" << zbin << std::endl;
     while (A13 <= A13Max) {
         PT2 = 0;
@@ -403,41 +408,27 @@ int ComputeBand(int zbin = 1) {
         std::cout << "Running Toy MC for A^1/3 = " << A13 << std::endl;
         for (int mc=0; mc<MCSTEPS; ++mc) {
             if (mc%100 == 0) {std::cout << "MC Step = " << mc+1 << " of " << MCSTEPS << std:: endl;}
-            // while (true) {
+            while (true) {
                 MultiGaus(parMeans, covMatrix, genPars);
                 q0 = genPars(0);
                 lp = genPars(1);
                 dz = genPars(2);
-            //     if (q0 > 0 && lp > 0) {
-            //         break;
-            //     }
-            // }
-
-
-
+                if (q0 > 0 && lp > 0) {
+                     break;
+                }
+                // std::cout << "Searching for a new random set of parameters within the physics limits" << std::endl;
+            }
             model->SetParameters("q0", q0);
             model->SetParameters("lp", lp);
             model->SetParameters("sigma", 30);
             model->SetParameters("dz", dz);
-            
             StatusCode = model->Compute(nucleus);
             PT2 = model->Get1();
             RM = model->Get2();
-
-            if (isnan(RM)) {
-                std::cout << "PROBLEM HERE" << std::endl;
-                std::cout << "MultiGaus Result" << std::endl;
-                std::cout << "Q0 = " << q0 << "\t LP = " << lp << "\t DZ = " << dz << std::endl;
-                std::cout << "PT2 = " << PT2 << std::endl;
-                std::cout << "RM = " << RM << std::endl; 
-                break;
-            }
-
             tree->Fill();
         }
         A13 += dA13; // go to next nucleus
     }
-
     tree->Write();
     fout->Close();
     return 0;
