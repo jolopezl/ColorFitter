@@ -96,12 +96,12 @@ def ATLASLabel(x,y,text="Internal",color=1):
     p.DrawLatex(x+delx,y,text)
     #    p.DrawLatex(x,y,"#sqrt{s}=900GeV");
 
-def AddLabel(x,y,text="Text here",color=1):
+def AddLabel(x,y,text="Text here",color=1,size=28):
   if (text):
     p=TLatex()
     p.SetNDC()
     p.SetTextFont(43)
-    p.SetTextSize(28)
+    p.SetTextSize(size)
     p.SetTextColor(color)
     p.DrawLatex(x,y,text)
     #    p.DrawLatex(x,y,"#sqrt{s}=900GeV");  

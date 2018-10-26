@@ -71,9 +71,9 @@ g3 = ROOT.TGraphErrors(4,xval3,val3,xerr,err3)
 # ROOT.gStyle.SetEndErrorSize(7.5)
 
 # Configuration
-xlabel = "z_{h}"
+xlabel = "z"
 # L_P configuration
-ylabel = "#hat{q}_{h} [GeV^{2}/fm] "
+ylabel = "#hat{q} [GeV^{2}/fm] "
 
 fileout = "fig06a_qhat_BL30.pdf" #sys.argv[3]
 
@@ -83,17 +83,16 @@ yhi = 0.01/factor
 # 0.000979387
 # 0.004087083
 
-markerSize = 2.0
-lineWidth = 3
+markerSize = 2
+lineWidth = 2
 ############# code
-c = ROOT.TCanvas("canvas","canvas",800,600)
 color = [1,2,4,8,9]
 i = 0
 g1.SetMarkerStyle(20+i)
 g1.SetMarkerSize(markerSize)
 g1.SetMarkerColor(color[i]) 
 g1.SetLineColor(color[i])
-# g1.SetLineWidth(lineWidth)
+g1.SetLineWidth(lineWidth)
 g1.GetXaxis().SetTitle(xlabel)
 g1.GetYaxis().SetTitle(ylabel)
 g1.GetYaxis().SetTitleOffset(1.75)
@@ -102,7 +101,7 @@ g2.SetMarkerStyle(20+i)
 g2.SetMarkerSize(markerSize)
 g2.SetMarkerColor(color[i]) 
 g2.SetLineColor(color[i])
-# g2.SetLineWidth(lineWidth)
+g2.SetLineWidth(lineWidth)
 g2.GetXaxis().SetTitle(xlabel)
 g2.GetYaxis().SetTitle(ylabel)
 g2.GetYaxis().SetTitleOffset(1.75)
@@ -111,7 +110,7 @@ g3.SetMarkerStyle(20+i)
 g3.SetMarkerSize(markerSize)
 g3.SetMarkerColor(color[i]) 
 g3.SetLineColor(color[i])
-# g3.SetLineWidth(lineWidth)
+g3.SetLineWidth(lineWidth)
 g3.GetXaxis().SetTitle(xlabel)
 g3.GetYaxis().SetTitle(ylabel)
 g3.GetYaxis().SetTitleOffset(1.75)
@@ -153,15 +152,16 @@ fontAxesCode = 43
 # axes range
 g1.GetXaxis().SetLimits(0.24,0.99)
 g1.GetYaxis().SetRangeUser(ylo,yhi)
+g1.GetYaxis().SetRangeUser(-0.0999,0.699)
 g1.GetYaxis().SetTitleOffset(1.5)
 
-x0 = 0.725
+x0 = 0.625
 y0 = 0.725
 x1 = x0 + 0.325
 y1 = y0 + 0.17
-leg = ROOT.TLegend(x0,y0,x1,y1)
-leg.SetTextFont(43)
-leg.SetTextSize(28)
+leg = ROOT.TLegend(0.2,0.5,0.4,0.78)
+leg.SetTextFont(42)
+leg.SetTextSize(0.04)
 leg.SetBorderSize(0)
 leg.SetFillStyle(0)
 # leg.SetHeader("  BLE40")
@@ -170,41 +170,51 @@ leg.SetHeader("  BL30")
 leg.AddEntry(g1,"Neon","ep")
 leg.AddEntry(g2,"Krypton","ep")
 leg.AddEntry(g3,"Xenon","ep")
+# foo = ROOT.TGraph(0);
+# foo.SetFillColor()
+
+lxmin=0.24
+lxmax=0.99
 
 theoretical_qhat = 0.075
-lxmin=0.24
-lxmax=0.99
 line = ROOT.TLine(lxmin, theoretical_qhat, lxmax, theoretical_qhat)
-# line.SetLineWidth(2)
+line.SetLineWidth(2)
 line.SetLineStyle(2)
+box = ROOT.TBox(lxmin,theoretical_qhat-0.005,lxmax,theoretical_qhat+0.015)
+box.SetLineStyle(2)
+box.SetLineWidth(2)
+box.SetFillColorAlpha(13,0.5)
 
-lxmin=0.24
-lxmax=0.99
+leg.AddEntry(box,"p+Pb, JHEP03(2013)122","fl")
+
+line3 = ROOT.TLine(lxmin, 0.20, lxmax, 0.20) # BDMPS, http://dx.doi.org/10.1016/j.physletb.2015.07.048
+line3.SetLineWidth(2)
+line3.SetLineStyle(2)
+box3 = ROOT.TBox(lxmin,0.2-0.02,lxmax,0.2+0.02)
+box3.SetFillColorAlpha(13,0.5)
+
 line2 = ROOT.TLine(lxmin, average, lxmax, average)
-# line.SetLineWidth(2)
+line2.SetLineWidth(2)
 line2.SetLineStyle(3)
 
+c = ROOT.TCanvas("canvas","canvas",800,600)
+c.cd()
+g1.GetXaxis().SetLimits(0,1)
+g1.GetXaxis().SetNdivisions(505)
 g1.Draw("AP")
-
-
-box = ROOT.TBox(lxmin,theoretical_qhat-0.005,lxmax,theoretical_qhat+0.015)
-box.SetFillColorAlpha(13,0.5)
 box.Draw("SAME")
-
+line.Draw("SAME")
+# box3.Draw("SAME")
+# line3.Draw("SAME")
 g1.Draw("P SAME")
 g2.Draw("P SAME")
 g3.Draw("P SAME")
-
-line.Draw("SAME")
-# line1.Draw("SAME")
-# line2.Draw("SAME")
-
 
 leg.Draw()
 
 
 # AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{T}^{2}#GT/L_{p} with 3 parameter fit")
 # AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 40 [mb]")
-AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{T}^{2}#GT/L_{p} with 2 parameter fit")
-AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 30 [mb]")
+AddLabel(0.2,0.88,"#hat{q}_{h} = #Delta#LTp_{T}^{2}#GT/L_{p} with 2 parameter fit",1,22)
+AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 30 [mb]",1,22)
 c.Print(fileout)
