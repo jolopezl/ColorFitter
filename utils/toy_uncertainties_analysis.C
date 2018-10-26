@@ -17,9 +17,9 @@ void simple() {
 
 void analysis(int opt=1, int zbin=1) {
     TH1::SetDefaultSumw2();
-    SetAtlasStyle();
+    // SetAtlasStyle();
 
-    TFile *data = TFile::Open("OutputROOT.BL30-Nominal.root","READ");
+    TFile *data = TFile::Open("OutputROOT.20180806.BLE30.root","READ");
     TGraphErrors *tg_data = nullptr;
     TGraphErrors *tg_model = nullptr;
     TGraphErrors *tg_model_up = nullptr;
@@ -43,10 +43,10 @@ void analysis(int opt=1, int zbin=1) {
     auto model_band = myMakeBand(tg_model, tg_model_up, tg_model_down);
     model_band->SetFillColorAlpha(kOrange,0.5);
 
-    TFile *toymc = TFile::Open("ToyMC_FullSimUI.root","READ");
+    TFile *toymc = TFile::Open("ToyMC_4.root","READ");
     auto tree = (TTree*) toymc->Get("tree");
 
-    int nbins = 20;
+    int nbins = 35;
     double lim_lo = 2.45;
     double lim_hi = 6.05;
 
@@ -56,7 +56,7 @@ void analysis(int opt=1, int zbin=1) {
     
     if (opt == 1) {
         pfx = new TProfile("pfx",";A^{1/3};Profile of p_{T}^{2}",nbins,lim_lo,lim_hi);
-        hist = new TH2F("hist","p_{T}^{2} vs A^{1/3;A^{1/3};p_{T}^{2} [GeV^{2}]",nbins,lim_lo,lim_hi,250,-0.03,0.05);
+        hist = new TH2F("hist","p_{T}^{2} vs A^{1/3};A^{1/3};p_{T}^{2} [GeV^{2}]",nbins,lim_lo,lim_hi,250,-0.03,0.05);
         tree->Project("pfx","PT2:A13",selection,"PROF");
         tree->Project("hist","PT2:A13",selection);
     }
@@ -147,7 +147,7 @@ void analysis(int opt=1, int zbin=1) {
     TH1 *h1 = nullptr;
     if (opt==1) {
         h1 = c1->DrawFrame(lim_lo,-0.03,lim_hi,0.05);
-        h1->SetTitle(";A^{1/3};P_{T}^{2}");
+        h1->SetTitle(";A^{1/3};#Deltap_{T}^{2} [GeV^{2}]");
     }
     else {
         h1 = c1->DrawFrame(lim_lo,0.3,lim_hi,1.1);
@@ -181,13 +181,15 @@ void analysis(int opt=1, int zbin=1) {
     TH1 *h2 = nullptr;
     if (opt==1) {
         h2 = c2->DrawFrame(lim_lo,-0.03,lim_hi,0.05);
-        h2->SetTitle(";A^{1/3};P_{T}^{2}");
+        h2->SetTitle(";A^{1/3};#Deltap_{T}^{2} [GeV^{2}]");
     }
     else {
         h2 = c2->DrawFrame(lim_lo,0.3,lim_hi,1.1);
         h2->SetTitle(";A^{1/3};R_{M}");
     }
     tg_model->Draw("SAME");
+    tg_data->Draw("PSAME");
+
 
     const int magic_number = 26;
     TGraphErrors *tg_model_toy_fitted_up = new TGraphErrors(magic_number);

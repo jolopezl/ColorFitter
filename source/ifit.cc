@@ -517,6 +517,9 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
         std::vector<double> rm_fiterr;
         std::vector<double> rm_x;
 
+        std::vector<double> average_density_fit;
+        std::vector<double> multiplicity_density_fit;
+
         double q0 = result.m_qhat;
         std::vector<double> d_pT_dq0;
         std::vector<double> d_pT_dL;
@@ -533,6 +536,9 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
             double average_density = func_array[2];
             double multiplicty_density = func_array[3];
 
+            average_density_fit.push_back(average_density);
+            multiplicity_density_fit.push_back(multiplicty_density);
+
             pt_fit.push_back(pT2);
             pt_fiterr.push_back(0);
             pt_x.push_back(x);
@@ -544,19 +550,22 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
             d_pT_dq0.push_back(pT2/q0);
             d_pT_dL.push_back(q0*average_density);
 
+            /** We will keep the uncertainties to first order only **/
+            /** higher orders do not agree with Toy MC, so something can be wrongly derived **/
+
             double uncertainty = 0;
             uncertainty += pow(pT2/q0*result.m_qhat_err,2);
-            uncertainty += pow(q0*average_density*result.m_lp_err, 2);
-            uncertainty += 2*pT2*average_density*correlation_factor[iz];
+            // uncertainty += pow(q0*average_density*result.m_lp_err, 2);
+            // uncertainty += 2*pT2*average_density*correlation_factor[iz];
             uncertainty = sqrt(uncertainty);
             pt_fit_up.push_back(pT2 + uncertainty);
             pt_fit_down.push_back(pT2 - uncertainty);
 
             double uncertainty2 = 0;
-            // uncertainty2 += pow(multiplicty_density*(result.m_lp_err), 2);
-            // uncertainty2 = sqrt(uncertainty2);
+            uncertainty2 += pow(multiplicty_density*(result.m_lp_err), 2);
+            uncertainty2 = sqrt(uncertainty2);
             // uncertainty2 += 9*pow(RM,2)*pow(average_density,2)*pow(result.m_lp_err,2);
-            uncertainty2 = 3*RM*0.11*result.m_lp_err;
+            // uncertainty2 = 3*RM*0.11*result.m_lp_err;
             // uncertainty2 = sqrt(uncertainty2);
             rm_fit_up.push_back(RM + uncertainty2);
             rm_fit_down.push_back(RM - uncertainty2);
@@ -587,9 +596,16 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
             x+=dx;
         }
 
-        result.m_tg_pT = TGraphErrors(3,x1,z1,errorz1,errorz1);
-        result.m_tg_Rm = TGraphErrors(3,x2,z2,errorz2,errorz2);
+        result.m_tg_data_pT = TGraphErrors(3,x1,z1,errorz1,errorz1);
+        result.m_tg_data_Rm = TGraphErrors(3,x2,z2,errorz2,errorz2);
+
+        double zeros[3] = {0,0,0};
+        result.m_tg_pT = TGraphErrors(3,x1,pT2,zeros,zeros);
+        result.m_tg_Rm = TGraphErrors(3,x2,Rm,zeros,zeros);
+
         int npoints = pt_x.size();
+        result.m_tg_average_density = TGraph(npoints,pt_x.data(),average_density_fit.data());
+        result.m_tg_multiplicity_density = TGraph(npoints,pt_x.data(),multiplicity_density_fit.data());
         result.m_tg_pT_extrapolation = TGraphErrors(npoints,pt_x.data(),pt_fit.data(),pt_fiterr.data(),pt_fiterr.data());
         result.m_tg_pT_extrapolation_up = TGraphErrors(npoints,pt_x.data(),pt_fit_up.data(),pt_fiterr.data(),pt_fiterr.data());
         result.m_tg_pT_extrapolation_down = TGraphErrors(npoints,pt_x.data(),pt_fit_down.data(),pt_fiterr.data(),pt_fiterr.data());

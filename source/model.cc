@@ -393,19 +393,23 @@ int Model::Compute(const double A){
         if (m_doMonitoring) {
             tree->Fill();
         }
-        if (!isOutside) {
+        if (not isOutside) {
             average_density += dtd1->Eval(z+L);
-            multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*average_density;
+            multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+L);
         }
-        if (ul - (z+L) < 0.1) { // choos a a suuuper threshold
-            multiplicity_density += 1;
-            multiplicity_density += exp(-temp*m_sigma_ph/10.);
+        else {
+            average_density += dtd1->Eval(z+ul);
+            multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+ul);
         }
-        average_density *= weight;
-        multiplicity_density *= weight;
+        // if (ul - (z+L) < 0.1) { // choos a a suuuper threshold
+        //     multiplicity_density += 1;
+        //     multiplicity_density += exp(-temp*m_sigma_ph/10.);
+        // }
+        // average_density *= weight;
+        // multiplicity_density *= weight;
     } // End of big loop     energy loss down here ------------*
-    m_average_density = average_density/normalize;
-    m_multip_density = multiplicity_density/normalize;
+    m_average_density = average_density/m_maxmcSteps;
+    m_multip_density = multiplicity_density/m_maxmcSteps;
     // ADD ENERGY LOSS, From Will's original code:
     temp = accumulator2/normalize;
     if (m_DoEnergyLoss == true) ApplyEnergyLoss(temp);

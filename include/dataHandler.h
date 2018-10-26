@@ -48,12 +48,16 @@ public:
     double m_c1, m_c2, m_c1_err, m_c2_err;
     TGraphErrors m_tg_pT;
     TGraphErrors m_tg_Rm;
+    TGraphErrors m_tg_data_pT;
+    TGraphErrors m_tg_data_Rm;
     TGraphErrors m_tg_pT_extrapolation;
     TGraphErrors m_tg_pT_extrapolation_up;
     TGraphErrors m_tg_pT_extrapolation_down;
     TGraphErrors m_tg_Rm_extrapolation;
     TGraphErrors m_tg_Rm_extrapolation_up;
     TGraphErrors m_tg_Rm_extrapolation_down;
+    TGraph m_tg_average_density;
+    TGraph m_tg_multiplicity_density;
     // constructor
     myResult();
     ~myResult();
