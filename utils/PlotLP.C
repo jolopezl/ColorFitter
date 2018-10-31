@@ -26,7 +26,9 @@ void PlotLP() {
     model->GetXaxis()->SetNdivisions(505);
     // model->GetYaxis()->SetRangeUser(0.0001,16);
     model->GetYaxis()->SetRangeUser(0.1,70);
-    model->SetTitle(";z;L_{p} [fm]");
+    model->SetTitle(";#it{z};#it{L}_{p} (fm)");
+    model->GetXaxis()->CenterTitle();
+    model->GetYaxis()->CenterTitle();
 
     /** Compute variants bar **/
     TGraphErrors *variants = new TGraphErrors(4);
@@ -202,6 +204,7 @@ void PlotLP() {
     cout << "p-value = " << fg2->GetProb() << endl;
 
     TCanvas *c2 = new TCanvas("c2","c2 title",800,600);
+
     model->Draw("APE"); 
     variants->Draw("SAME5");
     fg1->Draw("SAME");
@@ -212,7 +215,7 @@ void PlotLP() {
     fg1->Draw("SAME");
     model->Draw("PSAME"); 
 
-    model_corrected->Draw("PSAME");
+    // model_corrected->Draw("PSAME");
 
     // TLegend* leg = new TLegend(0.2,0.2,0.35,0.35);
     TLegend* leg = new TLegend(0.2,0.75,0.35,0.92);

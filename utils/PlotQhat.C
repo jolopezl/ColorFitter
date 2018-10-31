@@ -48,6 +48,7 @@ void PlotQhat() {
     for (int i = 0; i < 4; ++i) { // loop over models
         for (int iz=0; iz < 4; ++iz) { // loop over z-bin points
             for (int nucl=0; nucl < 3; ++nucl) {
+                // double zz = tg_lp[i]->GetX()[iz];
                 tg_qhat[nucl][i]->GetX()[iz] = tg_lp[i]->GetX()[iz];
                 double pt = tg_pt[iz][i]->GetY()[nucl];
                 double lp = tg_lp[i]->GetY()[iz];
@@ -57,7 +58,7 @@ void PlotQhat() {
                 double pterr = TMath::Sqrt(TMath::Power(pt/q0, 2) * TMath::Power(q0err, 2));
 
                 tg_qhat[nucl][i]->GetY()[iz] = pt/lp;
-                double qhaterrsq = TMath::Power(pt/lp, 2) * ( TMath::Power(pterr/pt, 2) + TMath::Power(lperr/lp, 2) - 2*correlation[iz]*lperr*pterr/(lp*pt) ); // Missing correlation!!??
+                double qhaterrsq = TMath::Power(pt/lp, 2) * ( TMath::Power(pterr/pt, 2)+ TMath::Power(lperr/lp, 2) - 2*correlation[iz]*lperr*pterr/(lp*pt) ); // Missing correlation!!??
                 tg_qhat[nucl][i]->GetEY()[iz] = TMath::Sqrt(qhaterrsq);
 
                 tg_qhat[nucl][i]->GetY()[iz] /= factor;
