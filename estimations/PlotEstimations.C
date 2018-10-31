@@ -46,10 +46,16 @@ std::pair<TF1*,TGraphAsymmErrors*> GetFunctionAndBand_LSM(const double kappa = 1
 std::pair<TF1*,TGraphAsymmErrors*> GetFunctionAndBand(const int zbin = 4, const double xBj = 0.2) {
 
     std::map<int,double> factor;
+    // m ~ sqrt(Q2)
     factor[1] = 9.24;
     factor[2] = 8.40;
     factor[3] = 7.94;
     factor[4] = 7.14;
+    // m ~ log (Q2)
+    // factor[1] = 16.41;
+    // factor[2] = 14.93;
+    // factor[3] = 14.12;
+    // factor[4] = 13.52;
     std::map<int,double> lp;
     lp[1] = 6.93319;//8.156268928;
     lp[2] = 4.95501;//6.11454026;
