@@ -45,9 +45,11 @@ int main(int argc, char *argv[]) {
     // computeSimpleFit2("BL35",  true, 0.0);
     // computeSimpleFit2("BL40",  true, 0.0);
     // computeSimpleFit2("BLE",   true, 0.0);
-    computeSimpleFit2("BLE30C", true, 0.0);
+    // computeSimpleFit2("BL30", true, 0.0);
     // computeSimpleFit2("BLE35", true, 0.0);
     // computeSimpleFit2("BLE40", true, 0.0);
+    computeSimpleFit2("BL", true, 0.0);
+    computeSimpleFit2("BLC", true, 0.0);
     // monitoring();
 }
 
@@ -158,6 +160,12 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_initial_sigma = 30.0;
         config->m_energyloss = false;
     }
+    else if (model == "BLC") {
+        config->m_preh = true;
+        config->m_initial_sigma = 30.0;
+        config->m_energyloss = false;
+        config->m_cascade = true;
+    }
     else {return -1;}
     config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
     config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
@@ -198,7 +206,7 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
             chisquared[i] = resultCont.at(i).m_chi2;
             std::cout << "z = " << z[i] << std::endl;
         }
-        std::string ffout = "OutputROOT.20180926."+model+".root";
+        std::string ffout = "OutputROOT.20181103."+model+".root";
         TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
         std::cout << "Output file created" << std::endl;
         OutputROOT->cd();
