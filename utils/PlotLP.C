@@ -67,20 +67,7 @@ void PlotLP() {
     }
     model_corrected->SetMarkerStyle(kOpenCircle);
 
-    TCanvas *c1 = new TCanvas("c1","title",800,600);
-    model->Draw("APE");
-    // tg[0]->Draw("PSAME");
-    // tg[1]->Draw("PSAME");
-    // tg[2]->Draw("PSAME");
-    variants->Draw("SAME5");
-    model->Draw("PSAME");
-    // model_corrected->Draw("PSAME");
-
-    c1->Print("figure_models_lp.pdf");
-
     /** Lund String Model Fitting **/
-
-
     /** CORRECT FOR SHIFT to X (light cone fraction) **/
 
     double nuList[4] = {14.4,13.1,12.4,10.7};
@@ -114,19 +101,20 @@ void PlotLP() {
 
     TF1 *fg1 = nullptr;
 
-    if (false) {
-        fg1 = new TF1("fg1", LundLinearLong, 0.5, 0.96);
-        fg1->SetParName(0,"MP");
-        fg1->FixParameter(0,0.938); // 0.9 GeV
-        fg1->SetParName(1,"NU"); 
-        fg1->FixParameter(1,13.1);
-        fg1->SetParName(2,"KAPPA");
-        fg1->SetParameter(2,1.0);
-        fg1->SetParName(3,"Q2"); 
-        fg1->FixParameter(3,2.4);
-    }
-    else {
-        fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0,1);
+    // if (false) {
+
+        TF1 *fg0 = new TF1("fg1", LundLinearLong, 0, 1.2);
+        fg0->SetParName(0,"MP");
+        fg0->FixParameter(0,0.938); // 0.9 GeV
+        fg0->SetParName(1,"NU"); 
+        fg0->FixParameter(1,13.1);
+        fg0->SetParName(2,"KAPPA");
+        fg0->SetParameter(2,1.0);
+        fg0->SetParName(3,"Q2"); 
+        fg0->FixParameter(3,2.4);
+    // }
+    // else {
+        fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0,1.2);
         fg1->SetParName(0, "KAPPA");
         fg1->SetParName(1, "MP");
         fg1->SetParName(2, "NU");
@@ -135,7 +123,7 @@ void PlotLP() {
         fg1->FixParameter(1, 0.938);
         fg1->FixParameter(2, 12.4);
         fg1->FixParameter(3, 0.14);
-    }
+    // }
 
     // TF1* fg2 = new TF1("fg2", LundLog, 0, 1);
     // fg2->SetParName(0,"F(Q2,NU)");
@@ -157,6 +145,28 @@ void PlotLP() {
     fg2->SetLineColor(kRed);
     fg1->SetFillColorAlpha(kAzure,0.3);
     fg2->SetFillColorAlpha(kRed,0.3);
+
+    const bool PLOT_MODELS_ONLY = true;
+    if(PLOT_MODELS_ONLY) {
+        TCanvas *c1 = new TCanvas("c1","title",800,600);
+        fg1->GetYaxis()->SetRangeUser(0,100);
+        fg1->SetTitle(";#it{z};#it{L}_{p} (fm)");
+        fg1->Draw();
+        fg2->Draw("SAME");
+        fg0->Draw("SAME");
+        c1->SetLogy();
+        TLegend* leg = new TLegend(0.2,0.75,0.35,0.92);
+        leg->SetTextFont(42);
+        leg->SetTextSize(0.03);
+        leg->SetBorderSize(0);
+        leg->SetFillStyle(0);
+        leg->AddEntry(fg0, "Lund String Model (struck quark) - with #it{z} = #it{E}/#nu","l");
+        leg->AddEntry(fg1, "Lund String Model (struck quark) - with #it{z} = #it{p}^{+}/P^{+}","l");
+        leg->AddEntry(fg2, "Bialas #it{et. al.} - with #it{z} = #it{p}^{+}/P^{+}","l");
+        leg->Draw();
+        c1->Print("figure_models_lp.pdf");
+        return;
+    }
 
     int npoints = 500;
     model->Fit("fg1", "EMN0", "", 0.2, 0.96);

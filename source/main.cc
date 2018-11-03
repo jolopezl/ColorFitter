@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     // computeSimpleFit2("BL35",  true, 0.0);
     // computeSimpleFit2("BL40",  true, 0.0);
     // computeSimpleFit2("BLE",   true, 0.0);
-    computeSimpleFit2("BLE30", true, 0.0);
+    computeSimpleFit2("BLE30C", true, 0.0);
     // computeSimpleFit2("BLE35", true, 0.0);
     // computeSimpleFit2("BLE40", true, 0.0);
     // monitoring();
@@ -141,6 +141,12 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
         config->m_energyloss = true;
+    }
+    else if (model == "BLE30C") {
+        config->m_preh = false;
+        config->m_initial_sigma = 30.0;
+        config->m_energyloss = true;
+        config->m_cascade = true;
     }
     else if (model == "BLE35") {
         config->m_preh = false;
