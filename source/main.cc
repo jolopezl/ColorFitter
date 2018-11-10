@@ -40,16 +40,16 @@ int main(int argc, char *argv[]) {
     // long conv = strtol(argv[1], nullptr, 10);
     // long nn = strtol(argv[2], nullptr,10);
     // ComputeBand(conv);
-    // computeSimpleFit2("BL", true, 0.0);
-    // computeSimpleFit2("BL30",  true, 0.0);
+    computeSimpleFit2("BL", true, 0.0);
+    computeSimpleFit2("BL30",  true, 0.0);
     // computeSimpleFit2("BL35",  true, 0.0);
     // computeSimpleFit2("BL40",  true, 0.0);
-    // computeSimpleFit2("BLE",   true, 0.0);
-    // computeSimpleFit2("BL30", true, 0.0);
+    computeSimpleFit2("BLE",   true, 0.0);
+    computeSimpleFit2("BLE30", true, 0.0);
     // computeSimpleFit2("BLE35", true, 0.0);
     // computeSimpleFit2("BLE40", true, 0.0);
-    computeSimpleFit2("BL", true, 0.0);
-    computeSimpleFit2("BLC", true, 0.0);
+    // computeSimpleFit2("BL", true, 0.0);
+    // computeSimpleFit2("BLC", true, 0.0);
     // monitoring();
 }
 
@@ -206,7 +206,7 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
             chisquared[i] = resultCont.at(i).m_chi2;
             std::cout << "z = " << z[i] << std::endl;
         }
-        std::string ffout = "OutputROOT.20181103."+model+".root";
+        std::string ffout = "OutputROOT.20181107."+model+".root";
         TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
         std::cout << "Output file created" << std::endl;
         OutputROOT->cd();

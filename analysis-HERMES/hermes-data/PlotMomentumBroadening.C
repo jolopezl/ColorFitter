@@ -224,4 +224,10 @@ void PlotMomentumBroadening() {
     line->Draw();
 
     c1->Print("Plot_HERMES_data_pT.pdf");
+
+
+    for (int i=0; i<4; ++i) {
+        cout << tg_Xe->GetX()[i] << "\t" << fabs(tg_Xe->GetEY()[i]/tg_Xe->GetY()[i] * 100) << " %" <<  endl;
+    }
+
 }

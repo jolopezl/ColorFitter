@@ -3,10 +3,10 @@ void PlotLP() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
-    fin[0] = new TFile("OutputROOT.20180806.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20180806.BL30.root","READ");
-    fin[2] = new TFile("OutputROOT.20180806.BLE.root","READ");
-    fin[3] = new TFile("OutputROOT.20180806.BLE30.root","READ");
+    fin[0] = new TFile("OutputROOT.20181107.BL.root","READ");
+    fin[1] = new TFile("OutputROOT.20181107.BL30.root","READ");
+    fin[2] = new TFile("OutputROOT.20181107.BLE.root","READ");
+    fin[3] = new TFile("OutputROOT.20181107.BLE30.root","READ");
 
     TGraphErrors *tg[4];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_lp");
@@ -122,7 +122,9 @@ void PlotLP() {
         fg1->SetParameter(0, 1);
         fg1->FixParameter(1, 0.938);
         fg1->FixParameter(2, 12.4);
-        fg1->FixParameter(3, 0.14);
+        // fg1->FixParameter(3, 0.14);
+        double mass_trans = TMath::Sqrt(0.14*0.14 + 0.25);
+        fg1->FixParameter(3, mass_trans);
     // }
 
     // TF1* fg2 = new TF1("fg2", LundLog, 0, 1);
@@ -146,7 +148,7 @@ void PlotLP() {
     fg1->SetFillColorAlpha(kAzure,0.3);
     fg2->SetFillColorAlpha(kRed,0.3);
 
-    const bool PLOT_MODELS_ONLY = true;
+    const bool PLOT_MODELS_ONLY = kFALSE;
     if(PLOT_MODELS_ONLY) {
         TCanvas *c1 = new TCanvas("c1","title",800,600);
         fg1->GetYaxis()->SetRangeUser(0,100);

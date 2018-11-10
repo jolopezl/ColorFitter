@@ -77,6 +77,10 @@ void myData::applyCorrection(myData* nucl, double rho) { // nucl is the bkg
         m_stat_corrected[i] = sqrt(pow2(m_stat[i]) + pow2(nucl->m_stat[i]));
         m_syst_corrected[i] = sqrt(pow2(m_syst[i]) + pow2(nucl->m_syst[i]) + 2*rho*m_syst[i]*nucl->m_syst[i]);
         m_err_corrected[i] = sqrt(pow2(m_stat_corrected[i]) + pow2(m_syst_corrected[i]));
+        // Testing uncertainties in z > 0.5
+        // if (i==2|| i==3) {
+        //     m_err_corrected[i] *= 0.5;
+        // }
     }
 }
 

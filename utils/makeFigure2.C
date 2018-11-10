@@ -1,10 +1,13 @@
 float zcentr[4]           = {0.32,0.53,0.75,0.94};
 float pt2_neon[4]         = {0.0069,0.0063,-0.0015,-0.0037};
-float pt2_err_neon[4]     = {0.002747726333,0.005152669211,0.01350888596,0.02077666961};
 float pt2_kripton[4]      = {0.021,0.0224,0.0085,0.0115};
-float pt2_err_kripton[4]  = {0.002946183973,0.005444263036,0.01360477857,0.02106038936};
 float pt2_xenon[4]        = {0.0274,0.0296,0.0144,0.0073};
-float pt2_err_xenon[4]    = {0.003243454948,0.005979130372,0.01442289846,0.02177360788};
+// float pt2_err_neon[4]     = {0.002747726333,0.005152669211,0.01350888596,0.02077666961};
+// float pt2_err_kripton[4]  = {0.002946183973,0.005444263036,0.01360477857,0.02106038936};
+// float pt2_err_xenon[4]    = {0.003243454948,0.005979130372,0.01442289846,0.02177360788};
+float pt2_err_neon[4]     = {0.002747726333,0.005152669211,0.5 * 0.01350888596,0.5 * 0.02077666961};
+float pt2_err_kripton[4]  = {0.002946183973,0.005444263036,0.5 * 0.01360477857,0.5 * 0.02106038936};
+float pt2_err_xenon[4]    = {0.003243454948,0.005979130372,0.5 * 0.01442289846,0.5 * 0.02177360788};
 
 float rm_neon[4]          = {0.893189114368,0.885454096825,0.880935853275,0.798520384419};
 float rm_kripton[4]       = {0.78747612087,0.744660997913,0.679028679486,0.551673817154};
@@ -17,9 +20,9 @@ void makeFigure2() {
     SetAtlasStyle(43,22);
     gStyle->SetEndErrorSize(0);
 
-    const char *variantname = "BLE30";
+    const char *variantname = "BL30";
 
-    TFile *fin = TFile::Open(Form("OutputROOT.20180926.%s.root",variantname));
+    TFile *fin = TFile::Open(Form("OutputROOT.20181107.%s.root",variantname));
     TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
     std::pair<TGraphErrors*,TGraphErrors*> tg[4];
     std::pair<TGraphErrors*,TGraphErrors*> tg_up[4];
@@ -31,13 +34,13 @@ void makeFigure2() {
         tg[i].first = (TGraphErrors*) fin->Get(Form("tg_model_pT_extrapolation_%d",i));
         tg_up[i].first = (TGraphErrors*) fin->Get(Form("tg_model_pT_extrapolation_up_%d",i));
         tg_down[i].first = (TGraphErrors*) fin->Get(Form("tg_model_pT_extrapolation_down_%d",i));
-        tg_toy_up[i].first = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_up_PT2_%d",i));
-        tg_toy_down[i].first = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_down_PT2_%d",i));
+        // tg_toy_up[i].first = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_up_PT2_%d",i));
+        // tg_toy_down[i].first = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_down_PT2_%d",i));
         tg[i].second = (TGraphErrors*) fin->Get(Form("tg_model_Rm_extrapolation_%d",i));
         tg_up[i].second = (TGraphErrors*) fin->Get(Form("tg_model_Rm_extrapolation_up_%d",i));
         tg_down[i].second = (TGraphErrors*) fin->Get(Form("tg_model_Rm_extrapolation_down_%d",i));
-        tg_toy_up[i].second = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_up_RM_%d",i));
-        tg_toy_down[i].second = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_down_RM_%d",i));
+        // tg_toy_up[i].second = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_up_RM_%d",i));
+        // tg_toy_down[i].second = (TGraphErrors*) fin_uncertainties->Get(Form("tg_model_toy_fitted_down_RM_%d",i));
         // band[i].first = myMakeBand(tg[i].first,tg_toy_up[i].first,tg_toy_down[i].first);
         // band[i].second = myMakeBand(tg[i].second,tg_toy_up[i].second,tg_toy_down[i].second);
         band[i].first = myMakeBand(tg[i].first,tg_up[i].first,tg_down[i].first);
@@ -51,6 +54,15 @@ void makeFigure2() {
     }
     /** data points **/
     std::pair<TGraphErrors*,TGraphErrors*> data[4];
+    data[0].first = (TGraphErrors*) fin->Get("tg_data_pT_0");
+    data[1].first = (TGraphErrors*) fin->Get("tg_data_pT_1");
+    data[2].first = (TGraphErrors*) fin->Get("tg_data_pT_2");
+    data[3].first = (TGraphErrors*) fin->Get("tg_data_pT_3");
+    data[0].second = (TGraphErrors*) fin->Get("tg_data_Rm_0");
+    data[1].second = (TGraphErrors*) fin->Get("tg_data_Rm_1");
+    data[2].second = (TGraphErrors*) fin->Get("tg_data_Rm_2");
+    data[3].second = (TGraphErrors*) fin->Get("tg_data_Rm_3");
+        
     float xval[3] = {2.9947753767563916, 4.813606330683598, 5.590790378970299};
     float xerr[3] = {0,0,0};
     for (int i = 0; i < 4; ++i) {
@@ -58,13 +70,13 @@ void makeFigure2() {
         float yerr1[4] = {pt2_err_neon[i],pt2_err_kripton[i],pt2_err_xenon[i]};
         float yval2[4] = {rm_neon[i],rm_kripton[i],rm_xenon[i]};
         float yerr2[4] = {rm_err_neon[i],rm_err_kripton[i],rm_err_xenon[i]};
-        data[i].first = new TGraphErrors(3,xval,yval1,xerr,yerr1);
+        // data[i].first = new TGraphErrors(3,xval,yval1,xerr,yerr1);
         data[i].first->GetYaxis()->SetRangeUser(-0.028,0.049);
         data[i].first->GetYaxis()->SetNdivisions(505);
-        data[i].second = new TGraphErrors(3,xval,yval2,xerr,yerr2);
+        // data[i].second = new TGraphErrors(3,xval,yval2,xerr,yerr2);
         data[i].second->GetYaxis()->SetRangeUser(0.01,1.199);
         data[i].second->GetYaxis()->SetNdivisions(505);
-        // data[i].first->GetYaxis()->SetTitle("#Delta #LT p_{T}^{2} #GT [GeV^{2}]");
+        data[i].first->GetYaxis()->SetTitle("#Delta #LT p_{T}^{2} #GT [GeV^{2}]");
         data[i].first->GetYaxis()->SetTitle("#Delta p_{T}^{2} [GeV^{2}]");
         data[i].first->GetXaxis()->SetTitle("A^{1/3}");
         data[i].second->GetYaxis()->SetTitle("R_{M}");
@@ -82,8 +94,10 @@ void makeFigure2() {
         data[i].second->SetMarkerStyle(21);
         // data[i].first->SetMarkerSize(7);
         // data[i].second->SetMarkerSize(7);
-
+        data[i].first->GetXaxis()->SetLimits(2.50001,5.4);
+        data[i].second->GetXaxis()->SetLimits(2.50001,5.4);
     }
+    
     // gStyle->SetEndErrorSize(5);
     float small = 1e-5;;
     float big = 0.25;

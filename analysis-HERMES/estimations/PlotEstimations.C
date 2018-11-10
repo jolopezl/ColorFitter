@@ -200,7 +200,7 @@ void PlotEstimations(const double xBj = 0.2) {
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(10,109);
+    bl.second->GetXaxis()->SetLimits(0.01,109);
     bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetYaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
@@ -220,7 +220,7 @@ void PlotEstimations(const double xBj = 0.2) {
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(10,109);
+    bl.second->GetXaxis()->SetLimits(0.01,109);
     bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetXaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
@@ -240,7 +240,7 @@ void PlotEstimations(const double xBj = 0.2) {
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(10,109);
+    bl.second->GetXaxis()->SetLimits(0.01,109);
     bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetXaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
@@ -260,7 +260,7 @@ void PlotEstimations(const double xBj = 0.2) {
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(10,109);
+    bl.second->GetXaxis()->SetLimits(0.01,109);
     bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetXaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
