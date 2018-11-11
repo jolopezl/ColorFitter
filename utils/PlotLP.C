@@ -246,8 +246,9 @@ void PlotLP() {
 
     // leg->AddEntry(grint1, "Lund String Model (struck quark)","fl");//   Form("Linear Form, #chi^{2}/dof = %.2f, #kappa = %.1f #pm %.1f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
     // leg->AddEntry(grint2, "Bialas #it{et. al.}","fl");//Form("Bialas #it{et. al.}, #chi^{2}/dof = %.2f, #kappa = %.1f #pm %.1f GeV/fm",fg2->GetChisquare()/fg2->GetNDF(),fg2->GetParameter(1),fg2->GetParError(1)),"fl");
-    leg->AddEntry(model,"BLE30 (corrected for kinematics)","pe");
-    leg->AddEntry(model_corrected,"BLE30 (uncorrected for kinematics)","pe");
+    leg->AddEntry(model,"BLE30","pe");
+    // leg->AddEntry(model,"BLE30 (corrected for kinematics)","pe");
+    // leg->AddEntry(model_corrected,"BLE30 (uncorrected for kinematics)","pe");
 
     leg->Draw();
 
