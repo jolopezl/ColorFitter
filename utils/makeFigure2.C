@@ -20,7 +20,7 @@ void makeFigure2() {
     SetAtlasStyle(43,22);
     gStyle->SetEndErrorSize(0);
 
-    const char *variantname = "BL30";
+    const char *variantname = "BLE30";
 
     TFile *fin = TFile::Open(Form("OutputROOT.20181107.%s.root",variantname));
     TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
@@ -76,11 +76,11 @@ void makeFigure2() {
         // data[i].second = new TGraphErrors(3,xval,yval2,xerr,yerr2);
         data[i].second->GetYaxis()->SetRangeUser(0.01,1.199);
         data[i].second->GetYaxis()->SetNdivisions(505);
-        data[i].first->GetYaxis()->SetTitle("#Delta #LT p_{T}^{2} #GT [GeV^{2}]");
-        data[i].first->GetYaxis()->SetTitle("#Delta p_{T}^{2} [GeV^{2}]");
-        data[i].first->GetXaxis()->SetTitle("A^{1/3}");
-        data[i].second->GetYaxis()->SetTitle("R_{M}");
-        data[i].second->GetXaxis()->SetTitle("A^{1/3}");
+        data[i].first->GetYaxis()->SetTitle("#Delta #LT #it{p}_{T}^{2} #GT (GeV^{2})");
+        data[i].first->GetYaxis()->SetTitle("#Delta #it{p}_{T}^{2} (GeV^{2})");
+        data[i].first->GetXaxis()->SetTitle("#it{A}^{1/3}");
+        data[i].second->GetYaxis()->SetTitle("#it{R}_{M}");
+        data[i].second->GetXaxis()->SetTitle("#it{A}^{1/3}");
 
         data[i].first->GetXaxis()->CenterTitle();
         data[i].first->GetYaxis()->CenterTitle();
@@ -120,10 +120,10 @@ void makeFigure2() {
         tg[i].second->Draw("CLSAME");
         data[i].second->Draw("PSAME");
     }
-    c1->cd(1); myText(0.35,0.9,1,"z = 0.32",22);
-    c1->cd(2); myText(0.15,0.9,1,"z = 0.53",22);
-    c1->cd(3); myText(0.15,0.9,1,"z = 0.75",22);
-    c1->cd(4); myText(0.15,0.9,1,"z = 0.94",22);
+    c1->cd(1); myText(0.35,0.9,1,"#it{z} = 0.32",22);
+    c1->cd(2); myText(0.15,0.9,1,"#it{z} = 0.53",22);
+    c1->cd(3); myText(0.15,0.9,1,"#it{z} = 0.75",22);
+    c1->cd(4); myText(0.15,0.9,1,"#it{z} = 0.94",22);
 
     c1->cd(1);
     TLegend* legend = new TLegend(0.38,0.1,0.65,0.35);

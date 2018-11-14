@@ -3,9 +3,9 @@ void PlotEloss() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[3];
-    fin[0] = new TFile("OutputROOT.20180806.BLE.root","READ");
-    fin[1] = new TFile("OutputROOT.20180806.BLE30.root","READ");
-    fin[2] = new TFile("OutputROOT.20180806.BLE40.root","READ");
+    fin[0] = new TFile("OutputROOT.20181107.BLE.root","READ");
+    fin[1] = new TFile("OutputROOT.20181107.BLE30.root","READ");
+    fin[2] = new TFile("OutputROOT.20181107.BLE30.root","READ");
 
     TGraphErrors *tg[3];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_dz");
@@ -31,7 +31,9 @@ void PlotEloss() {
     model->GetXaxis()->SetLimits(0.0,1.0);
     model->GetXaxis()->SetNdivisions(505);
     model->GetYaxis()->SetRangeUser(-1.9,1.49);
-    model->SetTitle(";z;E_{loss} [GeV]");
+    model->SetTitle(";#it{z};#it{E}_{Loss} (GeV)");
+    model->GetXaxis()->CenterTitle();
+    model->GetYaxis()->CenterTitle();
 
     /** Compute variants bar **/
     TGraphErrors *variants = new TGraphErrors(4);
@@ -92,7 +94,7 @@ void PlotEloss() {
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(model,"BLE30","pe");
-    leg->AddEntry(line,Form("#bar{E_{loss}}(z > 0.5) = %.0f MeV ", Eloss*1000), "l");
+    leg->AddEntry(line,Form("#bar{#it{E}_{Loss}}(#it{z} > 0.5) = %.0f MeV ", Eloss*1000), "l");
     leg->Draw();
 
     c1->Print("figure_models_eloss.pdf");

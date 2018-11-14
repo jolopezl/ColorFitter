@@ -41,15 +41,20 @@ int main(int argc, char *argv[]) {
     // long nn = strtol(argv[2], nullptr,10);
     // ComputeBand(conv);
     computeSimpleFit2("BL", true, 0.0);
+    computeSimpleFit2("BL25",  true, 0.0);
     computeSimpleFit2("BL30",  true, 0.0);
-    // computeSimpleFit2("BL35",  true, 0.0);
-    // computeSimpleFit2("BL40",  true, 0.0);
+    computeSimpleFit2("BL35",  true, 0.0);
+    computeSimpleFit2("BL40",  true, 0.0);
     computeSimpleFit2("BLE",   true, 0.0);
+    computeSimpleFit2("BLE25", true, 0.0);
     computeSimpleFit2("BLE30", true, 0.0);
+    computeSimpleFit2("BLE40", true, 0.0);
     // computeSimpleFit2("BLE35", true, 0.0);
     // computeSimpleFit2("BLE40", true, 0.0);
     // computeSimpleFit2("BL", true, 0.0);
     // computeSimpleFit2("BLC", true, 0.0);
+    // computeSimpleFit2("BL25", true, 0);
+    // computeSimpleFit2("BLE25", true, 0);
     // monitoring();
 }
 
@@ -126,6 +131,10 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_preh = false;
         config->m_initial_sigma = 35.0;
     }
+    else if (model == "BL25") {
+        config->m_preh = false;
+        config->m_initial_sigma = 25.0;
+    }
     else if (model == "BL30C") {
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
@@ -142,6 +151,11 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
     else if (model == "BLE30") {
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
+        config->m_energyloss = true;
+    }
+    else if (model == "BLE25") {
+        config->m_preh = false;
+        config->m_initial_sigma = 25.0;
         config->m_energyloss = true;
     }
     else if (model == "BLE30C") {
@@ -211,9 +225,9 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         std::cout << "Output file created" << std::endl;
         OutputROOT->cd();
         std::cout << "Making plots of everything" << std::endl;
-        TGraphErrors *tg_q0 = new TGraphErrors(fNzbins, z, q0, zErr, q0Err); tg_q0->SetName("tg_q0"); tg_q0->SetTitle(";z;q_{0} [GeV^{2}fm^{2}]");
-        TGraphErrors *tg_lp = new TGraphErrors(fNzbins, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp"); tg_lp->SetTitle(";z;L_{p} [fm]");
-        TGraphErrors *tg_sigma = new TGraphErrors(fNzbins, z, sigma, zErr, sigmaErr); tg_sigma->SetName("tg_sigma"); tg_sigma->SetTitle(";z;#sigma [mbarn]");
+        TGraphErrors *tg_q0 = new TGraphErrors(fNzbins, z, q0, zErr, q0Err); tg_q0->SetName("tg_q0"); tg_q0->SetTitle(";#it{z};#it{q}_{0} (GeV^{2}fm^{2})");
+        TGraphErrors *tg_lp = new TGraphErrors(fNzbins, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp"); tg_lp->SetTitle(";#it{z};#it{L}_{p} (fm)");
+        TGraphErrors *tg_sigma = new TGraphErrors(fNzbins, z, sigma, zErr, sigmaErr); tg_sigma->SetName("tg_sigma"); tg_sigma->SetTitle(";#it{z};#it{#sigma} (mbarn)");
         TGraphErrors *tg_dz = new TGraphErrors(fNzbins, z, dz, zErr, dzErr); tg_dz->SetName("tg_dz");
         TGraphErrors *tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err); tg_c1->SetName("tg_c1");
         TGraphErrors *tg_c2 = new TGraphErrors(fNzbins, z, c2, zErr, c2Err); tg_c2->SetName("tg_c2");

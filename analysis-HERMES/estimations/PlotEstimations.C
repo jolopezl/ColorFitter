@@ -120,7 +120,8 @@ void PlotEstimations(const double xBj = 0.2) {
     SetAtlasStyle(43,22);
     const double string = 1;
 
-    double yMin=0.6, yMax=80;
+    double yMin = 0.6, yMax = 80;
+    double xMin = 5, xMax = 110;
 
     TF1 *LogLund1 = new TF1("LogLund","((0.938 + 2*x)/(2*[1]))*[0]*(log(1/([0]*[0]))-1+[0]*[0])/(1-[0]*[0])",0,140); // LogLund(nu)
     TF1 *LogLund2 = new TF1("LogLund","((0.938 + 2*x)/(2*[1]))*[0]*(log(1/([0]*[0]))-1+[0]*[0])/(1-[0]*[0])",0,140); // LogLund(nu)
@@ -195,13 +196,13 @@ void PlotEstimations(const double xBj = 0.2) {
     c1->cd(1);
     auto bl = GetFunctionAndBand(1,xBj);
     bl.second->Draw("A3");
-    bl.second->GetYaxis()->SetTitle("L_{p} [fm]");
-    bl.second->GetXaxis()->SetTitle("#nu [GeV]");
+    bl.second->GetYaxis()->SetTitle("#it{L}_{p} (fm)");
+    bl.second->GetXaxis()->SetTitle("#it{#nu} (GeV)");
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(0.01,109);
-    bl.second->GetXaxis()->SetNdivisions(505);
+    bl.second->GetXaxis()->SetLimits(xMin,xMax);
+    // bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetYaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
     bl.first->Draw("SAME");
@@ -209,19 +210,22 @@ void PlotEstimations(const double xBj = 0.2) {
     LogLund1->Draw("SAME");
     fg1->Draw("SAME");
 
-    myText(0.28,0.25,kBlack,"z = 0.32, x_{B} = 0.2 #pm 0.1",16);
+    myText(0.28,0.25,kBlack,"#it{z} = 0.32, #it{x}_{B} = 0.2 #pm 0.1",16);
     c1->cd(1)->SetLogy();
+
+    // bl.second->GetYaxis()->SetMoreLogLabels();
+    // bl.second->GetYaxis()->SetNoExponent();
 
     c1->cd(2);
     bl = GetFunctionAndBand(2,xBj);
     bl.second->Draw("A3");
-    bl.second->GetYaxis()->SetTitle("L_{p} [fm]");
-    bl.second->GetXaxis()->SetTitle("#nu [GeV]");
+    bl.second->GetYaxis()->SetTitle("#it{L}_{p} (fm)");
+    bl.second->GetXaxis()->SetTitle("#it{#nu} (GeV)");
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(0.01,109);
-    bl.second->GetXaxis()->SetNdivisions(505);
+    bl.second->GetXaxis()->SetLimits(xMin,xMax);
+    // bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetXaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
     bl.first->Draw("SAME");
@@ -229,19 +233,19 @@ void PlotEstimations(const double xBj = 0.2) {
     LogLund2->Draw("SAME");
     fg2->Draw("SAME");
 
-    myText(0.15,0.27,kBlack,"z = 0.53, x_{B} = 0.2 #pm 0.1",16);
+    myText(0.15,0.27,kBlack,"#it{z} = 0.53, #it{x}_{B} = 0.2 #pm 0.1",16);
     c1->cd(2)->SetLogy(); 
 
     c1->cd(3);
     bl = GetFunctionAndBand(3,xBj);
     bl.second->Draw("A3");
-    bl.second->GetYaxis()->SetTitle("L_{p} [fm]");
-    bl.second->GetXaxis()->SetTitle("#nu [GeV]");
+    bl.second->GetYaxis()->SetTitle("#it{L}_{p} (fm)");
+    bl.second->GetXaxis()->SetTitle("#it{#nu} (GeV)");
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(0.01,109);
-    bl.second->GetXaxis()->SetNdivisions(505);
+    bl.second->GetXaxis()->SetLimits(xMin,xMax);
+    // bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetXaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
     bl.first->Draw("SAME");
@@ -249,19 +253,19 @@ void PlotEstimations(const double xBj = 0.2) {
     LogLund3->Draw("SAME");
     fg3->Draw("SAME");
 
-    myText(0.15,0.27,kBlack,"z = 0.75, x_{B} = 0.2 #pm 0.1",16);
+    myText(0.15,0.27,kBlack,"#it{z} = 0.75, #it{x}_{B} = 0.2 #pm 0.1",16);
     c1->cd(3)->SetLogy(); 
 
     c1->cd(4);
     bl = GetFunctionAndBand(4,xBj);
     bl.second->Draw("A3");
-    bl.second->GetYaxis()->SetTitle("L_{p} [fm]");
-    bl.second->GetXaxis()->SetTitle("#nu [GeV]");
+    bl.second->GetYaxis()->SetTitle("#it{L}_{p} (fm)");
+    bl.second->GetXaxis()->SetTitle("#it{#nu} (GeV)");
     bl.second->GetXaxis()->SetTitleOffset(1.1);
     bl.second->SetMaximum(yMax); 
     bl.second->SetMinimum(yMin); 
-    bl.second->GetXaxis()->SetLimits(0.01,109);
-    bl.second->GetXaxis()->SetNdivisions(505);
+    bl.second->GetXaxis()->SetLimits(xMin,xMax);
+    // bl.second->GetXaxis()->SetNdivisions(505);
     bl.second->GetXaxis()->CenterTitle();
     bl.second->GetXaxis()->CenterTitle();
     bl.first->Draw("SAME");
@@ -269,13 +273,13 @@ void PlotEstimations(const double xBj = 0.2) {
     LogLund4->Draw("SAME");
     fg4->Draw("SAME");
 
-    myText(0.15,0.27,kBlack,"z = 0.94, x_{B} = 0.2 #pm 0.1",16);
+    myText(0.15,0.27,kBlack,"#it{z} = 0.94, #it{x}_{B} = 0.2 #pm 0.1",16);
     c1->cd(4)->SetLogy(); 
 
     myLineText(0.15, 0.88, 0.06, kRed+1, "Lund String Model (Bialas et. al.)", 1, 14);
     myLineText(0.15, 0.80, 0.06, kAzure, "Lund String Model (struck quark)", kDashed, 14);
     myLineText(0.15, 0.72, 0.06, kBlack, "Relativistic Extrapolation", 1, 14);
-    // myText(0.25,0.9,kBlack,"z = 0.94, x_{B} = 0.2",0.04);
+    // myText(0.25,0.9,kBlack,"#it{z} = 0.94, #it{x}_{B} = 0.2",0.04);
     // myBoxText(0.15,0.82,0.05,kBlue,"Lund String Model",kBlack,2,3444,16);
     // myBoxText(0.15,0.76,0.05,kRed,"Relativistic Extrapolation",kBlack,2,3444,16);
 

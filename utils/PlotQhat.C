@@ -3,10 +3,10 @@ void PlotQhat() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
-    fin[0] = new TFile("OutputROOT.20180924.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20180924.BL30.root","READ");
-    fin[2] = new TFile("OutputROOT.20180924.BLE.root","READ");
-    fin[3] = new TFile("OutputROOT.20180924.BLE30.root","READ");
+    fin[0] = new TFile("OutputROOT.20181107.BL.root","READ");
+    fin[1] = new TFile("OutputROOT.20181107.BL30.root","READ");
+    fin[2] = new TFile("OutputROOT.20181107.BLE.root","READ");
+    fin[3] = new TFile("OutputROOT.20181107.BLE30.root","READ");
 
     TGraphErrors *tg_lp[4];
     TGraphErrors *tg_q0[4];
@@ -130,7 +130,9 @@ void PlotQhat() {
 
 
     // Set drawing attributes
-    model[0]->SetTitle(";z;#hat{q} [GeV^{2}/fm]");
+    model[0]->SetTitle(";#it{z};#it{#hat{q}} (GeV^{2}/fm)");
+    model[0]->GetXaxis()->CenterTitle();
+    model[0]->GetYaxis()->CenterTitle();
     model[0]->GetXaxis()->SetLimits(0,1);
     model[0]->GetXaxis()->SetNdivisions(505);
     // model[0]->GetYaxis()->SetRangeUser(-0.3,1);
@@ -147,7 +149,7 @@ void PlotQhat() {
     model[2]->Draw("PSAME");
 
     double theoretical_qhat = 0.075;
-    double lxmin=0.24;
+    double lxmin=0.85;
     double lxmax=0.99;
     TLine *line = new TLine(lxmin, theoretical_qhat, lxmax, theoretical_qhat);
     line->SetLineStyle(2);
@@ -155,7 +157,7 @@ void PlotQhat() {
 
     TBox *box = new TBox(lxmin,theoretical_qhat-0.005,lxmax,theoretical_qhat+0.015);
     box->SetLineStyle(2);
-    box->SetFillColorAlpha(13,0.5);
+    box->SetFillColorAlpha(13,1);
     box->Draw("SAME");
 
     variants[0]->Draw("SAME5");
@@ -166,6 +168,9 @@ void PlotQhat() {
     model[0]->Draw("PSAME");
     model[1]->Draw("PSAME");
     model[2]->Draw("PSAME");
+
+    box->Draw("SAME");
+    line->Draw("SAME");
 
     // TLine *line_average = new TLine(lxmin, average, lxmax, average);
     // line_average->SetLineWidth(4);
@@ -188,5 +193,42 @@ void PlotQhat() {
     // AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 30 [mb]")
 
     c1->Print("figure_qhat.pdf");
+
+
+    /* Compute strong coupling constant from energy loss, qhat and production length */
+    /* 
+        - Delta E_loss = alpha_S/4 * qhat * L^2
+    */
+    double qhat = 0; // q-hat computed from BLE30
+    double qhat_err = 0;
+
+    qhat += model[0]->GetY()[4]/model[0]->GetEY()[4];
+    cout << qhat << endl;
+    qhat += model[1]->GetY()[4]/model[1]->GetEY()[4];
+    qhat += model[2]->GetY()[4]/model[2]->GetEY()[4];
+
+    sumw = 0;
+    sumw += 1/model[0]->GetEY()[4];
+    sumw += 1/model[1]->GetEY()[4];
+    sumw += 1/model[2]->GetEY()[4];
+
+    qhat /= sumw;
+
+    qhat_err += TMath::Power(model[0]->GetEY()[4],2);
+    qhat_err += TMath::Power(model[1]->GetEY()[4],2);
+    qhat_err += TMath::Power(model[2]->GetEY()[4],2); // q-hat computed from BLE30
+    qhat_err = TMath::Sqrt(qhat_err);
+
+    double lp = tg_lp[3]->GetY()[4]; // Choosing BLE30
+    double lp_err = tg_lp[3]->GetEY()[4]; // Choosing BLE30
+
+    cout << "q-hat = " << qhat << " +/- " << qhat_err << " (GeV^2/fm)" << endl;
+    cout << "lp = " << lp << " +/- " << lp_err << " (fm)" << endl;
+
+    double alpha_S = 0;
+    alpha_S = 0.25 * 0.03 / (qhat * lp*lp);
+
+    cout << "Alpha_S = " << alpha_S << endl;
+
 
 }
