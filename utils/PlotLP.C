@@ -6,7 +6,7 @@ void PlotLP() {
     fin[0] = new TFile("OutputROOT.20181107.BL.root","READ");
     fin[1] = new TFile("OutputROOT.20181107.BL30.root","READ");
     fin[2] = new TFile("OutputROOT.20181107.BLE.root","READ");
-    fin[3] = new TFile("OutputROOT.20181107.BLEf30.root","READ");
+    fin[3] = new TFile("OutputROOT.20181107.BLE30.root","READ");
 
     TGraphErrors *tg[4];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_lp");
