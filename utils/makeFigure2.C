@@ -20,7 +20,7 @@ void makeFigure2() {
     SetAtlasStyle(43,22);
     gStyle->SetEndErrorSize(0);
 
-    const char *variantname = "BLE30";
+    const char *variantname = "BLEf30";
 
     TFile *fin = TFile::Open(Form("OutputROOT.20181107.%s.root",variantname));
     TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");

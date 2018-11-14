@@ -428,6 +428,8 @@ void Model::ApplyEnergyLoss(double &temp) {
     }
     // SIMPLE CASE - DEFAULT
     else {
+        if (m_iz ==0) {m_dz=0;}
+        else {m_dz =  -0.03;}
         if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
         else {temp *= (1.+(m_binratio*m_dz)/m_zbinwidth);} // events increase in the lowest z bin.
     }
