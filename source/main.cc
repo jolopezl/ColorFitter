@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     // computeSimpleFit2("BL", true, 0.0);
     // computeSimpleFit2("BLC", true, 0.0);
     // computeSimpleFit2("BL25", true, 0);
-    computeSimpleFit2("BLEf30", true, 0);
+    // computeSimpleFit2("BLEf30", true, 0);
     // monitoring();
 }
 
@@ -202,105 +202,8 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
 
     std::cout << "Fit is done." << std::endl;
 
-    const int fNzbins = 4; // 10 for JLab and 4 for HERMES !
-
-    double z[fNzbins], q0[fNzbins], lp[fNzbins], sigma[fNzbins], dz[fNzbins], c1[fNzbins], c2[fNzbins], cascade[fNzbins];
-    double zErr[fNzbins], q0Err[fNzbins], lpErr[fNzbins], sigmaErr[fNzbins], dzErr[fNzbins], c1Err[fNzbins], c2Err[fNzbins], cascade_err[fNzbins];
-    double chisquared[fNzbins];
-    if (resultCont.size() != fNzbins) {
-        std::cout << "I cannot produce a ROOT output file." << std::endl;
-        return 0;
-    }
-    else {
-        std::cout << "I will produce a ROOT out file..." << std::endl;
-        for (int i=0; i<fNzbins; ++i) {
-            std::cout << "Fetching result container for element " << i << std::endl;
-            z[i] = resultCont.at(i).m_zbin;         zErr[i] = 0;
-            q0[i] = resultCont.at(i).m_qhat;        q0Err[i] = resultCont.at(i).m_qhat_err;
-            lp[i] = resultCont.at(i).m_lp;          lpErr[i] = resultCont.at(i).m_lp_err;
-            sigma[i] = resultCont.at(i).m_sigma_ph; sigmaErr[i] = resultCont.at(i).m_sigma_ph_err;
-            dz[i] = resultCont.at(i).m_dz;          dzErr[i] = resultCont.at(i).m_dz_err;
-            c1[i] = resultCont.at(i).m_c1;          c1Err[i] = resultCont.at(i).m_c1_err;
-            c2[i] = resultCont.at(i).m_c2;          c2Err[i] = resultCont.at(i).m_c2_err;
-            cascade[i] = resultCont.at(i).m_cascade;          cascade_err[i] = resultCont.at(i).m_cascade;
-            chisquared[i] = resultCont.at(i).m_chi2;
-            std::cout << "z = " << z[i] << std::endl;
-        }
-        std::string ffout = "OutputROOT.20181107."+model+".root";
-        TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
-        std::cout << "Output file created" << std::endl;
-        OutputROOT->cd();
-        std::cout << "Making plots of everything" << std::endl;
-        TGraphErrors *tg_q0 = new TGraphErrors(fNzbins, z, q0, zErr, q0Err); tg_q0->SetName("tg_q0"); tg_q0->SetTitle(";#it{z};#it{q}_{0} (GeV^{2}fm^{2})");
-        TGraphErrors *tg_lp = new TGraphErrors(fNzbins, z, lp, zErr, lpErr); tg_lp->SetName("tg_lp"); tg_lp->SetTitle(";#it{z};#it{L}_{p} (fm)");
-        TGraphErrors *tg_sigma = new TGraphErrors(fNzbins, z, sigma, zErr, sigmaErr); tg_sigma->SetName("tg_sigma"); tg_sigma->SetTitle(";#it{z};#it{#sigma} (mbarn)");
-        TGraphErrors *tg_dz = new TGraphErrors(fNzbins, z, dz, zErr, dzErr); tg_dz->SetName("tg_dz");
-        TGraphErrors *tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err); tg_c1->SetName("tg_c1");
-        TGraphErrors *tg_c2 = new TGraphErrors(fNzbins, z, c2, zErr, c2Err); tg_c2->SetName("tg_c2");
-        TGraphErrors *tg_cascade = new TGraphErrors(fNzbins, z, cascade, zErr, cascade_err); tg_cascade->SetName("tg_cascade");
-        TGraph *tg_chisquared = new TGraph(fNzbins, z, chisquared); tg_chisquared->SetName("tg_chisquared");
-        std::cout << "Writing first set of plots" << std::endl;
-        tg_q0->Write();
-        tg_lp->Write();
-        tg_sigma->Write();
-        tg_dz->Write();
-        tg_c1->Write();
-        tg_c2->Write();
-        tg_cascade->Write();
-        tg_chisquared->Write();
-        std::cout << "Creating model plots" << std::endl;
-        TGraphErrors *tg_data_pT[fNzbins];
-        TGraphErrors *tg_data_Rm[fNzbins];
-        TGraphErrors *tg_model_pT[fNzbins];
-        TGraphErrors *tg_model_Rm[fNzbins];
-        TGraphErrors *tg_model_pT_extrapolation[fNzbins];
-        TGraphErrors *tg_model_pT_extrapolation_up[fNzbins];
-        TGraphErrors *tg_model_pT_extrapolation_down[fNzbins];
-        TGraphErrors *tg_model_Rm_extrapolation[fNzbins];
-        TGraphErrors *tg_model_Rm_extrapolation_up[fNzbins];
-        TGraphErrors *tg_model_Rm_extrapolation_down[fNzbins];
-
-        TGraph *tg_average_density[fNzbins];
-        TGraph *tg_multiplicity_density[fNzbins];
-
-        std::string title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
-        for (int i=0; i<fNzbins; ++i) {
-            std::cout << "Creating model plots for element " << i << std::endl;
-            title = ";A^{1/3};#Delta p_{t}^{2}";
-            tg_data_pT[i] = &(resultCont.at(i).m_tg_data_pT); tg_data_pT[i]->SetName(Form("tg_data_pT_%d",i)); tg_data_pT[i]->SetTitle(title.c_str());
-            tg_model_pT[i] = &(resultCont.at(i).m_tg_pT); tg_model_pT[i]->SetName(Form("tg_model_pT_%d",i)); tg_model_pT[i]->SetTitle(title.c_str());
-            tg_model_pT_extrapolation[i] = &(resultCont.at(i).m_tg_pT_extrapolation); tg_model_pT_extrapolation[i]->SetName(Form("tg_model_pT_extrapolation_%d",i)); tg_model_pT_extrapolation[i]->SetTitle(title.c_str());
-            tg_model_pT_extrapolation_up[i] = &(resultCont.at(i).m_tg_pT_extrapolation_up); tg_model_pT_extrapolation_up[i]->SetName(Form("tg_model_pT_extrapolation_up_%d",i)); tg_model_pT_extrapolation_up[i]->SetTitle(title.c_str());
-            tg_model_pT_extrapolation_down[i] = &(resultCont.at(i).m_tg_pT_extrapolation_down); tg_model_pT_extrapolation_down[i]->SetName(Form("tg_model_pT_extrapolation_down_%d",i)); tg_model_pT_extrapolation_down[i]->SetTitle(title.c_str());
-            
-            title = ";A^{1/3};R_{M}";
-            tg_data_Rm[i] = &(resultCont.at(i).m_tg_data_Rm); tg_data_Rm[i]->SetName(Form("tg_data_Rm_%d",i)); tg_data_Rm[i]->SetTitle(title.c_str());
-            tg_model_Rm[i] = &(resultCont.at(i).m_tg_Rm); tg_model_Rm[i]->SetName(Form("tg_model_Rm_%d",i)); tg_model_Rm[i]->SetTitle(title.c_str());
-            tg_model_Rm_extrapolation[i] = &(resultCont.at(i).m_tg_Rm_extrapolation); tg_model_Rm_extrapolation[i]->SetName(Form("tg_model_Rm_extrapolation_%d",i)); tg_model_Rm_extrapolation[i]->SetTitle(title.c_str());
-            tg_model_Rm_extrapolation_up[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_up); tg_model_Rm_extrapolation_up[i]->SetName(Form("tg_model_Rm_extrapolation_up_%d",i)); tg_model_Rm_extrapolation_up[i]->SetTitle(title.c_str());
-            tg_model_Rm_extrapolation_down[i] = &(resultCont.at(i).m_tg_Rm_extrapolation_down); tg_model_Rm_extrapolation_down[i]->SetName(Form("tg_model_Rm_extrapolation_down_%d",i)); tg_model_Rm_extrapolation_down[i]->SetTitle(title.c_str());
-
-            title = ";A^{1/3};#LT #rho #GT";
-            tg_average_density[i] = &(resultCont.at(i).m_tg_average_density); tg_average_density[i]->SetName(Form("tg_average_density_%d",i)); tg_average_density[i]->SetTitle(title.c_str());
-            title = ";A^{1/3};#LT #sigma exp(-#sigma#int#rhodz) #rho(z_{0}+l) #GT";
-            tg_multiplicity_density[i] = &(resultCont.at(i).m_tg_multiplicity_density); tg_multiplicity_density[i]->SetName(Form("tg_multiplicity_density_%d",i)); tg_multiplicity_density[i]->SetTitle(title.c_str());
-
-            tg_data_pT[i]->Write();
-            tg_data_Rm[i]->Write();
-            tg_model_pT[i]->Write();
-            tg_model_Rm[i]->Write();
-            tg_model_pT_extrapolation[i]->Write();
-            tg_model_pT_extrapolation_up[i]->Write();
-            tg_model_pT_extrapolation_down[i]->Write();
-            tg_model_Rm_extrapolation[i]->Write();
-            tg_model_Rm_extrapolation_up[i]->Write();
-            tg_model_Rm_extrapolation_down[i]->Write();
-            tg_average_density[i]->Write();
-            tg_multiplicity_density[i]->Write();
-        }
-        std::cout << "Done." << std::endl;
-        OutputROOT->Close();
-    }
+    /* Call output handler needs model name and result container */
+    OutputResultsToFile(model, resultCont);
     return 0;
 }
 

@@ -87,6 +87,7 @@ public:
 };
 
 std::vector<myData*> dataHandler(myConfig*);
+bool OutputResultsToFile(const std::string , std::vector<myResult>);
 void conv2double(std::vector<std::string>,double&,double&,double&);
 double pow2(double);
 
