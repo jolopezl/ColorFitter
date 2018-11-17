@@ -145,6 +145,14 @@ void conv2double(std::vector<std::string> words, double &val, double &stat, doub
 
 std::vector<myData*> dataHandler(myConfig *config) {
     double correlation = config->m_correlation;
+
+    /* 
+    This is a function and not a method of myData becuase it reads 
+    from an input file that is not well designed now, so all three nuclei are read at once.
+    Of course, this should only old for HERMES analysis. For Jlab analysis all data
+    should be read from TGraphErrors of pT and RM vs A^1/3 for each kinematic bin
+    */
+
     myData *he = new myData("Helium");
     myData *ne = new myData("Neon");
     myData *kr = new myData("Kripton");
