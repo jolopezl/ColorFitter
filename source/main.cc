@@ -1,61 +1,35 @@
 #include "main.h"
 #include "MultiGaus.h"
-#include <TMatrixD.h>
-#include <TVectorD.h>
 #include <TF2.h>
 #include <TH2.h>
 
 #define RUN 1
 
-int demoPlots(); // Do plots and studies of the model
-int demoPlots2D(); // Do fancier plots and studies of the model
-int computeSimpleFit(const bool, const bool, const double);                           // A simple fits trusted.
-int computeSimpleFit2(const std::string, const bool, const double);
-int computeComplexFit(int argc, char *argv[]);    // A fit with a complex configuration
-int printInteractionPoints();
-
-double fcn_gaus_2d_cov(double *x, double *par);
-int ComputeBand(int);
-
-int average_density();
-int plotTool();
-int monitoring();
-
-
 // ************ main function ************ //
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {                  
+    // runColorFitter(true, true,  0.0); // EnergyLoss, Subtraction, Correlation
+    // runColorFitter(true, true, -0.5);
+    // runColorFitter(true, true, -1.0);
+    // runColorFitterVariant(argv[1], true, 0); // If you want to pass the model variant from execution "$ ifit.exe BLE30"
+    // runColorFitterVariant("BL", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
+    // runColorFitterVariant("BL25",  true, 0.0);
+    runColorFitterVariant("BL30",  true, 0.0);
+    // runColorFitterVariant("BL35",  true, 0.0);
+    // runColorFitterVariant("BL40",  true, 0.0);
+    // runColorFitterVariant("BLE",   true, 0.0);
+    // runColorFitterVariant("BLE25", true, 0.0);
+    // runColorFitterVariant("BLE30", true, 0.0);
+    // runColorFitterVariant("BLE40", true, 0.0);
+    // runColorFitterVariant("BLE35", true, 0.0);
+    // runColorFitterVariant("BLE40", true, 0.0);
+    // runColorFitterVariant("BL", true, 0.0);
+    // runColorFitterVariant("BLC", true, 0.0);
+    // runColorFitterVariant("BL25", true, 0);
+    // runColorFitterVariant("BLEf30", true, 0);
+    // monitoring();
     // demoPlots();
     // printInteractionPoints();
-    // ********  EnergyLoss, Subtraction, Correlation                  
-    // computeSimpleFit(true, true, 0.0);
-    // computeSimpleFit(true, true,  0.0);
-    // computeSimpleFit(true, true, -0.5);
-    // computeSimpleFit(true, true, -1.0);
     // ComputeBand();
-    // demoPlots();
-    // int foo = average_density();
-    // computeSimpleFit(false,true,0.0);
-    // MODEL TYPE, do subtraction, value
-    // computeSimpleFit2(argv[1], true, -1.0);
-    // long conv = strtol(argv[1], nullptr, 10);
-    // long nn = strtol(argv[2], nullptr,10);
-    // ComputeBand(conv);
-    // computeSimpleFit2("BL", true, 0.0);
-    // computeSimpleFit2("BL25",  true, 0.0);
-    // computeSimpleFit2("BL30",  true, 0.0);
-    // computeSimpleFit2("BL35",  true, 0.0);
-    // computeSimpleFit2("BL40",  true, 0.0);
-    // computeSimpleFit2("BLE",   true, 0.0);
-    // computeSimpleFit2("BLE25", true, 0.0);
-    // computeSimpleFit2("BLE30", true, 0.0);
-    // computeSimpleFit2("BLE40", true, 0.0);
-    // computeSimpleFit2("BLE35", true, 0.0);
-    // computeSimpleFit2("BLE40", true, 0.0);
-    // computeSimpleFit2("BL", true, 0.0);
-    // computeSimpleFit2("BLC", true, 0.0);
-    // computeSimpleFit2("BL25", true, 0);
-    // computeSimpleFit2("BLEf30", true, 0);
-    // monitoring();
 }
 
 int monitoring() {
@@ -87,22 +61,29 @@ int monitoring() {
 }
 
 int plotTool() {
+    /* 
+        Just plot the results of the He subtraction in pt-broadening, only useful for HERMES
+        This is done by passing correctionPlots=true in the config 
+    */
     myConfig *config = new myConfig();
     config->m_subtraction = true;
     config->m_correlation = -0.5;
     config->correctionPlots = true;
     auto fc = dataHandler(config);
-    //int foo = average_density();
-    //computeSimpleFit(false,true,0.0);
-    // MODEL TYPE, do subtraction, value
-    computeSimpleFit2("BL", true, 0.0);
     return 0;
 }
 
-int computeSimpleFit2(const std::string model, const bool iSubt, const double iCorr) {
-    myConfig *config = new myConfig();
+int runColorFitterVariant(const std::string model, const bool iSubt, const double iCorr) {
+    /*
+        Set up different model variants defined by model
+        BL, BL30, BLE, BLE30, etc.
+        Helful to run multiple model variants at once from main()
+    */
+
     int Q2Int = -1;
     int izInt = -1; // 4 for bin #83
+
+    myConfig *config = new myConfig();
     config->m_subtraction = iSubt; // false;
     config->m_correlation = iCorr; // for physics -1.0 < rho < 0.0
 
@@ -114,14 +95,14 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_output_fit = "testFit"+model+".csv";
     }
 
-    if (model == "BLC") {
-       config->m_output_fit = "testFit"+model+".csv";
-       config->m_cascade = true;
-//        if (config->fixedLp == true) "testFit"+model+"fixedLp.csv";
+    if (model == "BL") {
+        config->m_preh = true;
+        config->m_initial_sigma = 30.0;
+        config->m_energyloss = false;
     }
-    else if (model == "BL40") {
+    else if (model == "BL25") {
         config->m_preh = false;
-        config->m_initial_sigma = 40.0;
+        config->m_initial_sigma = 25.0;
     }
     else if (model == "BL30") {
         config->m_preh = false;
@@ -131,21 +112,16 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_preh = false;
         config->m_initial_sigma = 35.0;
     }
-    else if (model == "BL25") {
+    else if (model == "BL40") {
         config->m_preh = false;
-        config->m_initial_sigma = 25.0;
-    }
-    else if (model == "BL30C") {
-        config->m_preh = false;
-        config->m_initial_sigma = 30.0;
-        config->m_cascade = true;
+        config->m_initial_sigma = 40.0;
     }
     else if (model == "BLE") {
         config->m_energyloss = true;
     }
-    else if (model == "BLE40") {
+    else if (model == "BLE25") {
         config->m_preh = false;
-        config->m_initial_sigma = 40.0;
+        config->m_initial_sigma = 25.0;
         config->m_energyloss = true;
     }
     else if (model == "BLE30") {
@@ -153,15 +129,14 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_initial_sigma = 30.0;
         config->m_energyloss = true;
     }
-    else if (model == "BLEf30") {
+    else if (model == "BLE35") {
         config->m_preh = false;
-        config->m_initial_sigma = 30.0;
+        config->m_initial_sigma = 35.0;
         config->m_energyloss = true;
-        // config->m_energyloss_fixed = true;
     }
-    else if (model == "BLE25") {
+    else if (model == "BLE40") {
         config->m_preh = false;
-        config->m_initial_sigma = 25.0;
+        config->m_initial_sigma = 40.0;
         config->m_energyloss = true;
     }
     else if (model == "BLE30C") {
@@ -170,29 +145,35 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
         config->m_energyloss = true;
         config->m_cascade = true;
     }
-    else if (model == "BLE35") {
-        config->m_preh = false;
-        config->m_initial_sigma = 35.0;
-        config->m_energyloss = true;
-    }
-    else if (model == "BL") {
-        config->m_preh = true;
-        config->m_initial_sigma = 30.0;
-        config->m_energyloss = false;
-    }
     else if (model == "BLC") {
         config->m_preh = true;
         config->m_initial_sigma = 30.0;
         config->m_energyloss = false;
         config->m_cascade = true;
     }
+    else if (model == "BL30C") {
+        config->m_preh = false;
+        config->m_initial_sigma = 30.0;
+        config->m_cascade = true;
+    }
+    else if (model == "BLC") {
+       config->m_output_fit = "testFit"+model+".csv";
+       config->m_cascade = true;
+//        if (config->fixedLp == true) "testFit"+model+"fixedLp.csv";
+    }
+    else if (model == "BLEf30") {
+        config->m_preh = false;
+        config->m_initial_sigma = 30.0;
+        config->m_energyloss = true;
+        // config->m_energyloss_fixed = true;
+    }
     else {return -1;}
     config->m_Q2BinOfInterest   = Q2Int; // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
     config->m_zBinOfInterest    = izInt; // value in between 1 and ZDIM of z bins. -1 fits all.
-    config->m_input_pt          = "hermesData.txt";
+    config->m_input_pt          = "hermesData.txt"; // ONLY FOR HERMES
     config->writeCorrectedValues = false; // text file from dataHandler
     config->correctionPlots      = false; // from dataHandler
-    config->outputPlots          = true; // model and data
+    config->outputPlots          = true; // model and data, very useful
     config->doMINOSErrors        = false; // usually false
     config->Update();
 
@@ -201,7 +182,6 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
     std::vector<myResult> resultCont = ifit(config);
 
     std::cout << "Fit is done." << std::endl;
-
     /* Call output handler needs model name and result container */
     OutputResultsToFile(model, resultCont);
     return 0;
@@ -209,8 +189,14 @@ int computeSimpleFit2(const std::string model, const bool iSubt, const double iC
 
 
 // **************** Compute a Simple Fit **************** //
-int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
+int runColorFitter(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {
+    /*
+        Generic function to configure the fitter
+        Initially used to study the impact of different correlations on the Helium subtraction
+        This will be deprecated for future data
+    */
     myConfig *config = new myConfig();
+    const std::string model = "BL_test";
     // bins of interest
     int Q2Int = -1;
     int izInt = -1;
@@ -239,30 +225,18 @@ int computeSimpleFit(const bool tEnergyLoss, const bool tSubtraction, const doub
     config->Update();
     std::cout << "Running iFit now:" << std::endl;
     auto fitOutput = ifit(config);
+    OutputResultsToFile(model, fitOutput);
     return 0;
 }
 
-// **** computations of the model **** //
-double fcn_gaus_2d_cov(double *x, double *par) {
-    /* par = q0, l, sigma_q0, sigma_l, correlation */
-    TMatrixD SIGMA(2,2);
-    TVectorD X(2);
-    X(0) = x[0] - par[0];
-    X(1) = x[1] - par[1];
-    SIGMA(0,0) = pow(par[2],2);
-    SIGMA(1,1) = pow(par[3],2);
-    SIGMA(0,1) = par[2]*par[3]*par[4];
-    SIGMA(1,0) = SIGMA(0,1);
-    double det = SIGMA.Determinant();
-    SIGMA.Invert();
-    double ans = exp(-0.5*X*(SIGMA*X));
-    ans /= 2*M_PI*sqrt(det);
-    return ans;
-}
-
 int ComputeBand(int zbin = 1) {
+    /*
+        Function created to study the model uncertainties
+        It is called from main and takes time, usually a cluster
+        It needs to know the parameters from a given model variant, 
+        those values are not read from file and must be set by hand - see below
+    */
     // x is A^1/3
-
     int MCSTEPS = 2500;
     std::cout << "ComputeBand will use " << MCSTEPS << " MCSTEPS" << std::endl;
 
@@ -387,9 +361,10 @@ int ComputeBand(int zbin = 1) {
     return 0;
 }
 
-
-// *** prints interaction points *** //
 int printInteractionPoints() {
+    /*
+        Prints interaction points
+    */
     Model *model = new Model("InteractionPoints");
     model->Initialization();
     double x=0.,y=0.,z=0.;
@@ -405,24 +380,12 @@ int printInteractionPoints() {
     return 0;
 }
 
-int average_density() {
-    Model *model = new Model("AverageDensityComputation");
-    model->Initialization();
-    model->SetParameters("lp", 3.1); // z=0.75
-    float xxx[3];
-    xxx[0]=pow(20.1797,1./3.); // Ne   here goes A^1/3
-    xxx[1]=pow(83.7980,1./3.); // Kr
-    xxx[2]=pow(131.293,1./3.); // Xe
-    {
-        int i = 2;
-        std::cout << "A13 = " << xxx[i] << std::endl;
-        model->Compute(xxx[i]);
-    }
-    return 0;
-}
-
 // ************ This is used for model plots ************ //
 int demoPlots() {
+    /*
+        Make those plots of pT vs A^1/3 as a demonstration of the model
+        Used to study fixed vs exp distribution for L
+    */
     Model *model = new Model("demoPlots");
     model->Initialization();
     model->DoFixedLp(true); 
@@ -445,32 +408,6 @@ int demoPlots() {
         }
     }
     return 0;
-    // std::vector<std::string> foo;
-    // std::for_each(
-    //     std::execution::par_unseq,
-    //     foo.begin(),
-    //     foo.end(),
-    //     [](auto&& item)
-    //     {
-    //         //do stuff with item
-    //     });
-    // std::for_each(std::execution::par_unseq,lpList.begin(),lpList.end(),
-    //     [](auto&& item) {
-    //         for (int nucleus = 12; nucleus <= 240; ++nucleus) {
-    //             std::cout << "Computing " << nucleus << " of 240 for lp = " << lp << std::endl;
-    //             model->SetParameters("lp", lp);   //* <------!!! *//
-    //             model->Compute(nucleus);          //* <------!!! *//
-    //             //* Print to file **//
-    //             std::ofstream fout;
-    //             std::string str = boost::lexical_cast<std::string>(lp);
-    //             std::string filename = "input-exp-lp="+str+".txt";
-    //             fout.open(filename, std::ios::out | std::ios::app);
-    //             fout.precision(10);
-    //             fout << pow(nucleus,1./3.) << '\t' << model->Get1() << '\n';
-    //             fout.close();
-    //         }
-    //     }
-    // )
 }
 
 // ************ This is used for model plots ************ //
@@ -489,127 +426,5 @@ int demoPlots2D() {
             std::cout << pow(nucleus,1./3.) << '\t' << lp << '\t' << model->Get1() << std::endl;
         }
     }
-    return 0;
-}
-
-// **************** Compute a _fancy_ Fit **************** //
-int computeComplexFit(int argc, char *argv[]) {
-    myConfig *config = new myConfig();
-    // bins to fit
-    int Q2Int  = 1;
-    int izInt  = 3;
-    // defaults
-    int input_energyloss  = 0;
-    int input_subtraction = 1;
-    double input_correlation = 0.0;
-    int max_run = 1; 
-
-    if (argc == 4) {
-        input_energyloss  = std::stoi(argv[1]);
-        input_subtraction = std::stoi(argv[2]);
-        input_correlation = std::stod(argv[3]);
-        max_run = std::stoi(argv[4]);
-        config->m_special_run = true;
-    }
-    else if (argc == 3) {
-        input_energyloss  = std::stoi(argv[1]);
-        input_subtraction = std::stoi(argv[2]);
-        input_correlation = std::stod(argv[3]);
-        max_run = 1; 
-        config->m_special_run = false;
-    }
-    else if (argc < 3) {
-        // defaults
-        input_energyloss  = 0;
-        input_subtraction = 1;
-        input_correlation = 0.0;
-        max_run = 1; 
-    }
-
-    config->m_stat_only         = false;
-    config->m_energyloss        = input_energyloss; // false;
-    config->m_logbehavior       = false;
-    config->m_fermimotion       = false;
-    config->m_subtraction       = input_subtraction; // false;
-    config->m_correlation       = input_correlation; // -1.0; // for physics -1.0 < rho < 0.0
-    config->m_Q2BinOfInterest   = Q2Int;   // value in between 1 and Q2DIM of Q2,x bins. -1 fits all.
-    config->m_zBinOfInterest    = izInt;   // value in between 1 and ZDIM of z bins. -1 fits all.
-    config->m_output_fit        = "testFit.txt";
-    config->m_input_pt          = "hermesData.txt";
-    // config->Update();
-
-    std::ostringstream foo;
-    foo << "iFit: energy loss: " << config->m_energyloss;
-    foo << " He subtraction: " << config->m_subtraction;
-    foo << " correlation = " << config->m_correlation;
-    config->m_comment           = foo.str();
-
-    std::cout << "Running iFit now:" << std::endl;
-    int mcMax=1; // this will control how many times I will average
-    if (config->m_special_run) {
-        mcMax=max_run;
-        // Do everything
-        myResult f;
-        TFile *out_file = TFile::Open("output.root","RECREATE");
-        TTree* tt = new TTree("tree","tree");
-        tt->Branch("zbin",         &f.m_zbin,         "zbin/D");
-        tt->Branch("qhat",         &f.m_qhat,         "q-hat/D");
-        tt->Branch("lp",           &f.m_lp,           "lp/D");
-        tt->Branch("sigma_ph",     &f.m_sigma_ph,     "sigma_ph/D");
-        tt->Branch("dz",           &f.m_dz,           "dz/D");
-        tt->Branch("qhat_err",     &f.m_qhat_err,     "qhat_err/D");
-        tt->Branch("lp_err",       &f.m_lp_err,       "lp_err/D");
-        tt->Branch("sigma_ph_err", &f.m_sigma_ph_err, "sigma_ph_err/D");
-        tt->Branch("dz_err",       &f.m_dz_err,       "dz_err/D");
-        tt->Branch("chi2",         &f.m_chi2,         "chi2/D");
-        for (int mc=1; mc<=mcMax; mc++) {
-            auto fitOutput = ifit(config);
-            int count = 1;
-            for (const auto &v : fitOutput) {
-                std::cout << "Info: Run #" << mc << " element " << count << " of " << (int)fitOutput.size() << std::endl;
-                std::cout << "Info:       z-bin    = " << v.m_zbin << std::endl;
-                std::cout << "Info: Value q-hat    = " << v.m_qhat << std::endl;
-                std::cout << "Info: Value l_p      = " << v.m_lp << std::endl;
-                std::cout << "Info: Value sigma_ph = " << v.m_sigma_ph << std::endl;
-                std::cout << "Info: Value dz       = " << v.m_dz << std::endl;
-                std::cout << "Info: Error q-hat    = " << v.m_qhat_err << std::endl;
-                std::cout << "Info: Error l_p      = " << v.m_lp_err << std::endl;
-                std::cout << "Info: Error sigma_ph = " << v.m_sigma_ph_err << std::endl;
-                std::cout << "Info: Error dz       = " << v.m_dz_err << std::endl;
-                std::cout << "Info:       chi2     = " << v.m_chi2 << std::endl;
-                f.m_zbin = v.m_zbin;
-                f.m_qhat = v.m_qhat;
-                f.m_lp = v.m_lp;
-                f.m_sigma_ph = v.m_sigma_ph;
-                f.m_dz = v.m_dz;
-                f.m_qhat_err = v.m_qhat_err;
-                f.m_lp_err = v.m_lp_err;
-                f.m_sigma_ph_err = v.m_sigma_ph_err;
-                f.m_dz_err = v.m_dz_err;
-                f.m_chi2 = v.m_chi2;
-                tt->Fill();
-                count++;
-            }
-        }
-        tt->Print();
-        out_file->Write();
-        out_file->Close();
-    }
-    else {
-        // run only once and do nothing else
-        auto fitOutput = ifit(config);
-    }
-    std::cout << "Running iFit ended" << std::endl;
-    // commnt plotFitOutput if doing special things
-    // plotFitOutput(config->m_output_fit);
-
-    // test(); // Test of Model Class
-    // auto fc = dataHandler(config); // This is just a test of dataHandler()
-    // double zbin[4] = {0.32, 0.53, 0.75, 0.94};
-    // for (int a=0; a<3; ++a) {
-    //   for (int iz=0; iz<4; ++iz) {
-    //     std::cout << zbin[iz] << "\t" << fc[a]->m_value[iz] << "\t" << 0.0 << "\t" << fc[a]->m_err[iz] << std::endl;
-    //   }
-    // }
     return 0;
 }

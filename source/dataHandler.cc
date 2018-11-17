@@ -332,15 +332,3 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     std::cout << "Results saved to a ROOT file file: " << ffout << std::endl;
     return true;
 }
-
-/* 
-    The following functions should be somewhere else
-*/
-
-void conv2double(std::vector<std::string> words, double &val, double &stat, double &syst) {
-    val  = std::stod(words.at(2));
-    stat = std::stod(words.at(3));
-    syst = std::stod(words.at(4));
-}
-
-double pow2(double x) {return x*x;} // move this to somewhere else.

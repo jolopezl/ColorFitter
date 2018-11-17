@@ -1,3 +1,9 @@
+/**
+  Taken from xxxyyy
+  Find ROOT JIRA ticket where it was implemented
+**/
+
+
 #include "MultiGaus.h"
 
 void MultiGaus(const TVectorD& parMeans, const TMatrixDSym& covMatrix, TVectorD& genPars)
@@ -41,4 +47,33 @@ double ChiSquare(double x, double ndf)
 {
   return TMath::Power(0.5, ndf/2.0) / TMath::Gamma(ndf/2.0) *
          TMath::Power(x, ndf/2.0 - 1.0) * TMath::Exp(-x/2.0);
+}
+
+/*
+  I will leave this helper functions here
+*/
+void conv2double(std::vector<std::string> words, double &val, double &stat, double &syst) {
+    val  = std::stod(words.at(2));
+    stat = std::stod(words.at(3));
+    syst = std::stod(words.at(4));
+}
+
+double pow2(double x) {return x*x;} // move this to somewhere else.
+
+// **** computations of the model **** //
+double fcn_gaus_2d_cov(double *x, double *par) {
+    /* par = q0, l, sigma_q0, sigma_l, correlation */
+    TMatrixD SIGMA(2,2);
+    TVectorD X(2);
+    X(0) = x[0] - par[0];
+    X(1) = x[1] - par[1];
+    SIGMA(0,0) = pow(par[2],2);
+    SIGMA(1,1) = pow(par[3],2);
+    SIGMA(0,1) = par[2]*par[3]*par[4];
+    SIGMA(1,0) = SIGMA(0,1);
+    double det = SIGMA.Determinant();
+    SIGMA.Invert();
+    double ans = exp(-0.5*X*(SIGMA*X));
+    ans /= 2*M_PI*sqrt(det);
+    return ans;
 }

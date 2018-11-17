@@ -5,21 +5,15 @@
 #include "TVectorD.h"
 
 // const double SYSTEMATIC_DPT2 = 0.04;
-
-const double SYSTEMATIC_DPT2 = 0.04;
-const double SYSTEMATIC_RM = 0.03;
-
-
+// const double SYSTEMATIC_RM = 0.03;
 const int ZDIM  = 4;
 const int Q2DIM = 1;
 double zbin[ZDIM]      = {0.31, 0.54, 0.75, 0.94}; // pi+
 double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
-
 // const int ZDIM  = 10;
 // const int Q2DIM = 1;
 // double zbin[ZDIM]      = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95}; // pi+
 // double zbinw[ZDIM]     = {0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1}; // Approx.
-
 // double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.95}; // pi-
 // double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05}; // Approx.
 // double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
@@ -32,7 +26,6 @@ double Rm[3] = {0,0,0};
 
 /* values from python/interpolate.py */
 // PI+ 
-
 double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
 // double rm[3][4] = 
 // { {0.893189114368,0.885454096825,0.880935853275,0.798520384419},
@@ -139,7 +132,6 @@ void callModel(const double A13,double *par){
 // I will write the Chi-Squared and some other functions here
 double chisq(double *par){
     double chisq = 0.0;
-    double delta = 0.0;
     callModel(xxx[0],par);
     pT2[0] = func_array[0];
     Rm[0] = func_array[1];
@@ -157,21 +149,7 @@ double chisq(double *par){
     model(4) = Rm[1];
     model(5) = Rm[2];
 
-    chisq = (data - model) * (V * (data - model));
-    /*
-    delta = (zzz[0]-pT2[0])/errorzzz[0];
-    chisq += delta*delta;
-    delta = (zzz[1]-pT2[1])/errorzzz[1];
-    chisq += delta*delta;
-    delta = (zzz[2]-pT2[2])/errorzzz[2];
-    chisq += delta*delta;
-    delta = (zzz[3]-Rm[0])/errorzzz[3];
-    chisq += delta*delta;
-    delta = (zzz[4]-Rm[1])/errorzzz[4];
-    chisq += delta*delta;
-    delta = (zzz[5]-Rm[2])/errorzzz[5];
-    chisq += delta*delta;
-    */
+    chisq = (data - model) * (V * (data - model)); // Uses matrix form for the Chi^2
     return chisq;
 }
 
@@ -427,7 +405,7 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
     // std::cout << correlation_matrix[0][0] << "\t" << correlation_matrix[0][1] << std::endl;
     // std::cout << correlation_matrix[1][0] << "\t" << correlation_matrix[1][1] << std::endl;
 
-    double correlation_factor[4] = {0.557,0.321,-0.074,-0.056};
+    // double correlation_factor[4] = {0.557,0.321,-0.074,-0.056};
     TRandom3 *rr = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
     rr->SetSeed(9234);
 
@@ -599,7 +577,7 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
         result.m_tg_data_pT = TGraphErrors(3,x1,z1,errorz1,errorz1);
         result.m_tg_data_Rm = TGraphErrors(3,x2,z2,errorz2,errorz2);
 
-        double zeros[3] = {0,0,0};
+        double zeros[3] = {0,0,0};
         result.m_tg_pT = TGraphErrors(3,x1,pT2,zeros,zeros);
         result.m_tg_Rm = TGraphErrors(3,x2,Rm,zeros,zeros);
 
