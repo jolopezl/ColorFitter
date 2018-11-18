@@ -26,7 +26,7 @@ C...Parameters.
 C-----------------------------------------------------------------
 C... Requiered variables
       INTEGER I
-      DOUBLE PRECISION Z, PZ, NU, XB, ZL
+      DOUBLE PRECISION Z, PZ, NU, XB, ZL, LP
       DOUBLE PRECISION q0, q1, q2, q3, W2
       DOUBLE PRECISION EB, ES
       DOUBLE PRECISION ELECTRON_MASS, PROTON_MASS
@@ -41,11 +41,11 @@ C...Main parameters of run: number of events and PYINIT inputs
 C...Energy should be given in the laboratory frame
 C...For Hermes the energy of the electron beam is 27.6 GeV
 C...The energy is given in the selected frame Pythia will transformations as it requieres them
-      NEV=100000!0000000
-      WIN=27.6D0 ! HERMES
+      NEV=1000000!0000000
+C       WIN=27.6D0 ! HERMES
 C       WIN=6 ! JLab .
 C       WIN=12 ! JLab upgrad.
-C       WIN=100
+      WIN=100
 C...Minimum cms energy to make this work
       PARP(2)=0.1
 C...Choose fragmentation scheme
@@ -57,6 +57,13 @@ C...Get events with Q2>1
       CKIN(67)=1D0
 C-----------------------------------------------------------------
       MRPY(1) = 0
+
+
+C       MSUB(131) = 0
+C       MSUB(132) = 0
+C       MSUB(135) = 0
+C       MSUB(135) = 0
+
 C...Initialize PYINIT
       CALL PYINIT('FIXT','gamma/e-','p',WIN)
 C...Second section: event loop.
@@ -85,12 +92,15 @@ C... compute Q2 = -q2 where q=p1-p3
 C... Loop over TRACKS and print some variables only for DIS
         IF(MSTI(1)==99) THEN
 C        IF( (Q2.GT.1).and.(W2.GT.4) ) THEN
-          WRITE(20,*)Q2,NU,XB
+          WRITE(20,*)Q2,NU,XB,W2
           DO 201 I=1,N
             Z=P(I,4)/NU
             PZ=P(I,3)
             ZL = (P(I,4)+PZ)/(PROTON_MASS+2*NU)
-            IF(K(I,2)==2212) WRITE(10,*)Z,ZL !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
+            LP = (1.38668 / 7.14) * SQRT(NU/(2*0.938*XB) - 1)
+            IF(K(I,2)==2212) THEN
+              IF ((Z.GT.0.9).AND.(Z.LT.0.98)) WRITE(10,*)Z,ZL,LP,XB,NU !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
+            ENDIF
   201     CONTINUE
         ENDIF
 C...List first few events.
