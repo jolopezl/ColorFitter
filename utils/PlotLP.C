@@ -19,9 +19,19 @@ void PlotLP() {
     tg[2]->SetMarkerStyle(21);
     tg[3]->SetMarkerStyle(20);
 
-    auto model = tg[3]; // Choose BLE30 as nominal;
+    int kModel = 3; // define nominal model
+    TGraphAsymmErrors *model = new TGraphAsymmErrors(4);
+    for (int i=0; i<4; ++i) {
+        double x(-99), y(-99);
+        tg[kModel]->GetPoint(i, x, y);
+        model->SetPoint(i, x, y);
+        model->GetEYhigh()[i] = tg[kModel]->GetEY()[i];
+        model->GetEYlow()[i] = tg[kModel]->GetEY()[i];
+    }
+
     model->SetMarkerSize(1.5);
     model->SetMarkerStyle(20);
+    model->SetLineWidth(2);
     model->GetXaxis()->SetLimits(0.0,1.0);
     model->GetXaxis()->SetNdivisions(505);
     // model->GetYaxis()->SetRangeUser(0.0001,16);
@@ -36,7 +46,6 @@ void PlotLP() {
     for (int i=0; i<4; ++i) {
         variants->GetX()[i] = model->GetX()[i];
         variants->GetY()[i] = 0;
-        
 
         double rms = 0;
         for (int j=0; j<4; ++j) {
@@ -51,7 +60,6 @@ void PlotLP() {
     }
     variants->SetFillColorAlpha(kYellow,1);
 
-    TGraphErrors *model_corrected = (TGraphErrors*) fin[3]->Get("tg_lp");
     const bool APPLY_KINEMATIC_CORRECTION = true;
     if (APPLY_KINEMATIC_CORRECTION) {
         // Remember to apply scale factors
@@ -59,13 +67,14 @@ void PlotLP() {
         double SFref = 7.94;
         // double SF[4] = {8.40,8.40,8.40,8.40};
         for (int i = 0; i < 4; ++i) {
-            // model_corrected->GetY()[i] *= SF[i]/SFref;
-            // model_corrected->GetEY()[i] = 0; // *= SF[i]/SFref;
+            // model_uncorrected->GetY()[i] *= SF[i]/SFref;
+            // model_uncorrected->GetEY()[i] = 0; // *= SF[i]/SFref;
             model->GetY()[i] *= SF[i]/SFref;
-            model->GetEY()[i] *= SF[i]/SFref;
+            // model->GetEY()[i] *= SF[i]/SFref;
+            model->GetEYhigh()[i] *= SF[i]/SFref;
+            model->GetEYlow()[i] *= SF[i]/SFref;
         }
     }
-    model_corrected->SetMarkerStyle(kOpenCircle);
 
     /** Lund String Model Fitting **/
     /** CORRECT FOR SHIFT to X (light cone fraction) **/
@@ -86,50 +95,59 @@ void PlotLP() {
             x *= (1 + TMath::Sqrt(1 - TMath::Power(mt/(z*nu),2)));
             x /= (M/nu + 1 + TMath::Sqrt(1 + Q2/TMath::Power(nu,2)));
             model->GetX()[i] = x;
-            model->GetEX()[i] = 0.5*fabs(x - z);
-            model_corrected->GetX()[i] = x;
-            model_corrected->GetEX()[i] = 0.5*fabs(x - z);
+            // model->GetEX()[i] = 0.5*fabs(x - z);
+            double shift = fabs(x - z);
+            model->SetPointEXlow(i, 0);
+            model->SetPointEXhigh(i, shift);
+            // model_uncorrected->GetX()[i] = x;
+            // model_uncorrected->GetEX()[i] = 0.5*fabs(x - z);
             cout << x - z << endl;
             variants->GetX()[i] = x;
         }
     }
+
+    TGraphErrors *model_uncorrected = (TGraphErrors*) fin[kModel]->Get("tg_lp");
+    TGraphErrors *model_syst = (TGraphErrors*) fin[kModel]->Get("tg_lp");
+    model_uncorrected->SetMarkerStyle(kOpenCircle);
+    for (int i=0; i<4; ++i) {
+        model_syst->GetX()[i] = model->GetX()[i];
+        double dy = fabs(model_syst->GetY()[i] - model->GetY()[i]);
+        model_syst->GetEY()[i] = dy;
+        model_syst->GetEX()[i] = variants->GetEX()[i];
+    }
+    model_syst->SetLineColor(kBlack);
+    model_syst->SetLineWidth(2);
+    /*
+        Fitting to production length models
+    */
 
     const char* LundLog = "[0]*x*(log(1/(x*x))-1+x*x)/(1-x*x)"; // Bialas paper
     const char* LundLogFull = "(([1]+2*[2])/(2*[0]))*x*(log(1/(x*x))-1+x*x)/(1-x*x)"; // Bialas paper 
     const char* LundLinearShort = "([0]+2*[1]-2*x*[1])/(2*[2])";
     const char* LundLinearLong = "(0.5*[0] + [1]*(0.5 + 0.5*sqrt(1 + [3]*[3]/([1]*[1])) - x))/[2]";
 
-    TF1 *fg1 = nullptr;
+    TF1 *fg0 = new TF1("fg1", LundLinearLong, 0, 1.2);
+    fg0->SetParName(0,"MP");
+    fg0->FixParameter(0,0.938); // 0.9 GeV
+    fg0->SetParName(1,"NU"); 
+    fg0->FixParameter(1,13.1);
+    fg0->SetParName(2,"KAPPA");
+    fg0->SetParameter(2,1.0);
+    fg0->SetParName(3,"Q2"); 
+    fg0->FixParameter(3,2.4);
 
-    // if (false) {
+    TF1 *fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0,1.2);
+    fg1->SetParName(0, "KAPPA");
+    fg1->SetParName(1, "MP");
+    fg1->SetParName(2, "NU");
+    fg1->SetParName(3, "mT");
+    fg1->SetParameter(0, 1);
+    fg1->FixParameter(1, 0.938);
+    fg1->FixParameter(2, 12.4);
+    // fg1->FixParameter(3, 0.14);
+    double mass_trans = TMath::Sqrt(0.14*0.14 + 0.25);
+    fg1->FixParameter(3, mass_trans);
 
-        TF1 *fg0 = new TF1("fg1", LundLinearLong, 0, 1.2);
-        fg0->SetParName(0,"MP");
-        fg0->FixParameter(0,0.938); // 0.9 GeV
-        fg0->SetParName(1,"NU"); 
-        fg0->FixParameter(1,13.1);
-        fg0->SetParName(2,"KAPPA");
-        fg0->SetParameter(2,1.0);
-        fg0->SetParName(3,"Q2"); 
-        fg0->FixParameter(3,2.4);
-    // }
-    // else {
-        fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0,1.2);
-        fg1->SetParName(0, "KAPPA");
-        fg1->SetParName(1, "MP");
-        fg1->SetParName(2, "NU");
-        fg1->SetParName(3, "mT");
-        fg1->SetParameter(0, 1);
-        fg1->FixParameter(1, 0.938);
-        fg1->FixParameter(2, 12.4);
-        // fg1->FixParameter(3, 0.14);
-        double mass_trans = TMath::Sqrt(0.14*0.14 + 0.25);
-        fg1->FixParameter(3, mass_trans);
-    // }
-
-    // TF1* fg2 = new TF1("fg2", LundLog, 0, 1);
-    // fg2->SetParName(0,"F(Q2,NU)");
-    // fg2->SetParameter(0,1); // 0.9 GeV
 
     TF1* fg2 = new TF1("fg2", LundLogFull, 0, 1);
     fg2->SetParName(0,"KAPPA");
@@ -147,6 +165,9 @@ void PlotLP() {
     fg2->SetLineColor(kRed);
     fg1->SetFillColorAlpha(kAzure,0.3);
     fg2->SetFillColorAlpha(kRed,0.3);
+
+    fg1->SetNpx(10000);
+    fg2->SetNpx(10000);
 
     const bool PLOT_MODELS_ONLY = kFALSE;
     if(PLOT_MODELS_ONLY) {
@@ -215,9 +236,10 @@ void PlotLP() {
     cout << "Chi^2/NDF = " << fg2->GetChisquare()/fg2->GetNDF() << endl;
     cout << "p-value = " << fg2->GetProb() << endl;
 
-    TCanvas *c2 = new TCanvas("c2","c2 title",800,600);
+    // gStyle->SetEndErrorSize(8);
+    TCanvas *c2 = new TCanvas("c2","c2 title",600,600);
 
-    model->Draw("APE"); 
+    model->Draw("APEZ"); 
     variants->Draw("SAME5");
     fg1->Draw("SAME");
     fg2->Draw("SAME");
@@ -225,9 +247,11 @@ void PlotLP() {
     fg2->Draw("SAME");
     grint1->Draw("SAME 3");
     fg1->Draw("SAME");
-    model->Draw("PSAME"); 
+    model->Draw("PSAMEZ"); 
 
-    // model_corrected->Draw("PSAME");
+    // model_uncorrected->Draw("PSAME");
+
+    // model_syst->Draw("||");
 
     // TLegend* leg = new TLegend(0.2,0.2,0.35,0.35);
     TLegend* leg = new TLegend(0.2,0.75,0.35,0.92);
@@ -241,14 +265,16 @@ void PlotLP() {
     // leg->AddEntry(grint1,Form("Linear Form, #chi^{2}/dof = %.3f, #kappa = %.3f #pm %.3f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(2),fg1->GetParError(2)),"fl");
     // leg->AddEntry(grint1,Form("Linear Form, #chi^{2}/dof = %.2f, #kappa = %.1f #pm %.1f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(2),fg1->GetParError(2)),"fl");
 
-    leg->AddEntry(grint1,Form("Lund String Model (struck quark), #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
+    // leg->AddEntry(grint1,Form("Lund String Model (struck quark), #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
+    leg->AddEntry(grint1,Form("Lund string model, #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
     leg->AddEntry(grint2,Form("Bialas #it{et. al.}, #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg2->GetChisquare()/fg2->GetNDF(),fg2->GetParameter(0),fg2->GetParError(0)),"fl");
 
     // leg->AddEntry(grint1, "Lund String Model (struck quark)","fl");//   Form("Linear Form, #chi^{2}/dof = %.2f, #kappa = %.1f #pm %.1f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
     // leg->AddEntry(grint2, "Bialas #it{et. al.}","fl");//Form("Bialas #it{et. al.}, #chi^{2}/dof = %.2f, #kappa = %.1f #pm %.1f GeV/fm",fg2->GetChisquare()/fg2->GetNDF(),fg2->GetParameter(1),fg2->GetParError(1)),"fl");
-    leg->AddEntry(model,"BLE30","pe");
+    if (kModel == 1) leg->AddEntry(model,"BL30","pe");
+    if (kModel == 3) leg->AddEntry(model,"BLE30","pe");
     // leg->AddEntry(model,"BLE30 (corrected for kinematics)","pe");
-    // leg->AddEntry(model_corrected,"BLE30 (uncorrected for kinematics)","pe");
+    // leg->AddEntry(model_uncorrected,"BLE30 (uncorrected for kinematics)","pe");
 
     leg->Draw();
 

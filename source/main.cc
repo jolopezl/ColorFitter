@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     // runColorFitterVariant(argv[1], true, 0); // If you want to pass the model variant from execution "$ ifit.exe BLE30"
     // runColorFitterVariant("BL", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
     // runColorFitterVariant("BL25",  true, 0.0);
-    runColorFitterVariant("BL30",  true, 0.0);
+    // runColorFitterVariant("BL30",  true, 0.0);
     // runColorFitterVariant("BL35",  true, 0.0);
     // runColorFitterVariant("BL40",  true, 0.0);
     // runColorFitterVariant("BLE",   true, 0.0);
@@ -27,7 +27,10 @@ int main(int argc, char *argv[]) {
     // runColorFitterVariant("BL25", true, 0);
     // runColorFitterVariant("BLEf30", true, 0);
     // monitoring();
-    // demoPlots();
+
+    demoPlots(true); // fixed lp
+    demoPlots(false); // exp lp
+
     // printInteractionPoints();
     // ComputeBand();
 }
@@ -381,32 +384,56 @@ int printInteractionPoints() {
 }
 
 // ************ This is used for model plots ************ //
-int demoPlots() {
+int demoPlots(bool do_fixed_lp) {
     /*
         Make those plots of pT vs A^1/3 as a demonstration of the model
         Used to study fixed vs exp distribution for L
     */
+    TFile *fout = nullptr;
+    if (do_fixed_lp) {
+        fout = new TFile("DemoPlots.fixedLp.root","RECREATE");
+    }
+    else {
+        fout = new TFile("DemoPlots.ExpLp.root","RECREATE");
+    }
     Model *model = new Model("demoPlots");
     model->Initialization();
-    model->DoFixedLp(true); 
-    model->SetParameters("q0", 1.0);
+    model->DoFixedLp(do_fixed_lp);
+    model->SetParameters("q0", 1);
     // To run and produce full list of files at once.
-    std::vector<double> lpList = {1.0,2.0,3.0,4.0,5.0,7.0,9.0,10.0,20.0};
+    std::string str;
+    std::string filename;
+    std::vector<double> lpList = {1, 3, 5, 10, 20};
     for (const auto &lp : lpList) {
-        for (int nucleus = 12; nucleus <= 240; ++nucleus) {
-            std::cout << "Computing " << nucleus << " of 240 for lp = " << lp << std::endl;
+        TGraph *tg1 = new TGraph(230);
+        TGraph *tg2 = new TGraph(230);
+        for (int nucleus = 12; nucleus <= 241; ++nucleus) {
+            std::cout << "Computing " << nucleus << " of 241 for lp = " << lp << std::endl;
             model->SetParameters("lp", lp);   //* <------!!! *//
             model->Compute(nucleus);          //* <------!!! *//
             //* Print to file **//
-            std::ofstream fout;
-            std::string str = boost::lexical_cast<std::string>(lp);
-            std::string filename = "input-exp-fixed-lp="+str+".txt";
-            fout.open(filename, std::ios::out | std::ios::app);
-            fout.precision(10);
-            fout << pow(nucleus,1./3.) << '\t' << model->Get1() << '\n';
-            fout.close();
+            // std::ofstream fout;
+            // filename = "input-exp-fixed-lp="+str+".txt";
+            // fout.open(filename, std::ios::out | std::ios::app);
+            // fout.precision(10);
+            // fout << pow(nucleus,1./3.) << "\t" << model->Get1() << "\t" << model->Get2() << "\n";
+            // fout.close();
+            tg1->SetPoint(nucleus-12, pow(nucleus,1./3.), model->Get1());
+            tg2->SetPoint(nucleus-12, pow(nucleus,1./3.), model->Get2());
+            str = boost::lexical_cast<std::string>(lp);
         }
+        std::string name1 = "pT2_lp_"+str;
+        std::string name2 = "RM_lp_"+str;
+        tg1->SetName(name1.c_str());
+        tg2->SetName(name2.c_str());
+        tg1->SetTitle(";#it{A}^{1/3};#Delta#it{p}_{T}^{2} (GeV^{2})");
+        tg2->SetTitle(";#it{A}^{1/3};#it{R}_{M}");
+        tg1->Write();
+        tg2->Write();
+        delete tg1;
+        delete tg2;
     }
+    fout->Close();
     return 0;
 }
 

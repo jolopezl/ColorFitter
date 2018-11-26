@@ -20,7 +20,7 @@ void makeFigure2() {
     SetAtlasStyle(43,22);
     gStyle->SetEndErrorSize(0);
 
-    const char *variantname = "BLEf30";
+    const char *variantname = "BL30";
 
     TFile *fin = TFile::Open(Form("OutputROOT.20181107.%s.root",variantname));
     TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
@@ -84,9 +84,9 @@ void makeFigure2() {
 
         data[i].first->GetXaxis()->CenterTitle();
         data[i].first->GetYaxis()->CenterTitle();
-        data[i].first->GetYaxis()->SetTitleOffset(3.5);
+        data[i].first->GetYaxis()->SetTitleOffset(2.8);
         data[i].second->GetXaxis()->CenterTitle();
-        data[i].second->GetYaxis()->SetTitleOffset(3.5);
+        data[i].second->GetYaxis()->SetTitleOffset(2.8);
         data[i].second->GetXaxis()->SetTitleOffset(2);
         data[i].second->GetYaxis()->CenterTitle();
 
@@ -101,7 +101,7 @@ void makeFigure2() {
     // gStyle->SetEndErrorSize(5);
     float small = 1e-5;;
     float big = 0.25;
-    TCanvas* c1 = new TCanvas("c1","c1 title",1100,600);
+    TCanvas* c1 = new TCanvas("c1","c1 title",1000,500);
     // c1->SetRightMargin(0.09);
     c1->SetLeftMargin(0.22);
     c1->SetBottomMargin(0.17);

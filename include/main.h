@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 
-int demoPlots(); // Do plots and studies of the model
+int demoPlots(bool); // Do plots and studies of the model
 int demoPlots2D(); // Do fancier plots and studies of the model
 int runColorFitter(const bool, const bool, const double);
 int runColorFitterVariant(const std::string, const bool, const double);

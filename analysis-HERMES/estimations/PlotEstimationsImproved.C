@@ -58,7 +58,7 @@ TGraph* ExtrapolationImproved(int zbin) {
     return tg;
 }
 
-void PlotEstimations(const double xBj = 0.04) {
+void PlotEstimationsImproved(const double xBj = 0.04) {
     SetAtlasStyle(43,22);
 
     TF1 *LogLund1 = new TF1("LogLund","((0.938 + 2*x)/(2*[1]))*[0]*(log(1/([0]*[0]))-1+[0]*[0])/(1-[0]*[0])",0,140); // LogLund(nu)
@@ -174,5 +174,5 @@ void PlotEstimations(const double xBj = 0.04) {
     // myBoxText(0.15,0.82,0.05,kBlue,"Lund String Model",kBlack,2,3444,16);
     // myBoxText(0.15,0.76,0.05,kRed,"Relativistic Extrapolation",kBlack,2,3444,16);
 
-    c1->SaveAs("PlotEstimationsImproved.pdf");
+    c1->Print("PlotEstimationsImproved.pdf");
 }

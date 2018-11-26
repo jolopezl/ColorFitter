@@ -79,9 +79,9 @@ void PlotQhat() {
     }
     
     TGraphErrors *model[3];
-    model[0] = tg_qhat[0][3]; // selects BLE30
-    model[1] = tg_qhat[1][3]; // selects BLE30
-    model[2] = tg_qhat[2][3]; // selects BLE30
+    model[0] = tg_qhat[0][1]; // selects BLE30
+    model[1] = tg_qhat[1][1]; // selects BLE30
+    model[2] = tg_qhat[2][1]; // selects BLE30
 
     cout << model[0]->GetMean(2) << endl;
     cout << model[1]->GetMean(2) << endl;
@@ -165,12 +165,16 @@ void PlotQhat() {
     variants[2]->Draw("SAME5");
     // model->Draw("PSAME");
     // model_corrected->Draw("PSAME");
+
+    box->Draw("SAME");
+    line->Draw("SAME");
+
     model[0]->Draw("PSAME");
     model[1]->Draw("PSAME");
     model[2]->Draw("PSAME");
 
-    box->Draw("SAME");
-    line->Draw("SAME");
+    // box->Draw("SAME");
+    // line->Draw("SAME");
 
     // TLine *line_average = new TLine(lxmin, average, lxmax, average);
     // line_average->SetLineWidth(4);
