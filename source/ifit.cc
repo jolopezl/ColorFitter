@@ -161,7 +161,7 @@ std::vector<myResult> ifit(myConfig *config) {
     std::vector<myResult> resultCont;
     m = new Model("default");
     m->Initialization();
-    m->DoEnergyLoss(config->m_energyloss);
+    m->DoEnergyLoss(config->m_energyloss, ZDIM);
     m->DoEnergyLossWeighted(config->m_energylossWeighted);
     m->DoLogBehavior(config->m_logbehavior);
     m->DoCascade(config->m_cascade);
@@ -656,7 +656,7 @@ int test() {
 void justCompute(myConfig* config) {
     Model* model = new Model("toy");
     model->Initialization();
-    model->DoEnergyLoss(config->m_energyloss);
+    model->DoEnergyLoss(config->m_energyloss, ZDIM);
     model->DoLogBehavior(config->m_logbehavior);
     const double A_Ne = pow(20.1797,1./3.); // Ne
     const double A_Kr = pow(83.7980,1./3.); // Kr

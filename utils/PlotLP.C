@@ -3,10 +3,10 @@ void PlotLP() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
-    fin[0] = new TFile("OutputROOT.20181107.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20181107.BL30.root","READ");
-    fin[2] = new TFile("OutputROOT.20181107.BLE.root","READ");
-    fin[3] = new TFile("OutputROOT.20181107.BLE30.root","READ");
+    fin[0] = new TFile("OutputROOT.20181229.BL.root","READ");
+    fin[1] = new TFile("OutputROOT.20181229.BL30.root","READ");
+    fin[2] = new TFile("OutputROOT.20181229.BLE.root","READ");
+    fin[3] = new TFile("OutputROOT.20181229.BLE30.root","READ");
 
     TGraphErrors *tg[4];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_lp");
@@ -19,7 +19,7 @@ void PlotLP() {
     tg[2]->SetMarkerStyle(21);
     tg[3]->SetMarkerStyle(20);
 
-    int kModel = 3; // define nominal model
+    int kModel = 1; // define nominal model
     TGraphAsymmErrors *model = new TGraphAsymmErrors(4);
     for (int i=0; i<4; ++i) {
         double x(-99), y(-99);
@@ -31,7 +31,7 @@ void PlotLP() {
 
     model->SetMarkerSize(1.5);
     model->SetMarkerStyle(20);
-    model->SetLineWidth(2);
+    // model->SetLineWidth(2);
     model->GetXaxis()->SetLimits(0.0,1.0);
     model->GetXaxis()->SetNdivisions(505);
     // model->GetYaxis()->SetRangeUser(0.0001,16);
@@ -237,7 +237,7 @@ void PlotLP() {
     cout << "p-value = " << fg2->GetProb() << endl;
 
     // gStyle->SetEndErrorSize(8);
-    TCanvas *c2 = new TCanvas("c2","c2 title",600,600);
+    TCanvas *c2 = new TCanvas("c2","c2 title",800,600);
 
     model->Draw("APEZ"); 
     variants->Draw("SAME5");

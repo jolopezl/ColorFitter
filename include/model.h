@@ -21,6 +21,7 @@ public:
     void SetBinRatio(int,double,double);
     void SetFermiValues(double,double);
     void SetMaxMonteCarloSteps(int);
+    void DoEnergyLoss(bool, int);
     void DoEnergyLoss(bool);
     void DoEnergyLossWeighted(bool);
     void DoLogBehavior(bool);
@@ -67,6 +68,7 @@ private:
     void ApplyLogBehavior(double &, double);
     // private members
     std::string m_ModelName;
+    int kBINS;
     double m_dPt2;
     double m_Rm;
     double m_average_density;

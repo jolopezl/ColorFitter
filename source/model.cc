@@ -61,14 +61,21 @@ double Model::Get2() {return m_Rm;}
 double Model::Get3() {return m_average_density;}
 double Model::Get4() {return m_multip_density;}
 
-void Model::DoEnergyLoss(bool foo)         {m_DoEnergyLoss = foo;}
-void Model::DoEnergyLossWeighted(bool foo) {m_DoEnergyLossWeighted = foo;}
-void Model::DoLogBehavior(bool foo)        {m_DoLogBehavior = foo;}
-void Model::DoFermiMotion(bool foo)        {m_DoFermiMotion = foo;}
-void Model::DoFixedLp(bool foo)            {m_doFixedLp = foo;}
-void Model::DoCascade(bool foo)            {m_doCascade = foo;}
-void Model::DoMonitoring(bool foo)         {m_doMonitoring = foo;}
-void Model::SetMaxMonteCarloSteps(int value)    {m_maxmcSteps = value;}
+void Model::DoEnergyLoss(bool foo, int N) {
+  m_DoEnergyLoss = foo;
+  kBINS = N;
+}
+void Model::DoEnergyLoss(bool foo) {
+  m_DoEnergyLoss = foo;
+  kBINS = 4; // think something smarter
+}
+void Model::DoEnergyLossWeighted(bool foo) { m_DoEnergyLossWeighted = foo; }
+void Model::DoLogBehavior(bool foo) { m_DoLogBehavior = foo; }
+void Model::DoFermiMotion(bool foo) { m_DoFermiMotion = foo; }
+void Model::DoFixedLp(bool foo) { m_doFixedLp = foo; }
+void Model::DoCascade(bool foo) { m_doCascade = foo; }
+void Model::DoMonitoring(bool foo) { m_doMonitoring = foo; }
+void Model::SetMaxMonteCarloSteps(int value) { m_maxmcSteps = value; }
 
 void Model::SetParameters(std::vector<double> parms) {
     m_q0       = parms.at(0);
@@ -412,7 +419,9 @@ int Model::Compute(const double A){
     m_multip_density = multiplicity_density/m_maxmcSteps;
     // ADD ENERGY LOSS, From Will's original code:
     temp = accumulator2/normalize;
-    if (m_DoEnergyLoss == true) ApplyEnergyLoss(temp);
+    if (m_DoEnergyLoss == true) {
+        ApplyEnergyLoss(temp);
+    }
     m_dPt2 = accumulator1/normalize; //  pT broadening
     m_Rm = temp;                     //  Multiplicity
     // if (m_doMonitoring) {
@@ -422,16 +431,28 @@ int Model::Compute(const double A){
 }
 
 void Model::ApplyEnergyLoss(double &temp) {
+/*    
     if (m_DoEnergyLossWeighted == true) {
         if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz*m_A13/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
         else {temp *= (1.+(m_binratio*m_dz*m_A13)/m_zbinwidth);} // events increase in the lowest z bin.
     }
     // SIMPLE CASE - DEFAULT
     else {
-        if (m_iz ==0) {m_dz=0;}
-        else {m_dz =  -0.03;}
+        // if (m_iz == 0) {m_dz=0;}
+        // else {m_dz =  -0.03;}
         if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
         else {temp *= (1.+(m_binratio*m_dz)/m_zbinwidth);} // events increase in the lowest z bin.
+    }
+*/
+    const int BIN = m_iz;
+    const double b = m_zbinwidth;
+    const double ratio = m_binratio;
+    if (BIN == 0) {
+        temp *= 1 + m_dz / b * ratio; // first bin gains events
+    } else if (BIN == kBINS - 1) {
+        temp *= 1 - m_dz / b; // last bin loses events
+    } else {
+        temp *= 1 - m_dz / b + m_dz / b * ratio; // middle bins gain and lose events
     }
 }
 

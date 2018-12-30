@@ -3,9 +3,9 @@ void PlotEloss() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[3];
-    fin[0] = new TFile("OutputROOT.20181107.BLE.root","READ");
-    fin[1] = new TFile("OutputROOT.20181107.BLE30.root","READ");
-    fin[2] = new TFile("OutputROOT.20181107.BLE40.root","READ");
+    fin[0] = new TFile("OutputROOT.20181229.BLE.root","READ");
+    fin[1] = new TFile("OutputROOT.20181229.BLE30.root","READ");
+    fin[2] = new TFile("OutputROOT.20181229.BLE40.root","READ");
 
     TGraphErrors *tg[3];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_dz");

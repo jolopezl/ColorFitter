@@ -3,10 +3,10 @@ void PlotQhat() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
-    fin[0] = new TFile("OutputROOT.20181107.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20181107.BL30.root","READ");
-    fin[2] = new TFile("OutputROOT.20181107.BLE.root","READ");
-    fin[3] = new TFile("OutputROOT.20181107.BLE30.root","READ");
+    fin[0] = new TFile("OutputROOT.20181229.BL.root","READ");
+    fin[1] = new TFile("OutputROOT.20181229.BL30.root","READ");
+    fin[2] = new TFile("OutputROOT.20181229.BLE.root","READ");
+    fin[3] = new TFile("OutputROOT.20181229.BLE30.root","READ");
 
     TGraphErrors *tg_lp[4];
     TGraphErrors *tg_q0[4];
@@ -193,7 +193,7 @@ void PlotQhat() {
     leg->Draw();
 
     // myText(0.25, 0.6, kBlack, "#hat{q} = #frac{#Deltap_{T}^{2}}{L_{p}}",0.045); // z-bin #3
-    myText(0.8, 0.9, kBlack, "BLE30",0.045); // z-bin #3
+    myText(0.8, 0.9, kBlack, "BL30",0.045); // z-bin #3
     // AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 30 [mb]")
 
     c1->Print("figure_qhat.pdf");
