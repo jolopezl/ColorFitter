@@ -19,7 +19,7 @@ void PlotLP() {
     tg[2]->SetMarkerStyle(21);
     tg[3]->SetMarkerStyle(20);
 
-    int kModel = 1; // define nominal model
+    const int kModel = 1; // define nominal model
     TGraphAsymmErrors *model = new TGraphAsymmErrors(4);
     for (int i=0; i<4; ++i) {
         double x(-99), y(-99);
@@ -83,7 +83,7 @@ void PlotLP() {
     double Q2List[4] = {2.4,2.4,2.4,2.2};
 
 
-    const bool APPLY_Z_SHIFT = true;
+    const bool APPLY_Z_SHIFT = kTRUE;
     if (APPLY_Z_SHIFT) {
         for (int i=0; i<4; ++i) {
             double z = model->GetX()[i];

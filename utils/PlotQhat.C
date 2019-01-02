@@ -78,10 +78,11 @@ void PlotQhat() {
         }
     }
     
+    const int kModel = 3;
     TGraphErrors *model[3];
-    model[0] = tg_qhat[0][1]; // selects BLE30
-    model[1] = tg_qhat[1][1]; // selects BLE30
-    model[2] = tg_qhat[2][1]; // selects BLE30
+    model[0] = tg_qhat[0][kModel]; // selects BLE30
+    model[1] = tg_qhat[1][kModel]; // selects BLE30
+    model[2] = tg_qhat[2][kModel]; // selects BLE30
 
     cout << model[0]->GetMean(2) << endl;
     cout << model[1]->GetMean(2) << endl;
@@ -193,7 +194,7 @@ void PlotQhat() {
     leg->Draw();
 
     // myText(0.25, 0.6, kBlack, "#hat{q} = #frac{#Deltap_{T}^{2}}{L_{p}}",0.045); // z-bin #3
-    myText(0.8, 0.9, kBlack, "BL30",0.045); // z-bin #3
+    myText(0.8, 0.9, kBlack, "BLE30",0.045); // z-bin #3
     // AddLabel(0.2, 0.81, "Fixed cross section #sigma_{ph} = 30 [mb]")
 
     c1->Print("figure_qhat.pdf");
