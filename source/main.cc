@@ -18,8 +18,8 @@ int main(int argc, char *argv[]) {
     // runColorFitterVariant("BL40",  true, 0.0);
     // runColorFitterVariant("BLE",   true, 0.0);
     // runColorFitterVariant("BLE25", true, 0.0);
-    // runColorFitterVariant("BLE30", true, 0.0);
-    runColorFitterVariant("BLE40", true, 0.0);
+    runColorFitterVariant("BLE30", true, 0.0);
+    // runColorFitterVariant("BLE40", true, 0.0);
     // runColorFitterVariant("BLE35", true, 0.0);
     // runColorFitterVariant("BLE40", true, 0.0);
     // runColorFitterVariant("BL", true, 0.0);

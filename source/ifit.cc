@@ -9,7 +9,7 @@
 const int ZDIM  = 4;
 const int Q2DIM = 1;
 double zbin[ZDIM]      = {0.31, 0.54, 0.75, 0.94}; // pi+
-double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
+// double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
 // const int ZDIM  = 10;
 // const int Q2DIM = 1;
 // double zbin[ZDIM]      = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95}; // pi+
@@ -26,7 +26,9 @@ double Rm[3] = {0,0,0};
 
 /* values from python/interpolate.py */
 // PI+ 
-double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
+// double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
+double binratios[ZDIM] = {0.278172,0.314365,0.340509,0.0890805}; // PI+ with cuts !!
+double zbinw[ZDIM]     = {0.25,0.21,0.21,0.085}; // Exact !!
 // double rm[3][4] = 
 // { {0.893189114368,0.885454096825,0.880935853275,0.798520384419},
 //     {0.78747612087,0.744660997913,0.679028679486,0.551673817154},

@@ -41,11 +41,11 @@ C...Main parameters of run: number of events and PYINIT inputs
 C...Energy should be given in the laboratory frame
 C...For Hermes the energy of the electron beam is 27.6 GeV
 C...The energy is given in the selected frame Pythia will transformations as it requieres them
-      NEV=1000000!0000000
-C       WIN=27.6D0 ! HERMES
+      NEV=10000!0000000
+       WIN=27.6D0 ! HERMES
 C       WIN=6 ! JLab .
 C       WIN=12 ! JLab upgrad.
-      WIN=100
+C      WIN=100
 C...Minimum cms energy to make this work
       PARP(2)=0.1
 C...Choose fragmentation scheme
@@ -57,19 +57,16 @@ C...Get events with Q2>1
       CKIN(67)=1D0
 C-----------------------------------------------------------------
       MRPY(1) = 0
-
-
 C       MSUB(131) = 0
 C       MSUB(132) = 0
 C       MSUB(135) = 0
 C       MSUB(135) = 0
-
 C...Initialize PYINIT
       CALL PYINIT('FIXT','gamma/e-','p',WIN)
 C...Second section: event loop.
 C...Begin event loop.
       DO 100 IEV=1,NEV
-        CALL PYEVNT
+  200    CALL PYEVNT
 C        CALL PYLIST(1)
 C...This parameters check if we have errors
 C...I should create a while loop make NEV events without errors
@@ -86,7 +83,13 @@ C... compute Q2 = -q2 where q=p1-p3
         q3 = P(1,3)-P(3,3)
         Q2 = q0*q0-q1*q1-q2*q2-q3*q3
         Q2 = -Q2
+        IF((Q2.GT.(2.4+0.5)).OR.(Q2.LT.(2.4-0.5))) THEN 
+          GOTO 200
+        ENDIF
         NU = EB-ES
+        IF((NU.GT.(12.4+1)).OR.(NU.LT.(12.4-1))) THEN
+          GOTO 200
+        ENDIF
         XB = Q2/(2*PROTON_MASS*NU)
         W2 = PROTON_MASS*PROTON_MASS-Q2+2*PROTON_MASS*NU
 C... Loop over TRACKS and print some variables only for DIS
@@ -98,8 +101,11 @@ C        IF( (Q2.GT.1).and.(W2.GT.4) ) THEN
             PZ=P(I,3)
             ZL = (P(I,4)+PZ)/(PROTON_MASS+2*NU)
             LP = (1.38668 / 7.14) * SQRT(NU/(2*0.938*XB) - 1)
-            IF(K(I,2)==2212) THEN
-              IF ((Z.GT.0.9).AND.(Z.LT.0.98)) WRITE(10,*)Z,ZL,LP,XB,NU !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
+            IF(K(I,2)==211) THEN
+C              IF ((Z.GT.0.9).AND.(Z.LT.0.98)) THEN
+C                WRITE(10,*)Z,ZL,LP,XB,NU !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
+C              ENDIF
+              WRITE(10,*)Z,ZL,XB,Q2,NU !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
             ENDIF
   201     CONTINUE
         ENDIF

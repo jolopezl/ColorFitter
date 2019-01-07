@@ -260,7 +260,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
         chisquared[i] = resultCont.at(i).m_chi2;
         std::cout << "z = " << z[i] << std::endl;
     }
-    std::string ffout = "OutputROOT.20181229."+model+".root";
+    std::string ffout = "OutputROOT.20190107."+model+".root";
     TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
     std::cout << "Output file created" << std::endl;
     OutputROOT->cd();

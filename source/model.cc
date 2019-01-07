@@ -447,9 +447,10 @@ void Model::ApplyEnergyLoss(double &temp) {
     const int BIN = m_iz;
     const double b = m_zbinwidth;
     const double ratio = m_binratio;
-    if (BIN == 0) {
-        temp *= 1 + m_dz / b * ratio; // first bin gains events
-    } else if (BIN == kBINS - 1) {
+    // if (BIN == 0) {
+    //     temp *= 1 + m_dz / b * ratio; // first bin gains events
+    // } else if (BIN == kBINS - 1) {
+    if (BIN == kBINS - 1) {
         temp *= 1 - m_dz / b; // last bin loses events
     } else {
         temp *= 1 - m_dz / b + m_dz / b * ratio; // middle bins gain and lose events
