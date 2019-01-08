@@ -27,8 +27,9 @@ double Rm[3] = {0,0,0};
 /* values from python/interpolate.py */
 // PI+ 
 // double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
-double binratios[ZDIM] = {0.278172,0.314365,0.340509,0.0890805}; // PI+ with cuts !!
-double zbinw[ZDIM]     = {0.25,0.21,0.21,0.085}; // Exact !!
+double binratios[ZDIM] = {0.214848,0.432318,0.440678,0.125506}; // PI+ with cuts !!
+// double zbinw[ZDIM]     = {0.25,0.21,0.21,0.085}; // Exact !!
+double zbinw[ZDIM]     = {0.2,0.2,0.2,0.2}; // Exact !!
 // double rm[3][4] = 
 // { {0.893189114368,0.885454096825,0.880935853275,0.798520384419},
 //     {0.78747612087,0.744660997913,0.679028679486,0.551673817154},

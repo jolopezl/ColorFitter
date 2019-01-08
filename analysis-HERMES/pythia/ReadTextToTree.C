@@ -36,7 +36,8 @@ int ReadTextToTree() {
 //    double zbinw[ZDIM]     = {0.20,0.22,0.22,0.16}; // Approx.
 
     const int kNBINS = 5;
-    const double kBINS[kNBINS+1] = {0, 0.185, 0.435, 0.645, 0.855, 0.9825};
+    // const double kBINS[kNBINS+1] = {0, 0.185, 0.435, 0.645, 0.855, 0.9825};
+    const double kBINS[kNBINS+1] = {0, 0.2, 0.4, 0.6, 0.8, 1};
     TH1D *hMultiplicity = new TH1D("hMultiplicity", ";z_{h};Events",kNBINS,kBINS);
 
     tree2->Project("hMultiplicity", "ZH");
