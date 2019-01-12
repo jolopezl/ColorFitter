@@ -431,29 +431,13 @@ int Model::Compute(const double A){
 }
 
 void Model::ApplyEnergyLoss(double &temp) {
-/*    
-    if (m_DoEnergyLossWeighted == true) {
-        if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz*m_A13/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
-        else {temp *= (1.+(m_binratio*m_dz*m_A13)/m_zbinwidth);} // events increase in the lowest z bin.
-    }
-    // SIMPLE CASE - DEFAULT
-    else {
-        // if (m_iz == 0) {m_dz=0;}
-        // else {m_dz =  -0.03;}
-        if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
-        else {temp *= (1.+(m_binratio*m_dz)/m_zbinwidth);} // events increase in the lowest z bin.
-    }
-*/
     const int BIN = m_iz;
     const double b = m_zbinwidth;
     const double ratio = m_binratio;
-    // if (BIN == 0) {
-    //     temp *= 1 + m_dz / b * ratio; // first bin gains events
-    // } else if (BIN == kBINS - 1) {
-    if (BIN == kBINS - 1) {
+    if (BIN < kBINS) {
         temp *= 1 - m_dz / b; // last bin loses events
     } else {
-        temp *= 1 - m_dz / b + m_dz / b * ratio; // middle bins gain and lose events
+        temp *= 1 - m_dz / b + m_dz / b * ratio; // first and middle bins gain and lose events
     }
 }
 
