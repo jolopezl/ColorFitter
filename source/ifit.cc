@@ -7,7 +7,7 @@
 const double SYSTEMATIC_DPT2 = 0.04;
 const double SYSTEMATIC_RM = 0.03;
 const int ZDIM  = 10;
-const int Q2DIM = 1;
+const int Q2DIM = 16;
 double zbin[ZDIM]      = {0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95}; // pi+
 double zbinw[ZDIM]     = {0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1}; // Approx.
 double binratios[ZDIM] = {1,1,1,1,1,1,1,1,1,1};
@@ -108,12 +108,18 @@ std::vector<myResult> ifit(myConfig *config) {
     for (int iQ2 = 0; iQ2 < Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
         for (int iz = 0; iz < ZDIM; ++iz) {
             std::cout << "z-bin #" << iz+1 << " z-bin center = " << zbin[iz] << std::endl;
-            if ((config->m_zBinOfInterest != -1) && ((config->m_zBinOfInterest-1) != iz)) {
-                std::cout << "Ignoring this bin" << std::endl;
-                continue;
+            if ((config->m_zBinOfInterest != -1) &&
+                ((config->m_zBinOfInterest - 1) != iz)) {
+              std::cout << "Ignoring this bin" << std::endl;
+              continue;
             }
-            tge.first = (TGraphErrors*)fInputData->Get(Form("tge_PT2_slice_9_zbin_%d",iz+1));
-            tge.second = (TGraphErrors*)fInputData->Get(Form("tge_RM_slice_9_zbin_%d",iz+1));
+            if ((config->m_Q2BinOfInterest != -1) &&
+                ((config->m_Q2BinOfInterest - 1) != iQ2)) {
+              std::cout << "Ignoring this bin" << std::endl;
+              continue;
+            }
+            tge.first = (TGraphErrors*)fInputData->Get(Form("tge_PT2_slice_%d_zbin_%d",iQ2+1,iz+1));
+            tge.second = (TGraphErrors*)fInputData->Get(Form("tge_RM_slice_%d_zbin_%d",iQ2+1,iz+1));
             double *p1 = tge.first->GetY();
             double *p2 = tge.second->GetY();
             double *pe1 = tge.first->GetEY();

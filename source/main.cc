@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     // runColorFitterVariant("BL40",  true, 0.0);
     // runColorFitterVariant("BLE",   true, 0.0);
     // runColorFitterVariant("BLE25", true, 0.0);
-    runColorFitterVariant("BLE30", true, 0.0);
+    runColorFitterVariant("BL30", true, 0.0);
     // runColorFitterVariant("BLE40", true, 0.0);
     // runColorFitterVariant("BLE35", true, 0.0);
     // runColorFitterVariant("BLE40", true, 0.0);
@@ -83,7 +83,7 @@ int runColorFitterVariant(const std::string model, const bool iSubt, const doubl
         Helful to run multiple model variants at once from main()
     */
 
-    int Q2Int = -1;
+    int Q2Int = 9; // -1 to run over all, 9 for bin #83
     int izInt = -1; // 4 for bin #83
 
     myConfig *config = new myConfig();
@@ -189,7 +189,6 @@ int runColorFitterVariant(const std::string model, const bool iSubt, const doubl
     OutputResultsToFile(model, resultCont);
     return 0;
 }
-
 
 // **************** Compute a Simple Fit **************** //
 int runColorFitter(const bool tEnergyLoss, const bool tSubtraction, const double tCorrelation) {

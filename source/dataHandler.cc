@@ -238,7 +238,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     This function is created to simplify the main function regarding the output handling.
     It still needs some tweakign for instance reading from somewhere else the number of z-bins.
     */
-    const int fNzbins = 4; // 10 for JLab and 4 for HERMES !
+    const int fNzbins = 10; // 10 for JLab and 4 for HERMES !
     double z[fNzbins], q0[fNzbins], lp[fNzbins], sigma[fNzbins], dz[fNzbins], c1[fNzbins], c2[fNzbins], cascade[fNzbins];
     double zErr[fNzbins], q0Err[fNzbins], lpErr[fNzbins], sigmaErr[fNzbins], dzErr[fNzbins], c1Err[fNzbins], c2Err[fNzbins], cascade_err[fNzbins];
     double chisquared[fNzbins];
@@ -260,7 +260,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
         chisquared[i] = resultCont.at(i).m_chi2;
         std::cout << "z = " << z[i] << std::endl;
     }
-    std::string ffout = "OutputROOT.20190107."+model+".root";
+    std::string ffout = "OutputROOT_"+model+".root";
     TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
     std::cout << "Output file created" << std::endl;
     OutputROOT->cd();
