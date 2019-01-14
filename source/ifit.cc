@@ -166,7 +166,6 @@ std::vector<myResult> ifit(myConfig *config) {
             V.Print();
             data.Print();
 
-
             TMinuit *gMinuit = new TMinuit(8);  //initialize TMinuit with a maximum of N params
             gMinuit->SetFCN(fcn);      
             double arglist[10];
