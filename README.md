@@ -1,4 +1,4 @@
-
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7198b51fe96c4c16a4d2b6a51d3e5cb5)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jolopezl/ColorFitter&amp;utm_campaign=Badge_Grade)
 
 # ColorFitter
 ## Authors
