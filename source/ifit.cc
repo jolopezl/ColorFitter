@@ -269,7 +269,7 @@ std::vector<myResult> ifit(myConfig* config)
 }
 
 // this will be moved away someday to graphics.cc
-void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
+void modelplot(TMinuit* g, myConfig* config, std::string& bin_info,
                int iQ2x, int iz, double Q2, double xB, double z,
                std::string filename, myResult& result)
 {

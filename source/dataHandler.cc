@@ -241,7 +241,7 @@ std::vector<myData*> dataHandler(myConfig* config)
   return output;
 }
 
-bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCont)
+bool OutputResultsToFile(const std::string& model, std::vector<myResult> resultCont)
 {
   /*
     This function is created to simplify the main function regarding the output handling.

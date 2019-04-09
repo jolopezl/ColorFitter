@@ -92,6 +92,6 @@ class myData
 };
 
 std::vector<myData*> dataHandler(myConfig*);
-bool OutputResultsToFile(const std::string, std::vector<myResult>);
+bool OutputResultsToFile(const std::string&, std::vector<myResult>);
 
 #endif

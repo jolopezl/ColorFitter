@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
   // runColorFitter(true, true, -0.5);
   // runColorFitter(true, true, -1.0);
   // runColorFitterVariant(argv[1], true, 0); // If you want to pass the model variant from execution "$ ifit.exe BLE30"
-  runColorFitterVariant("BL", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
+  runColorFitterVariant("BL30", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
                                           // runColorFitterVariant("BL25",  true, 0.0);
                                           // runColorFitterVariant("BL30",  true, 0.0);
                                           // runColorFitterVariant("BL35",  true, 0.0);
@@ -79,7 +79,7 @@ int plotTool()
   return 0;
 }
 
-int runColorFitterVariant(const std::string model, const bool iSubt, const double iCorr)
+int runColorFitterVariant(const std::string& model, const bool iSubt, const double iCorr)
 {
   /*
         Set up different model variants defined by model
