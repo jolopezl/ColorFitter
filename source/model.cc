@@ -388,6 +388,12 @@ int Model::Compute(const double A)
       zrange1 = 1.; // dummy value
       m_dPt2 = -99;
       m_Rm = -99;
+      
+      // Avoid memory leaks and exit.
+      delete dtd1;
+      delete dtd2;
+      delete igdtd1;
+      delete igdtd2;
       return 1;
     }
     if (temp == 0)
@@ -413,6 +419,12 @@ int Model::Compute(const double A)
       std::cout << "igdtd2 is negative!! Error!! \n";
       m_dPt2 = -99;
       m_Rm = -99;
+
+      // Avoid memory leaks and exit.
+      delete dtd1;
+      delete dtd2;
+      delete igdtd1;
+      delete igdtd2;
       return 1;
     }
     if (zrange2 > 0 && (isOutside == false)) {
@@ -431,6 +443,12 @@ int Model::Compute(const double A)
       std::cout << "Error: negative zrange2 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << std::endl;
       m_dPt2 = -99;
       m_Rm = -99;
+
+      // Avoid memory leaks and exit.
+      delete dtd1;
+      delete dtd2;
+      delete igdtd1;
+      delete igdtd2;
       return 1;
     }
     // normalize+= 1.;
@@ -461,9 +479,11 @@ int Model::Compute(const double A)
   }
   m_dPt2 = accumulator1 / normalize; //  pT broadening
   m_Rm = temp;                       //  Multiplicity
-  // if (m_doMonitoring) {
-  //   MonitoringFinish();
-  // }
+
+  if (m_doMonitoring) {
+    MonitoringFinish();
+  }
+
   // Avoid memory leaks
   delete dtd1;
   delete dtd2;
