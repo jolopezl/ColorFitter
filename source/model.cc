@@ -464,6 +464,11 @@ int Model::Compute(const double A)
   // if (m_doMonitoring) {
   //   MonitoringFinish();
   // }
+  // Avoid memory leaks
+  delete dtd1;
+  delete dtd2;
+  delete igdtd1;
+  delete igdtd2;
   return 0;
 }
 
