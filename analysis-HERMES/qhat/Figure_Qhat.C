@@ -1,4 +1,4 @@
-void Figure_Qhat() {
-    SetAtlasStyle()
-    
+void Figure_Qhat()
+{
+  SetAtlasStyle()
 }

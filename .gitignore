@@ -50,3 +50,4 @@ build
 run
 *.out
 *.dat
+.vscode
