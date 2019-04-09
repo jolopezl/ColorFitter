@@ -2,8 +2,7 @@
 
 # ColorFitter
 ## Authors
-- William Brooks (william.brooks@usm.cl)
-- Jorge López (jall@pm.me)
+William Brooks (<william.brooks@usm.cl>) and Jorge López (<jorge.lopez@physi.uni-heidelberg.de>)
 
 Compile using `make`. The binary is found under `bin`.
 
@@ -11,4 +10,4 @@ To run the ColorFitter for to `run/test_HERMES/` and call the fitter as `../../i
 
 Look at the functions defined in `source/main.cc`, there `runColorFitter()` and `runColorFitterVariant()` are the most useful. The former one helps to set a complete fit configuring everything, and the latter runs defined fits.
 
-Legacy analysis code based on the HERMES data results available here: https://github.com/jolopezl/ColorFitter-AnalysisTools.
+Legacy analysis code based on the HERMES data results available here: [https://github.com/jolopezl/ColorFitter-AnalysisTools].
