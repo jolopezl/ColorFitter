@@ -47,3 +47,6 @@ Fit_output
 *.png
 test
 build
+run
+*.out
+*.dat
