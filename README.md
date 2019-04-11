@@ -15,4 +15,4 @@ To run ColorFitter, go to `run/test_*/` and call the fitter as `../../ifit.exe`.
 
 Look at the functions defined in `source/main.cc`, there `runColorFitter()` and `runColorFitterVariant()` are the most useful. The former one helps to set a complete fit configuring everything, and the latter runs defined fits.
 
-Legacy analysis code based on the HERMES data results available here: [https://github.com/jolopezl/ColorFitter-AnalysisTools].
+The legacy analysis code, based on the HERMES data results, is available here: https://github.com/jolopezl/ColorFitter-AnalysisTools.
