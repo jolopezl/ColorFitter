@@ -1,6 +1,6 @@
 /**
-  Taken from xxxyyy
-  Find ROOT JIRA ticket where it was implemented
+  Code taken from:
+  https://sft.its.cern.ch/jira/browse/ROOT-767
 **/
 
 #include "MultiGaus.h"
