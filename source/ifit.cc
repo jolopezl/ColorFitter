@@ -309,7 +309,7 @@ void modelplot(TMinuit* g, myConfig* config, std::string& bin_info,
   double xlolim = 0;
   double xuplim = 0;
   int iuint = 0;
-  int NPAR = 8;
+  constexpr int NPAR = 8;
   TString chnam;
   double par[NPAR], par_errors[NPAR];
   std::ostringstream out;

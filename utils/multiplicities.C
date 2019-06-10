@@ -1,6 +1,7 @@
 using namespace std;
 
-void ComputeFit(double* xval, double* xerrminus, double* xerrplus, double* yval, double* yerrminus, double* yerrplus) {
+void ComputeFit(double* xval, double* xerrminus, double* xerrplus, double* yval, double* yerrminus, double* yerrplus)
+{
   // make 3 graphs
   // - g0, g_upper, g_lower
   // fit each one to a "pol4"
@@ -12,33 +13,33 @@ void ComputeFit(double* xval, double* xerrminus, double* xerrplus, double* yval,
     double y = yval[i];
     double y_plus = yval[i] + yerrplus[i];
     double y_minus = yval[i] - yerrminus[i];
-    g_val->SetPoint(i,x,y);
-    g_plus->SetPoint(i,x,y_plus);
-    g_minus->SetPoint(i,x,y_minus);
+    g_val->SetPoint(i, x, y);
+    g_plus->SetPoint(i, x, y_plus);
+    g_minus->SetPoint(i, x, y_minus);
   }
-  g_val->Fit("pol4","Q");
-  g_plus->Fit("pol4","Q");
-  g_minus->Fit("pol4","Q");
+  g_val->Fit("pol4", "Q");
+  g_plus->Fit("pol4", "Q");
+  g_minus->Fit("pol4", "Q");
 
   auto f_val = g_val->GetFunction("pol4");
   auto f_plus = g_plus->GetFunction("pol4");
   auto f_minus = g_minus->GetFunction("pol4");
 
-  double zbin[4] = {0.32, 0.53, 0.75, 0.94};
+  double zbin[4] = { 0.32, 0.53, 0.75, 0.94 };
   for (int i = 0; i < 4; ++i) {
     float z = zbin[i];
-    cout << z << " " << f_val->Eval(z) << " " << f_plus->Eval(z)-f_minus->Eval(z) << endl;
+    cout << z << " " << f_val->Eval(z) << " " << f_plus->Eval(z) - f_minus->Eval(z) << endl;
   }
 
   return;
 
   TCanvas c("c");
-  g_val->GetYaxis()->SetRangeUser(0.,1.1);
+  g_val->GetYaxis()->SetRangeUser(0., 1.1);
   g_val->SetMarkerStyle(20);
   g_val->Draw("APE");
   c.Print("test.pdf");
 
-/**
+  /**
 // this has to dump
     Rm Value Stat. Error  Syst. Uncert.
   z-bin#1 
@@ -50,7 +51,8 @@ void ComputeFit(double* xval, double* xerrminus, double* xerrplus, double* yval,
 **/
 }
 
-void multiplicities() {
+void multiplicities()
+{
   gROOT->SetStyle("Plain");
   // K+ multiplicty ratio (Helium/Deuterium) as a function of Z.
   // Plot: p6820_d5x1y1
@@ -76,8 +78,7 @@ void multiplicities() {
              p6820_d5x1y1_xerrplus,
              p6820_d5x1y1_yval,
              p6820_d5x1y1_yerrminus,
-             p6820_d5x1y1_yerrplus
-             );
+             p6820_d5x1y1_yerrplus);
 
   // K+ multiplicty ratio (Neon/Deuterium) as a function of Z.
   // Plot: p6820_d14x1y1
@@ -103,8 +104,7 @@ void multiplicities() {
              p6820_d14x1y1_xerrplus,
              p6820_d14x1y1_yval,
              p6820_d14x1y1_yerrminus,
-             p6820_d14x1y1_yerrplus
-             );
+             p6820_d14x1y1_yerrplus);
 
   // K+ multiplicty ratio (Krypton/Deuterium) as a function of Z.
   // Plot: p6820_d23x1y1
@@ -130,8 +130,7 @@ void multiplicities() {
              p6820_d23x1y1_xerrplus,
              p6820_d23x1y1_yval,
              p6820_d23x1y1_yerrminus,
-             p6820_d23x1y1_yerrplus
-             );
+             p6820_d23x1y1_yerrplus);
 
   // K+ multiplicty ratio (Xenon/Deuterium) as a function of Z.
   // Plot: p6820_d32x1y1
@@ -157,7 +156,6 @@ void multiplicities() {
              p6820_d32x1y1_xerrplus,
              p6820_d32x1y1_yval,
              p6820_d32x1y1_yerrminus,
-             p6820_d32x1y1_yerrplus
-             );
+             p6820_d32x1y1_yerrplus);
   return;
 }

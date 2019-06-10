@@ -1,6 +1,10 @@
 CC        = g++
-CCFLAGS   = -c -g -Wall
-CCFLAGS  += -fPIC -Wno-deprecated
+CCFLAGS   = -std=c++14
+CCFLAGS  += -c -g -fPIC 
+CCFLAGS  += -Wall -W -Wextra -Wshadow
+CCFLAGS  += -Wwrite-strings
+# CCFLAGS  += -Werror -Weffc++ -pedantic-errors
+CCFLAGS  += -Wno-deprecated
 CCFLAGS  += -O2
 CCFLAGS  += `root-config --cflags`
 CCFLAGS  += -I./include -I/usr/local/include/

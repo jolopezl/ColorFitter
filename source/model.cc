@@ -388,7 +388,7 @@ int Model::Compute(const double A)
       zrange1 = 1.; // dummy value
       m_dPt2 = -99;
       m_Rm = -99;
-      
+
       // Avoid memory leaks and exit.
       delete dtd1;
       delete dtd2;
