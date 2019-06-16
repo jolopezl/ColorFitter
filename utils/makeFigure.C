@@ -16,7 +16,7 @@ float rm_err_xenon[4]     = {0.0535218789044,0.0411665583174,0.0503850083386,0.0
 void makeFigure(int plot=2) {
     SetAtlasStyle(43,32);
     gStyle->SetEndErrorSize(0);
-    TFile *fin = TFile::Open("OutputROOT.20180806.BL30.root");
+    TFile *fin = TFile::Open("OutputROOT.20190107.BL30.root");
     TFile *fin_uncertainties = TFile::Open("OutputROOT_ToyMC_ModelUncertianties.root");
     TGraphErrors *tg[4];
     TGraphErrors *tg_up[4];

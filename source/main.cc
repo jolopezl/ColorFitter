@@ -13,12 +13,12 @@ int main(int argc, char *argv[]) {
     // runColorFitterVariant(argv[1], true, 0); // If you want to pass the model variant from execution "$ ifit.exe BLE30"
     // runColorFitterVariant("BL", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
     // runColorFitterVariant("BL25",  true, 0.0);
-    // runColorFitterVariant("BL30",  true, 0.0);
+    runColorFitterVariant("BL30",  true, 0.0);
     // runColorFitterVariant("BL35",  true, 0.0);
     // runColorFitterVariant("BL40",  true, 0.0);
     // runColorFitterVariant("BLE",   true, 0.0);
     // runColorFitterVariant("BLE25", true, 0.0);
-    runColorFitterVariant("BLE30", true, 0.0);
+    // runColorFitterVariant("BLE30", true, 0.0);
     // runColorFitterVariant("BLE40", true, 0.0);
     // runColorFitterVariant("BLE35", true, 0.0);
     // runColorFitterVariant("BLE40", true, 0.0);

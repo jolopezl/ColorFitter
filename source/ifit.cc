@@ -288,10 +288,10 @@ std::vector<myResult> ifit(myConfig *config) {
 
             V(0,0) = TMath::Power(errorzzz[0], 2);
             V(1,1) = TMath::Power(errorzzz[1], 2);
-            V(2,2) = TMath::Power(errorzzz[2], 2);
-            V(3,3) = TMath::Power(errorzzz[3], 2);
             V(4,4) = TMath::Power(errorzzz[4], 2);
+            V(2,2) = TMath::Power(errorzzz[2], 2);
             V(5,5) = TMath::Power(errorzzz[5], 2);
+            V(3,3) = TMath::Power(errorzzz[3], 2);
 
             const double rho = 0.0;
             V(0,3) = rho*errorzzz[0]*errorzzz[3];

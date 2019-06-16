@@ -22,7 +22,7 @@ void makeFigure2() {
 
     const char *variantname = "BL30";
 
-    TFile *fin = TFile::Open(Form("OutputROOT.20181107.%s.root",variantname));
+    TFile *fin = TFile::Open(Form("OutputROOT.20181229.%s.root",variantname)); // 20181229 nominal
     TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
     std::pair<TGraphErrors*,TGraphErrors*> tg[4];
     std::pair<TGraphErrors*,TGraphErrors*> tg_up[4];
