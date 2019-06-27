@@ -84,9 +84,10 @@ std::vector<myResult> ifit(myConfig* config)
   m->DoFixedLp(config->fixedLp);
   // m->DoFermiMotion(config->m_fermimotion);
   // This is for Jlab
-  xxx[0] = pow(12.0107, 1. / 3.); // C
-  xxx[1] = pow(55.845, 1. / 3.);  // Fe
-  xxx[2] = pow(207.2, 1. / 3.);   // Pb
+  auto A = config->getMassNumbers();
+  xxx[0] = pow(A[0], 1. / 3.); // C
+  xxx[1] = pow(A[1], 1. / 3.); // Fe
+  xxx[2] = pow(A[2], 1. / 3.); // Pb
   // This is for HERMES
   // xxx[0] = pow(20.1797,1./3.); // Ne   here goes A^1/3
   // xxx[1] = pow(83.7980,1./3.); // Kr

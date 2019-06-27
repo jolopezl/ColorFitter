@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 class myConfig
 {
@@ -39,6 +40,11 @@ class myConfig
   myConfig();
   ~myConfig();
   void Update();
+  std::vector<float> getMassNumbers() const { return kMASSNUMBER; }
+
+ private:
+  std::vector<float> kMASSNUMBER = { 12.0107, 55.845, 207.2 }; // C, Fe, Pb For JLab
+  // constexpr float kMASSNUMBER[3] = { 20.1797, 83.7980, 131.293 }; // For HERMES
 };
 
 #endif
