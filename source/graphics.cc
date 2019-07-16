@@ -94,16 +94,14 @@ void doDataPlots(myConfig* config, myData* he, myData* ne, myData* kr, myData* x
     leg[i]->SetFillStyle(0);
   }
 
-  std::vector<std::string> labels =
-    { "HERMES Helium data",
-      "HERMES Neon data",
-      "HERMES Krypton data",
-      "HERMES Xenon data" };
-  std::vector<std::string> labels2 =
-    { "HERMES Helium subtracted #rho=",
-      "HERMES Neon with Helium subtracted #rho=",
-      "HERMES Krypton with Helium subtracted #rho=",
-      "HERMES Xenon with Helium subtracted #rho=" };
+  std::vector<std::string> labels = { "HERMES Helium data",
+                                      "HERMES Neon data",
+                                      "HERMES Krypton data",
+                                      "HERMES Xenon data" };
+  std::vector<std::string> labels2 = { "HERMES Helium subtracted #rho=",
+                                       "HERMES Neon with Helium subtracted #rho=",
+                                       "HERMES Krypton with Helium subtracted #rho=",
+                                       "HERMES Xenon with Helium subtracted #rho=" };
   std::ostringstream out;
   out << std::setprecision(3) << config->m_correlation;
   std::string foolabel = out.str();
