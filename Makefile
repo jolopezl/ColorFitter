@@ -1,7 +1,8 @@
 CC        = g++
 CCFLAGS   = -std=c++14
 CCFLAGS  += -c -g -fPIC 
-CCFLAGS  += -Wall -W -Wextra -Wshadow
+CCFLAGS  += -Wall -W -Wextra 
+#CCFLAFS  += -Wshadow
 CCFLAGS  += -Wwrite-strings
 # CCFLAGS  += -Werror -Weffc++ -pedantic-errors
 CCFLAGS  += -Wno-deprecated
