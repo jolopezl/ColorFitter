@@ -1,12 +1,14 @@
 void PlotLP() {
     SetAtlasStyle();
+    // SetAtlasStyle(43,22);
+    // gStyle->SetEndErrorSize(5);
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
-    fin[0] = new TFile("OutputROOT.20181229.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20181229.BL30.root","READ");
-    fin[2] = new TFile("OutputROOT.20181229.BLE.root","READ");
-    fin[3] = new TFile("OutputROOT.20181229.BLE30.root","READ");
+    fin[0] = new TFile("OutputROOT.20191115.BL.root","READ");
+    fin[1] = new TFile("OutputROOT.20191115.BL30.root","READ");
+    fin[2] = new TFile("OutputROOT.20191115.BLE.root","READ");
+    fin[3] = new TFile("OutputROOT.20191115.BLE30.root","READ");
 
     TGraphErrors *tg[4];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_lp");
@@ -30,12 +32,13 @@ void PlotLP() {
     }
 
     model->SetMarkerSize(1.5);
-    model->SetMarkerStyle(20);
+    model->SetMarkerStyle(kFullCircle);
     // model->SetLineWidth(2);
     model->GetXaxis()->SetLimits(0.0,1.0);
     model->GetXaxis()->SetNdivisions(505);
     // model->GetYaxis()->SetRangeUser(0.0001,16);
-    model->GetYaxis()->SetRangeUser(0.1,70);
+    model->GetYaxis()->SetRangeUser(0.001,20);
+    model->GetYaxis()->SetNdivisions(505);
     model->SetTitle(";#it{z};#it{L}_{p} (fm)");
     model->GetXaxis()->CenterTitle();
     model->GetYaxis()->CenterTitle();
@@ -58,7 +61,7 @@ void PlotLP() {
         variants->GetEY()[i] = rms;
         variants->GetEX()[i] = 0.015;
     }
-    variants->SetFillColorAlpha(kYellow,1);
+    variants->SetFillColorAlpha(kYellow,0.5);
 
     const bool APPLY_KINEMATIC_CORRECTION = true;
     if (APPLY_KINEMATIC_CORRECTION) {
@@ -83,7 +86,7 @@ void PlotLP() {
     double Q2List[4] = {2.4,2.4,2.4,2.2};
 
 
-    const bool APPLY_Z_SHIFT = kTRUE;
+    const bool APPLY_Z_SHIFT = true;
     if (APPLY_Z_SHIFT) {
         for (int i=0; i<4; ++i) {
             double z = model->GetX()[i];
@@ -163,15 +166,15 @@ void PlotLP() {
     fg2->SetLineWidth(2);
     fg1->SetLineColor(kAzure);
     fg2->SetLineColor(kRed);
-    fg1->SetFillColorAlpha(kAzure,0.3);
-    fg2->SetFillColorAlpha(kRed,0.3);
+    fg1->SetFillColorAlpha(kAzure,0.5);
+    fg2->SetFillColorAlpha(kRed+1,0.5);
 
     fg1->SetNpx(10000);
     fg2->SetNpx(10000);
 
     const bool PLOT_MODELS_ONLY = kFALSE;
     if(PLOT_MODELS_ONLY) {
-        TCanvas *c1 = new TCanvas("c1","title",800,600);
+        TCanvas *c1 = new TCanvas("c1","title",600,600);
         fg1->GetYaxis()->SetRangeUser(0,100);
         fg1->SetTitle(";#it{z};#it{L}_{p} (fm)");
         fg1->Draw();
@@ -236,7 +239,7 @@ void PlotLP() {
     cout << "Chi^2/NDF = " << fg2->GetChisquare()/fg2->GetNDF() << endl;
     cout << "p-value = " << fg2->GetProb() << endl;
 
-    // gStyle->SetEndErrorSize(8);
+    gStyle->SetEndErrorSize(8);
     TCanvas *c2 = new TCanvas("c2","c2 title",800,600);
 
     model->Draw("APEZ"); 
@@ -266,7 +269,7 @@ void PlotLP() {
     // leg->AddEntry(grint1,Form("Linear Form, #chi^{2}/dof = %.2f, #kappa = %.1f #pm %.1f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(2),fg1->GetParError(2)),"fl");
 
     // leg->AddEntry(grint1,Form("Lund String Model (struck quark), #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
-    leg->AddEntry(grint1,Form("Lund string model, #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
+    leg->AddEntry(grint1,Form("Lund string model (struck quark only), #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
     leg->AddEntry(grint2,Form("Bialas #it{et. al.}, #chi^{2}/dof = %.2f, #kappa = %.2f #pm %.2f GeV/fm",fg2->GetChisquare()/fg2->GetNDF(),fg2->GetParameter(0),fg2->GetParError(0)),"fl");
 
     // leg->AddEntry(grint1, "Lund String Model (struck quark)","fl");//   Form("Linear Form, #chi^{2}/dof = %.2f, #kappa = %.1f #pm %.1f GeV/fm",fg1->GetChisquare()/fg1->GetNDF(),fg1->GetParameter(0),fg1->GetParError(0)),"fl");
@@ -284,7 +287,7 @@ void PlotLP() {
     myText(0.22, 0.23, kBlack, "#LTQ^{2}#GT = 2.4 GeV^{2}, #LT#nu#GT = 12.4 GeV",0.045); // z-bin #3
 
 
-    c2->SetLogy();
+    // c2->SetLogy();
     
 //    myText(0.2, 0.4, kBlack, "Fit uncorrected for kinematics", 0.05, 0);
     c2->Print("figure_models_lundfit_lp.pdf");

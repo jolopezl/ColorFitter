@@ -56,11 +56,6 @@ void Model::GetResult(double &dPT2,double &Rm) {
     Rm   = m_Rm;
 }
 
-double Model::Get1() {return m_dPt2;}
-double Model::Get2() {return m_Rm;}
-double Model::Get3() {return m_average_density;}
-double Model::Get4() {return m_multip_density;}
-
 void Model::DoEnergyLoss(bool foo, int N) {
   m_DoEnergyLoss = foo;
   kBINS = N;
@@ -163,12 +158,13 @@ double Model::GetR(const double A, const double density_threshold) {
     return R;
 }
 
-double Model::GetC(int A) {
-    return m_c_interpolation[A];
+double Model::GetC(double A) {
+    // return m_c_interpolation[A];
     /* using the mathematica notebook */
     // if (A == (int) 20.1797)  {return 2.77966;}
     // if (A == (int) 83.7980)  {return 4.73264;}
     // if (A == (int) 131.293)  {return 5.54713;}
+    return 1.1 * pow(A, 1./3.);
 }
 
 double Model::Density(const double A, const double xx, const double yy, const double zz){
@@ -300,6 +296,7 @@ int Model::Compute(const double A){
     double constant = 0.1*3./(4.*3.141592); // alpha_s * N_c / 4pi, the prefix of the formula for delta pT^2 = 0.02387
     // MC part
     double average_density = 0;
+    double average_length = 0;
     double multiplicity_density = 0;
     for (int mcStep = 0; mcStep < m_maxmcSteps; ++mcStep) {
         InteractionPoint(x,y,z,R);
@@ -403,11 +400,16 @@ int Model::Compute(const double A){
         if (not isOutside) {
             average_density += dtd1->Eval(z+L);
             multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+L);
+            average_length += z+L;
         }
         else {
-            average_density += dtd1->Eval(z+ul);
             multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+ul);
+            average_density += dtd1->Eval(z+ul);
+            average_length += z+ul;
         }
+        // multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+ul);
+        // average_density += dtd1->Eval(z+ul);
+        // average_length += z+ul;
         // if (ul - (z+L) < 0.1) { // choos a a suuuper threshold
         //     multiplicity_density += 1;
         //     multiplicity_density += exp(-temp*m_sigma_ph/10.);
@@ -415,8 +417,12 @@ int Model::Compute(const double A){
         // average_density *= weight;
         // multiplicity_density *= weight;
     } // End of big loop     energy loss down here ------------*
-    m_average_density = average_density/m_maxmcSteps;
-    m_multip_density = multiplicity_density/m_maxmcSteps;
+    average_density /= m_maxmcSteps;
+    multiplicity_density /= m_maxmcSteps;
+    average_length /= m_maxmcSteps;
+    m_average_density = average_density/average_length;
+    m_multip_density = multiplicity_density/average_length;
+    m_average_length = average_length;
     // ADD ENERGY LOSS, From Will's original code:
     temp = accumulator2/normalize;
     if (m_DoEnergyLoss == true) {

@@ -17,7 +17,7 @@ double zbin[ZDIM]      = {0.31, 0.54, 0.75, 0.94}; // pi+
 // double zbin[ZDIM]      = {0.32, 0.53, 0.75, 0.95}; // pi-
 // double zbinw[ZDIM]     = {0.20,0.22,0.22, 0.16+0.05}; // Approx.
 // double binratios[ZDIM] = {0.469058,0.290631,0.0789474,0}; // Computed with 1M events
-double func_array[4] = {0,0,0,0};
+double func_array[5] = {0,0,0,0,0};
 double zzz[6] = {0,0,0,0,0,0};
 double errorzzz[6] = {0,0,0,0,0,0};
 double xxx[6] = {0,0,0,0,0,0};
@@ -126,10 +126,11 @@ void callModel(const double A13,double *par){
     m->SetParameters(my_pars);
     m->SetTestParameter(par[6],par[7]); // new coefficients
     m->Compute(nucleus);
-    func_array[0] = m->Get1(); 
-    func_array[1] = m->Get2();
-    func_array[2] = m->Get3();
-    func_array[3] = m->Get4();
+    func_array[0] = m->Get1();             // pt-broadening
+    func_array[1] = m->Get2();             // multiplicity ratio
+    func_array[2] = m->Get3();             // average density
+    func_array[3] = m->Get4();             // average multiplicity
+    func_array[4] = m->GetAverageLength(); // average length
 }
 
 // I will write the Chi-Squared and some other functions here
@@ -325,7 +326,7 @@ std::vector<myResult> ifit(myConfig *config) {
                 lim_hi[4] = +10.0;
             }
             // gMinuit->mnparm(0, "Q0",    2.286, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
-            gMinuit->mnparm(0, "Q0",    0.7, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
+            gMinuit->mnparm(0, "Q0",    3, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
             gMinuit->mnparm(1, "LP",    1.6, step[1], lim_lo[1],lim_hi[1],ierflg); // production length
             gMinuit->mnparm(2, "SIGMA", vstart[2], step[2], lim_lo[2],lim_hi[2],ierflg); // prehadron cross section
             gMinuit->mnparm(3, "DLOG",  vstart[3], step[3], lim_lo[3],lim_hi[3],ierflg); // parameter needed for log description
@@ -341,11 +342,10 @@ std::vector<myResult> ifit(myConfig *config) {
             if (!config->m_logbehavior) gMinuit->FixParameter(3); // Log description
             if (!config->m_energyloss)  gMinuit->FixParameter(4); // Energy Loss
             if (!config->m_cascade)     gMinuit->FixParameter(5); // Cascade Parameter
-            if (!config->m_testing) gMinuit->FixParameter(6);
-            if (!config->m_testing) gMinuit->FixParameter(7);
+            if (!config->m_testing)     gMinuit->FixParameter(6);
+            if (!config->m_testing)     gMinuit->FixParameter(7);
             
             /* Testing new parameters */
-            // gMinuit->SetParameter(0,2.286);
             // gMinuit->FixParameter(0);
             gMinuit->FixParameter(6);
             gMinuit->FixParameter(7);
@@ -500,6 +500,7 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
 
         std::vector<double> average_density_fit;
         std::vector<double> multiplicity_density_fit;
+        std::vector<double> average_length_fit;
 
         double q0 = result.m_qhat;
         std::vector<double> d_pT_dq0;
@@ -516,9 +517,11 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
             double RM = func_array[1];
             double average_density = func_array[2];
             double multiplicty_density = func_array[3];
+            double average_length = func_array[4];
 
             average_density_fit.push_back(average_density);
             multiplicity_density_fit.push_back(multiplicty_density);
+            average_length_fit.push_back(average_length);
 
             pt_fit.push_back(pT2);
             pt_fiterr.push_back(0);
@@ -587,6 +590,7 @@ void modelplot(TMinuit *g, myConfig *config, std::string bin_info,
         int npoints = pt_x.size();
         result.m_tg_average_density = TGraph(npoints,pt_x.data(),average_density_fit.data());
         result.m_tg_multiplicity_density = TGraph(npoints,pt_x.data(),multiplicity_density_fit.data());
+        result.m_tg_average_length = TGraph(npoints,pt_x.data(),average_length_fit.data());
         result.m_tg_pT_extrapolation = TGraphErrors(npoints,pt_x.data(),pt_fit.data(),pt_fiterr.data(),pt_fiterr.data());
         result.m_tg_pT_extrapolation_up = TGraphErrors(npoints,pt_x.data(),pt_fit_up.data(),pt_fiterr.data(),pt_fiterr.data());
         result.m_tg_pT_extrapolation_down = TGraphErrors(npoints,pt_x.data(),pt_fit_down.data(),pt_fiterr.data(),pt_fiterr.data());

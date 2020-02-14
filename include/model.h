@@ -33,14 +33,16 @@ public:
     int Compute(const double);
     void InteractionPoint(double &, double &, double &, const double);
     double GetR(const double, const double);
-    double Get1();
-    double Get2();
-    double Get3();
-    double Get4();
-    double GetC(int);
+    double GetC(double);
+    double Fermi(int inucleus);
+
+    double Get1() const  { return m_dPt2; };
+    double Get2() const  { return m_Rm; };
+    double Get3() const  { return m_average_density; };
+    double Get4() const  { return m_multip_density; };
+    double GetAverageLength() const { return m_average_length; }
     std::vector<double> GetResult();
     void GetResult(double&,double&);
-    double Fermi(int inucleus);
 
     // Monitoring code
     bool m_doMonitoring = false;
@@ -73,6 +75,7 @@ private:
     double m_Rm;
     double m_average_density;
     double m_multip_density;
+    double m_average_length;
     // physical input parameters
     double m_q0;
     double m_lp; // production lenght

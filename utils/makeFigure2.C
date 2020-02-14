@@ -22,8 +22,8 @@ void makeFigure2() {
 
     const char *variantname = "BL30";
 
-    TFile *fin = TFile::Open(Form("OutputROOT.20181229.%s.root",variantname)); // 20181229 nominal
-    TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
+    TFile *fin = TFile::Open(Form("OutputROOT.20191115.%s.root",variantname)); // 20181229 nominal
+    // TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
     std::pair<TGraphErrors*,TGraphErrors*> tg[4];
     std::pair<TGraphErrors*,TGraphErrors*> tg_up[4];
     std::pair<TGraphErrors*,TGraphErrors*> tg_down[4];
@@ -31,6 +31,7 @@ void makeFigure2() {
     std::pair<TGraphErrors*,TGraphErrors*> tg_toy_down[4];
     std::pair<TGraphAsymmErrors*,TGraphAsymmErrors*> band[4];
     for (int i=0;i<4;++i) {
+        cout << Form("tg_model_pT_extrapolation_%d",i) << endl;
         tg[i].first = (TGraphErrors*) fin->Get(Form("tg_model_pT_extrapolation_%d",i));
         tg_up[i].first = (TGraphErrors*) fin->Get(Form("tg_model_pT_extrapolation_up_%d",i));
         tg_down[i].first = (TGraphErrors*) fin->Get(Form("tg_model_pT_extrapolation_down_%d",i));
@@ -46,10 +47,10 @@ void makeFigure2() {
         band[i].first = myMakeBand(tg[i].first,tg_up[i].first,tg_down[i].first);
         band[i].second = myMakeBand(tg[i].second,tg_up[i].second,tg_down[i].second);
         tg[i].first->SetLineColor(kAzure);
-        tg[i].first->SetLineWidth(3);
+        tg[i].first->SetLineWidth(2);
         band[i].first->SetFillColorAlpha(kAzure,0.5);
         tg[i].second->SetLineColor(kRed+1);
-        tg[i].second->SetLineWidth(3);
+        tg[i].second->SetLineWidth(2);
         band[i].second->SetFillColorAlpha(kRed+1,0.5);
     }
     /** data points **/
@@ -71,10 +72,12 @@ void makeFigure2() {
         float yval2[4] = {rm_neon[i],rm_kripton[i],rm_xenon[i]};
         float yerr2[4] = {rm_err_neon[i],rm_err_kripton[i],rm_err_xenon[i]};
         // data[i].first = new TGraphErrors(3,xval,yval1,xerr,yerr1);
-        data[i].first->GetYaxis()->SetRangeUser(-0.028,0.049);
+        // data[i].first->GetYaxis()->SetRangeUser(-0.028,0.049);
+        data[i].first->GetYaxis()->SetRangeUser(-0.019,0.045);
         data[i].first->GetYaxis()->SetNdivisions(505);
         // data[i].second = new TGraphErrors(3,xval,yval2,xerr,yerr2);
-        data[i].second->GetYaxis()->SetRangeUser(0.01,1.199);
+        // data[i].second->GetYaxis()->SetRangeUser(0.01,1.199);
+        data[i].second->GetYaxis()->SetRangeUser(0.41,0.99);
         data[i].second->GetYaxis()->SetNdivisions(505);
         data[i].first->GetYaxis()->SetTitle("#Delta #LT #it{p}_{T}^{2} #GT (GeV^{2})");
         data[i].first->GetYaxis()->SetTitle("#Delta #it{p}_{T}^{2} (GeV^{2})");
@@ -104,7 +107,7 @@ void makeFigure2() {
     TCanvas* c1 = new TCanvas("c1","c1 title",1000,500);
     // c1->SetRightMargin(0.09);
     c1->SetLeftMargin(0.22);
-    c1->SetBottomMargin(0.17);
+    c1->SetBottomMargin(0.2);
     c1->Divide(4,2,0,0);
     for (int i=0; i<4; ++i) {
         c1->cd(i+1);
@@ -120,10 +123,10 @@ void makeFigure2() {
         tg[i].second->Draw("CLSAME");
         data[i].second->Draw("PSAME");
     }
-    c1->cd(1); myText(0.35,0.9,1,"#it{z} = 0.32",22);
-    c1->cd(2); myText(0.15,0.9,1,"#it{z} = 0.53",22);
-    c1->cd(3); myText(0.15,0.9,1,"#it{z} = 0.75",22);
-    c1->cd(4); myText(0.15,0.9,1,"#it{z} = 0.94",22);
+    c1->cd(1); myText(0.35,0.9,1,"#it{z}_{h} = 0.32",22);
+    c1->cd(2); myText(0.15,0.9,1,"#it{z}_{h} = 0.53",22);
+    c1->cd(3); myText(0.15,0.9,1,"#it{z}_{h} = 0.75",22);
+    c1->cd(4); myText(0.15,0.9,1,"#it{z}_{h} = 0.94",22);
 
     c1->cd(1);
     TLegend* legend = new TLegend(0.38,0.1,0.65,0.35);
@@ -134,7 +137,7 @@ void makeFigure2() {
     legend->SetTextSize(22); // Increase entry font size! 
     legend->AddEntry(data[0].first, "Data", "pe");
     legend->AddEntry(tg[0].first, Form("Fit result %s",variantname), "L");
-    legend->Draw();
+    // legend->Draw();
     c1->cd(5);
     TLegend* legend2 = new TLegend(0.38,0.3,0.65,0.5);
     legend2->SetBorderSize(0);  // no border
@@ -144,7 +147,7 @@ void makeFigure2() {
     legend2->SetTextSize(22); // Increase entry font size! 
     legend2->AddEntry(data[0].second, "Data", "pe");
     legend2->AddEntry(tg[0].second, Form("Fit result %s",variantname), "L");
-    legend2->Draw();
+    // legend2->Draw();
    
     // c1->SetGrayscale(kTRUE);
     c1->Print(Form("modelplot_%s.pdf",variantname));

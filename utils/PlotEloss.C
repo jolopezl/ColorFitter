@@ -3,9 +3,12 @@ void PlotEloss() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[3];
-    fin[0] = new TFile("OutputROOT.20181229.BLE.root","READ");
-    fin[1] = new TFile("OutputROOT.20181229.BLE30.root","READ");
-    fin[2] = new TFile("OutputROOT.20181229.BLE40.root","READ");
+    // fin[0] = new TFile("backup-201911-4/OutputROOT.20181229.BLE.root","READ");
+    // fin[1] = new TFile("backup-201911-4/OutputROOT.20181229.BLE30.root","READ");
+    // fin[2] = new TFile("backup-201911-4/OutputROOT.20181229.BLE40.root","READ");
+    fin[0] = new TFile("OutputROOT.20191115.BLE.root","READ");
+    fin[1] = new TFile("OutputROOT.20191115.BLE30.root","READ");
+    fin[2] = new TFile("OutputROOT.20191115.BLE30.root","READ");
 
     TGraphErrors *tg[3];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_dz");
@@ -30,8 +33,8 @@ void PlotEloss() {
     model->SetMarkerStyle(20);
     model->GetXaxis()->SetLimits(0.0,1.0);
     model->GetXaxis()->SetNdivisions(505);
-    model->GetYaxis()->SetRangeUser(-1.9,1.49);
-    model->SetTitle(";#it{z};#it{E}_{Loss} (GeV)");
+    model->GetYaxis()->SetRangeUser(-2.4,1.49);
+    model->SetTitle(";#it{z}_{h};#it{E}_{Loss} (GeV)");
     model->GetXaxis()->CenterTitle();
     model->GetYaxis()->CenterTitle();
 
@@ -53,13 +56,13 @@ void PlotEloss() {
         variants->GetEY()[i] = rms;
         variants->GetEX()[i] = 0.015;
     }
-    variants->SetFillColorAlpha(kYellow,1);
+    variants->SetFillColorAlpha(kYellow,0.5);
 
     /** Get average energy loss **/
     double Eloss = 0;
     double ElossErr = 0;
     double Sum = 0;
-    for (int i=1; i<4; ++i) {
+    for (int i=0; i<4; ++i) {
         Eloss += model->GetY()[i]/model->GetEY()[i];
         Sum += 1/model->GetEY()[i];
         ElossErr += TMath::Power(model->GetEY()[i],2);
@@ -94,7 +97,7 @@ void PlotEloss() {
     leg->SetBorderSize(0);
     leg->SetFillStyle(0);
     leg->AddEntry(model,"BLE30","pe");
-    leg->AddEntry(line,Form("#bar{#it{E}_{Loss}}(#it{z} > 0.5) = %.0f MeV ", Eloss*1000), "l");
+    leg->AddEntry(line,Form("#bar{#it{E}_{Loss}}(#it{z}_{h} > 0.5) = %.0f MeV ", Eloss*1000), "l");
     leg->Draw();
 
     c1->Print("figure_models_eloss.pdf");

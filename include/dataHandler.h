@@ -59,6 +59,7 @@ public:
     TGraphErrors m_tg_Rm_extrapolation_down;
     TGraph m_tg_average_density;
     TGraph m_tg_multiplicity_density;
+    TGraph m_tg_average_length;
     // constructor
     myResult();
     ~myResult();

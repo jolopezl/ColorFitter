@@ -260,7 +260,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
         chisquared[i] = resultCont.at(i).m_chi2;
         std::cout << "z = " << z[i] << std::endl;
     }
-    std::string ffout = "OutputROOT.20190107."+model+".root";
+    std::string ffout = "OutputROOT.20191115."+model+".root";
     TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
     std::cout << "Output file created" << std::endl;
     OutputROOT->cd();
@@ -295,6 +295,8 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     TGraphErrors *tg_model_Rm_extrapolation_down[fNzbins];
     TGraph *tg_average_density[fNzbins];
     TGraph *tg_multiplicity_density[fNzbins];
+    TGraph *tg_average_length[fNzbins];
+    
     std::string title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
     for (int i=0; i<fNzbins; ++i) {
         std::cout << "Creating model plots for element " << i << std::endl;
@@ -314,6 +316,8 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
         tg_average_density[i] = &(resultCont.at(i).m_tg_average_density); tg_average_density[i]->SetName(Form("tg_average_density_%d",i)); tg_average_density[i]->SetTitle(title.c_str());
         title = ";A^{1/3};#LT #sigma exp(-#sigma#int#rhodz) #rho(z_{0}+l) #GT";
         tg_multiplicity_density[i] = &(resultCont.at(i).m_tg_multiplicity_density); tg_multiplicity_density[i]->SetName(Form("tg_multiplicity_density_%d",i)); tg_multiplicity_density[i]->SetTitle(title.c_str());
+        title = ";A^{1/3};#LT l #GT (fm)";
+        tg_average_length[i] = &(resultCont.at(i).m_tg_average_length); tg_average_length[i]->SetName(Form("tg_average_length_%d",i)); tg_average_length[i]->SetTitle(title.c_str());
         tg_data_pT[i]->Write();
         tg_data_Rm[i]->Write();
         tg_model_pT[i]->Write();
@@ -326,6 +330,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
         tg_model_Rm_extrapolation_down[i]->Write();
         tg_average_density[i]->Write();
         tg_multiplicity_density[i]->Write();
+        tg_average_length[i]->Write();
     }
     std::cout << "Done." << std::endl;
     OutputROOT->Close();

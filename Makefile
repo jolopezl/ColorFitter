@@ -21,12 +21,12 @@ BINDIR = bin
 all: $(SOURCES) $(DEPS) $(EXE)
 
 $(EXE): $(CCOBJS) | $(BINDIR)
-	$(CXX) $(LDFLAGS) $(CCOBJS) -o $@
+	$(CC) $(LDFLAGS) $(CCOBJS) -o $@
 
 #.cc.o :
 build/%.o: source/%.cc $(DEPS) | $(OBJDIR)
 	@echo Compiling $@
-	@$(CXX) $(CCFLAGS) -c $< -o $@
+	@$(CC) $(CCFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(EXE) $(CCOBJS)
