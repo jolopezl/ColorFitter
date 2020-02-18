@@ -400,12 +400,12 @@ int Model::Compute(const double A){
         if (not isOutside) {
             average_density += dtd1->Eval(z+L);
             multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+L);
-            average_length += z+L;
+            average_length += L;
         }
         else {
             multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+ul);
             average_density += dtd1->Eval(z+ul);
-            average_length += z+ul;
+            average_length += ul-z;
         }
         // multiplicity_density += (m_sigma_ph/10.)*exp(-temp*m_sigma_ph/10.)*dtd1->Eval(z+ul);
         // average_density += dtd1->Eval(z+ul);

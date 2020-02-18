@@ -24,6 +24,8 @@ double xxx[6] = {0,0,0,0,0,0};
 double pT2[3] = {0,0,0};
 double Rm[3] = {0,0,0};
 
+double SIG[4] = {27.0363, 25.4381, 25.098, 24.9184}; // interpolated cross-section
+
 /* values from python/interpolate.py */
 // PI+ 
 // double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
@@ -316,7 +318,8 @@ std::vector<myResult> ifit(myConfig *config) {
             gMinuit->mnexcm("SET ERR", arglist ,1,ierflg);
             arglist[0] = 3;
             gMinuit->mnexcm("SET PRI", arglist ,1,ierflg);      
-            const double sigma0 = config->m_initial_sigma;
+            // const double sigma0 = config->m_initial_sigma;
+            const double sigma0 = SIG[iz];
             double vstart[] = {0.4775, 1.6,     sigma0, 2.5,    0.0,     0.2};
             double step[]   = {0.01,   0.01,    0.01,   0.5,    0.00001, 0.01};
             double lim_lo[] = {0.,     0.0001, -0.01,   0.1,   -1.0,    -0.1};

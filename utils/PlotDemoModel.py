@@ -17,7 +17,7 @@ def main():
     fe = ROOT.TFile.Open("DemoPlots.ExpLp.root", "READ")
     ff = ROOT.TFile.Open("DemoPlots.FixedLp.root", "READ")
 
-    fig, axs = plt.subplots(2, 3, sharex='col',constrained_layout=True,figsize=(9,5))
+    fig, axs = plt.subplots(2, 3, sharex='col',constrained_layout=True,figsize=(9,4.5))
 
     ll = [1, 3, 5, 10]
     style=itertools.cycle(["-","--","-.",":",".","h","H"])
@@ -37,8 +37,8 @@ def main():
         axs[0, 2].plot(fe.Get(graph_name).GetX(), fe.Get(graph_name).GetY(), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
         axs[1, 2].plot(ff.Get(graph_name).GetX(), ff.Get(graph_name).GetY(), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
    
-    axs[0,0].set(xlabel='', ylabel=r'$f_p (L; L_c)$')
-    axs[1,0].set(xlabel=r'$L$ (fm)', ylabel=r'$f_p (L; L_c)$')
+    axs[0,0].set(xlabel='', ylabel=r'$f_p (L; L_\mathrm{c})$')
+    axs[1,0].set(xlabel=r'$L$ (fm)', ylabel=r'$f_p (L; L_\mathrm{c})$')
     axs[0,1].set(xlabel='', ylabel=r'$\Delta \langle p_\mathrm{T}^2\rangle$ (GeV$^2$)')
     axs[1,1].set(xlabel='$A^{1/3}$', ylabel=r'$\Delta \langle p_\mathrm{T}^2\rangle$ (GeV$^2$)')
     axs[0,2].set(xlabel='', ylabel='$R_\mathrm{M}$')
@@ -56,13 +56,13 @@ def main():
 # if (A == (int) 131.293)  {return 5.54713;}
 
 
-    axs[0,0].annotate('Ne', xy=(1.2 * 20.1797**(1./3.), 0.151),  xycoords='data', xytext=(10,100), textcoords='offset points',
+    axs[0,0].annotate('Ne', xy=(1.1 * 20.1797**(1./3.), 0.151),  xycoords='data', xytext=(10,100), textcoords='offset points',
             arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=90,rad=10")
             )
-    axs[0,0].annotate('Kr', xy=(1.2 * 83.7980**(1./3.), 0.151),  xycoords='data', xytext=(10,60), textcoords='offset points',
+    axs[0,0].annotate('Kr', xy=(1.1 * 83.7980**(1./3.), 0.151),  xycoords='data', xytext=(10,60), textcoords='offset points',
             arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=90,rad=10")
             )
-    axs[0,0].annotate('Xe', xy=(1.2 * 131.293**(1./3.), 0.151),  xycoords='data', xytext=(10,40), textcoords='offset points',
+    axs[0,0].annotate('Xe', xy=(1.1 * 131.293**(1./3.), 0.151),  xycoords='data', xytext=(10,40), textcoords='offset points',
             arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=90,rad=10")
             )
 
