@@ -47,3 +47,8 @@ Fit_output
 *.png
 test
 build
+*.err
+*.out
+*.csv
+*.sh
+.vscode/
