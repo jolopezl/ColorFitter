@@ -20,9 +20,9 @@ void makeFigure2() {
     SetAtlasStyle(43,22);
     gStyle->SetEndErrorSize(0);
 
-    const char *variantname = "BL30";
+    const char *variantname = "BLE30";
 
-    TFile *fin = TFile::Open(Form("OutputROOT.20191115.%s.root",variantname)); // 20181229 nominal
+    TFile *fin = TFile::Open(Form("OutputROOT.20200219.%s.root",variantname)); // 20181229 nominal
     // TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
     std::pair<TGraphErrors*,TGraphErrors*> tg[4];
     std::pair<TGraphErrors*,TGraphErrors*> tg_up[4];

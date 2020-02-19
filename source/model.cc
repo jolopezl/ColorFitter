@@ -231,7 +231,8 @@ void Model::InteractionPoint(double &x, double &y, double &z, const double R){
 }
 
 void Model::SortProductionLength(double &L) {
-    double mean = m_lp + m_coeff_1*m_A13 + m_coeff_2*m_A23; // testing idea
+    // double mean = m_lp + m_coeff_1*m_A13 + m_coeff_2*m_A23; // testing idea
+    double mean = m_lp;
     // double mean = m_lp; // original idea
     if (m_doFixedLp) L = mean;
     else L = m_random3->Exp(mean); // exponentially distributed production length
@@ -426,7 +427,8 @@ int Model::Compute(const double A){
     // ADD ENERGY LOSS, From Will's original code:
     temp = accumulator2/normalize;
     if (m_DoEnergyLoss == true) {
-        ApplyEnergyLoss(temp);
+        // ApplyEnergyLoss(temp);
+        ApplyImprovedEnergyLoss(temp);
     }
     m_dPt2 = accumulator1/normalize; //  pT broadening
     m_Rm = temp;                     //  Multiplicity
@@ -460,6 +462,28 @@ void Model::ApplyEnergyLoss(double &temp) {
         temp *= 1 - m_dz / b; // last bin loses events
     } else {
         temp *= 1 - m_dz / b + m_dz / b * ratio; // middle bins gain and lose events
+    }
+}
+
+void Model::ApplyImprovedEnergyLoss(double &temp) {
+    double NU[4] = {14.37, 13.03, 12.33, 10.70};
+    const int BIN = m_iz;
+    const double b = m_zbinwidth;
+    const double ratio = m_binratio;
+    // Now the z-shift is calculated using model
+    // shift = delta E / nu
+    // dividing by NU provides m_coeff_2 with units of GeV/fm
+    double shift = 0.0;
+    if (  < m_coeff_1) {
+        shift = m_coeff_2 * pow(m_lp, 2) / NU[BIN];
+    } else {
+        shift = m_coeff_2 * m_coeff_1 * (2 * m_lp - m_coeff_1) / NU[BIN];
+    }
+    //
+    if (BIN == kBINS - 1) {
+        temp *= 1 - shift / b;
+    } else {
+        temp *= 1 - shift / b + shift / b * ratio; // middle bins gain and lose events
     }
 }
 

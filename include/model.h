@@ -66,6 +66,7 @@ private:
     double FindR(const double, const double);
     void SortProductionLength(double &);
     void ApplyEnergyLoss(double &);
+    void ApplyImprovedEnergyLoss(double &);
     //void InteractionPoint(double &, double &, double &, const double);
     void ApplyLogBehavior(double &, double);
     // private members
@@ -85,8 +86,9 @@ private:
     double m_cascade;
 
     // two new parameters August 30, 2017
-    double m_coeff_1;
-    double m_coeff_2;
+    // now used to implement improved energy loss model Feb 19, 2020
+    double m_coeff_1; // critical length
+    double m_coeff_2; // shape parameter
 
     // for the nuclear density
     double m_rho0 = 0.170; // nucleons/fm^3

@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     // runColorFitterVariant(argv[1], true, 0); // If you want to pass the model variant from execution "$ ifit.exe BLE30"
     // runColorFitterVariant("BL", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
     // runColorFitterVariant("BL25",  true, 0.0);
-    runColorFitterVariant("BL30",  true, 0.0);
+    runColorFitterVariant("BLE30",  true, 0.0);
     // runColorFitterVariant("BL40",  true, 0.0);
     // runColorFitterVariant("BLE",   true, 0.0);
     // runColorFitterVariant("BLE25", true, 0.0);
@@ -130,6 +130,7 @@ int runColorFitterVariant(const std::string model, const bool iSubt, const doubl
         config->m_preh = false;
         config->m_initial_sigma = 30.0;
         config->m_energyloss = true;
+        config->m_testing = true;
     }
     else if (model == "BLE35") {
         config->m_preh = false;
