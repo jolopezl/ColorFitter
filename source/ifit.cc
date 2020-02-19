@@ -1,6 +1,8 @@
 #include "ifit.h"
 
 #include <time.h>
+#include "TFile.h"
+#include "TGraph.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
 
@@ -392,6 +394,21 @@ std::vector<myResult> ifit(myConfig *config) {
             modelplot(gMinuit,config,bin_info,iQ2,iz,Q2,xB,zbin[iz],config->m_output_fit,result);
             resultCont.push_back(result);
             // fout->Write();
+
+            if (false) {
+                TFile *fout = TFile::Open("correlation_test.root","RECREATE");
+                int number_of_points = 50;
+                TGraph *gr_contours[5];
+                for (int i=0; i<5; ++i) {
+                    int nsigma = i + 1;
+                    gMinuit->SetErrorDef(nsigma * nsigma);
+                    gr_contours[i] = (TGraph*) gMinuit->Contour(number_of_points,0,1);
+                    gr_contours[i]->SetName(Form("contour_%d",i));
+                    gr_contours[i]->Write();
+                }
+                fout->Close();
+            }
+
             delete(gMinuit);
         }
     // End of loop over z-bins
