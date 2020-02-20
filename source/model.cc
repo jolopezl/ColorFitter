@@ -381,7 +381,12 @@ int Model::Compute(const double A){
                 // accumulator2 += (exp(-temp*m_sigma_ph/10.) + log(m_cascade))*weight;
             }
             else {
-                accumulator2 += exp(-temp*m_sigma_ph/10.)*weight;
+                double exponential_value = exp(-temp*m_sigma_ph/10.);
+                if (m_DoEnergyLoss == true) {
+                   // ApplyEnergyLoss(temp);
+                    ApplyImprovedEnergyLoss(exponential_value, L);
+                }
+                accumulator2 += temp*weight;
             }
         }
         else if (isOutside == true) accumulator2 += 1*weight;
@@ -426,10 +431,10 @@ int Model::Compute(const double A){
     m_average_length = average_length;
     // ADD ENERGY LOSS, From Will's original code:
     temp = accumulator2/normalize;
-    if (m_DoEnergyLoss == true) {
-        // ApplyEnergyLoss(temp);
-        ApplyImprovedEnergyLoss(temp);
-    }
+    // if (m_DoEnergyLoss == true) {
+    //     // ApplyEnergyLoss(temp);
+    //     ApplyImprovedEnergyLoss(temp);
+    // }
     m_dPt2 = accumulator1/normalize; //  pT broadening
     m_Rm = temp;                     //  Multiplicity
     // if (m_doMonitoring) {
@@ -465,7 +470,7 @@ void Model::ApplyEnergyLoss(double &temp) {
     }
 }
 
-void Model::ApplyImprovedEnergyLoss(double &temp) {
+void Model::ApplyImprovedEnergyLoss(double &temp, const double &L) {
     double NU[4] = {14.37, 13.03, 12.33, 10.70};
     const int BIN = m_iz;
     const double b = m_zbinwidth;
@@ -474,10 +479,10 @@ void Model::ApplyImprovedEnergyLoss(double &temp) {
     // shift = delta E / nu
     // dividing by NU provides m_coeff_2 with units of GeV/fm
     double shift = 0.0;
-    if (  < m_coeff_1) {
-        shift = m_coeff_2 * pow(m_lp, 2) / NU[BIN];
+    if (L  < m_coeff_1) {
+        shift = m_coeff_2 * pow(L, 2) / NU[BIN];
     } else {
-        shift = m_coeff_2 * m_coeff_1 * (2 * m_lp - m_coeff_1) / NU[BIN];
+        shift = m_coeff_2 * m_coeff_1 * (2 * L - m_coeff_1) / NU[BIN];
     }
     //
     if (BIN == kBINS - 1) {

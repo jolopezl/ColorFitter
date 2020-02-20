@@ -66,7 +66,7 @@ private:
     double FindR(const double, const double);
     void SortProductionLength(double &);
     void ApplyEnergyLoss(double &);
-    void ApplyImprovedEnergyLoss(double &);
+    void ApplyImprovedEnergyLoss(double &, const double&);
     //void InteractionPoint(double &, double &, double &, const double);
     void ApplyLogBehavior(double &, double);
     // private members
