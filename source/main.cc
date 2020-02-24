@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     config->m_initial_sigma = 30.0;        // legacy, now input is from pdf cross sections
     config->m_energyloss = true;           // do energy loss
     config->m_testing = true;              // active testing parameters
-    config->m_Q2BinOfInterest = -1;        // value in between 1 and 4
+    config->m_Q2BinOfInterest = -1;        // do not change
     config->m_zBinOfInterest = -1;         // value in between 1 and 4
     config->m_input_pt = "hermesData.txt"; // ONLY FOR HERMES
     config->writeCorrectedValues = false;  // text file from dataHandler
