@@ -383,10 +383,10 @@ int Model::Compute(const double A){
             else {
                 double exponential_value = exp(-temp*m_sigma_ph/10.);
                 if (m_DoEnergyLoss == true) {
-                   // ApplyEnergyLoss(temp);
-                    ApplyImprovedEnergyLoss(exponential_value, L);
+                    ApplyEnergyLoss(exponential_value);
+                    // ApplyImprovedEnergyLoss(exponential_value, L);
                 }
-                accumulator2 += temp*weight;
+                accumulator2 += exponential_value*weight;
             }
         }
         else if (isOutside == true) accumulator2 += 1*weight;
@@ -432,8 +432,8 @@ int Model::Compute(const double A){
     // ADD ENERGY LOSS, From Will's original code:
     temp = accumulator2/normalize;
     // if (m_DoEnergyLoss == true) {
-    //     // ApplyEnergyLoss(temp);
-    //     ApplyImprovedEnergyLoss(temp);
+    //     ApplyEnergyLoss(temp);
+    //     // ApplyImprovedEnergyLoss(temp);
     // }
     m_dPt2 = accumulator1/normalize; //  pT broadening
     m_Rm = temp;                     //  Multiplicity
@@ -463,26 +463,33 @@ void Model::ApplyEnergyLoss(double &temp) {
     // if (BIN == 0) {
     //     temp *= 1 + m_dz / b * ratio; // first bin gains events
     // } else if (BIN == kBINS - 1) {
+    double shift = 0.0;
+    shift = m_dz;
+    // shift = m_random3->Exp(m_dz);
     if (BIN == kBINS - 1) {
-        temp *= 1 - m_dz / b; // last bin loses events
+        temp *= 1 - shift / b; // last bin loses events
     } else {
-        temp *= 1 - m_dz / b + m_dz / b * ratio; // middle bins gain and lose events
+        temp *= 1 - shift / b + m_dz / b * ratio; // middle bins gain and lose events
     }
 }
 
 void Model::ApplyImprovedEnergyLoss(double &temp, const double &L) {
-    double NU[4] = {14.37, 13.03, 12.33, 10.70};
+    // const double NU[4] = {14.37, 13.03, 12.33, 10.70};
     const int BIN = m_iz;
     const double b = m_zbinwidth;
     const double ratio = m_binratio;
     // Now the z-shift is calculated using model
     // shift = delta E / nu
     // dividing by NU provides m_coeff_2 with units of GeV/fm
+
+    double a = m_random3->Exp(m_coeff_2);
+    double Lcrit = m_random3->Exp(m_coeff_1);
+
     double shift = 0.0;
-    if (L  < m_coeff_1) {
-        shift = m_coeff_2 * pow(L, 2) / NU[BIN];
+    if (L  < Lcrit) {
+        shift = a * pow(L, 2);
     } else {
-        shift = m_coeff_2 * m_coeff_1 * (2 * L - m_coeff_1) / NU[BIN];
+        shift = a * Lcrit * (2 * L - Lcrit);
     }
     //
     if (BIN == kBINS - 1) {

@@ -338,8 +338,8 @@ std::vector<myResult> ifit(myConfig *config) {
             gMinuit->mnparm(4, "DZ",    vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
             gMinuit->mnparm(5, "CASCAD",vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
             // New parameters that should be treated perturbatively
-            gMinuit->mnparm(6, "LCRIT", 1, 0.0001, 0, 10, ierflg); // new coeff 1
-            gMinuit->mnparm(7, "SHAPE", 0, 0.0001, -1, 1, ierflg); // new coeff 2
+            gMinuit->mnparm(6, "LCRIT", 0, 0.0001, 0, 50, ierflg); // new coeff 1
+            gMinuit->mnparm(7, "SHAPE", 0, 0.0001, -0.5, 0.5, ierflg); // new coeff 2
             // Parameter fixing
             if (!config->m_qhat)        gMinuit->FixParameter(0); // q-hat
             if (!config->m_lp)          gMinuit->FixParameter(1); // production length
@@ -347,15 +347,19 @@ std::vector<myResult> ifit(myConfig *config) {
             if (!config->m_logbehavior) gMinuit->FixParameter(3); // Log description
             if (!config->m_energyloss)  gMinuit->FixParameter(4); // Energy Loss
             if (!config->m_cascade)     gMinuit->FixParameter(5); // Cascade Parameter
-            // if (!config->m_testing)     gMinuit->FixParameter(6);
-            // if (!config->m_testing)     gMinuit->FixParameter(7);
-            gMinuit->FixParameter(4);
+            // gMinuit->FixParameter(4);
+            // gMinuit->FixParameter(6); gMinuit->FixParameter(7);
 
             // Now ready for minimization step
             arglist[0] = 500;
             arglist[1] = 1.;
             gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
             // gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
+
+            // gMinuit->FixParameter(0); gMinuit->FixParameter(1);
+            // gMinuit->Release(6); gMinuit->Release(7);
+            // gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
+
 /*
             std::cout << "STARTING TO SEARCH FOR A FIT IMPROVEMENT" << std::endl;
             gMinuit->FixParameter(0);

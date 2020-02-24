@@ -1,5 +1,7 @@
 #include "dataHandler.h"
 
+#include <ctime>
+
 #define DIM 4 // This should be defined somewhere else
 
 myResult::myResult() {
@@ -260,7 +262,14 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
         chisquared[i] = resultCont.at(i).m_chi2;
         std::cout << "z = " << z[i] << std::endl;
     }
-    std::string ffout = "OutputROOT.20200220."+model+".root";
+
+    time_t t = time(NULL);
+    auto my_time = localtime(&t);
+    std::string dd = "";
+    dd += std::to_string(my_time->tm_year);
+    dd += std::to_string(my_time->tm_mon+1);
+    dd += std::to_string(my_time->tm_mday);
+    std::string ffout = "OutputROOT."+dd+"."+model+".root";
     TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");
     std::cout << "Output file created" << std::endl;
     OutputROOT->cd();

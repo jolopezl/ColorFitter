@@ -22,7 +22,7 @@ void makeFigure2() {
 
     const char *variantname = "BLE30";
 
-    TFile *fin = TFile::Open(Form("OutputROOT.20200219.%s.root",variantname)); // 20181229 nominal
+    TFile *fin = TFile::Open(Form("OutputROOT.20200221.%s.root",variantname)); // 20181229 nominal
     // TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
     std::pair<TGraphErrors*,TGraphErrors*> tg[4];
     std::pair<TGraphErrors*,TGraphErrors*> tg_up[4];
@@ -150,5 +150,5 @@ void makeFigure2() {
     // legend2->Draw();
    
     // c1->SetGrayscale(kTRUE);
-    c1->Print(Form("modelplot_%s.pdf",variantname));
+    c1->Print(Form("modelplot_%s__temp.pdf",variantname));
 }
