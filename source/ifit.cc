@@ -338,7 +338,7 @@ std::vector<myResult> ifit(myConfig *config) {
             gMinuit->mnparm(4, "DZ",    vstart[4], step[4], lim_lo[4],lim_hi[4],ierflg); // z shift due to energy loss
             gMinuit->mnparm(5, "CASCAD",vstart[5], step[5], lim_lo[5],lim_hi[5],ierflg); // Cascade parameter
             // New parameters that should be treated perturbatively
-            gMinuit->mnparm(6, "LCRIT",
+            gMinuit->mnparm(2, "LCRIT",
                             100, // start
                             0.0001, 0, 50, ierflg);                         // new coeff 1
             gMinuit->mnparm(7, "SHAPE",
@@ -355,8 +355,8 @@ std::vector<myResult> ifit(myConfig *config) {
             // gMinuit->SetParameter(6,0);
             // gMinuit->SetParameter(7,0);
             gMinuit->FixParameter(4); 
-            gMinuit->FixParameter(6); // Lcrit
-            gMinuit->FixParameter(7); // a - shape parameter
+            // gMinuit->FixParameter(6); // Lcrit
+            // gMinuit->FixParameter(7); // a - shape parameter
 
             // Now ready for minimization step
             arglist[0] = 500;

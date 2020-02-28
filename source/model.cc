@@ -377,24 +377,32 @@ int Model::Compute(const double A){
             m_dPt2 = -99; m_Rm = -99;
             return 1;
         }
+
+        double multiplicity_ratio = 0;
         if(zrange2 > 0 && (isOutside == false)) {
             if (m_doCascade == true) {
-                accumulator2 += (exp(-temp*m_sigma_ph/10.) + 1 - exp(-temp*m_cascade/10.))*weight;
+                multiplicity_ratio = (exp(-temp*m_sigma_ph/10.) + 1 - exp(-temp*m_cascade/10.))*weight;
                 // accumulator2 += (exp(-temp*m_sigma_ph/10.) + log(m_cascade))*weight;
             }
             else {
-                double exponential_value = exp(-temp*m_sigma_ph/10.);
-                if (m_DoEnergyLoss == true) {
-                    // ApplyEnergyLoss(exponential_value);
-                    double before = exponential_value; // before correction;
-                    m_normalized_energy_loss = ApplyImprovedEnergyLoss(exponential_value, L);
-                    double after = exponential_value; // after correction
-                    m_multiplicative_factor = after/before;
-                }
-                accumulator2 += exponential_value*weight;
+                multiplicity_ratio = exp(-temp*m_sigma_ph/10.);
             }
         }
-        else if (isOutside == true) accumulator2 += 1*weight;
+        else if (isOutside == true) {
+            multiplicity_ratio = 1;
+        }
+
+        /// *** ENERGY LOSS *** //
+        if (m_DoEnergyLoss == true) {
+            double before = multiplicity_ratio; // before correction;
+            // m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
+            m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, L);
+            double after = multiplicity_ratio; // after correction
+            m_multiplicative_factor = after / before;
+        }
+
+        accumulator2 += multiplicity_ratio * weight;
+
         if (zrange2 == 0) {
             std::cout << "Info: zrange2 = 0 encountered; weight, R, z, L= " << weight << " " << R << " " << z << " " << L << " " << std::endl;
         }
@@ -448,7 +456,7 @@ int Model::Compute(const double A){
     return 0;
 }
 
-void Model::ApplyEnergyLoss(double &temp) {
+double Model::ApplyEnergyLoss(double &temp) {
 /*    
     if (m_DoEnergyLossWeighted == true) {
         if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz*m_A13/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
@@ -469,13 +477,14 @@ void Model::ApplyEnergyLoss(double &temp) {
     //     temp *= 1 + m_dz / b * ratio; // first bin gains events
     // } else if (BIN == kBINS - 1) {
     double shift = 0.0;
-    shift = m_dz;
-    // shift = m_random3->Exp(m_dz);
+    // shift = m_dz;
+    shift = m_random3->Exp(m_dz);
     if (BIN == kBINS - 1) {
         temp *= 1 - shift / b; // last bin loses events
     } else {
         temp *= 1 - shift / b + m_dz / b * ratio; // middle bins gain and lose events
     }
+    return shift;
 }
 
 double Model::ApplyImprovedEnergyLoss(double &temp, const double &L) {

@@ -67,7 +67,7 @@ private:
     double Density(const double, const double, const double, const double);
     double FindR(const double, const double);
     void SortProductionLength(double &);
-    void ApplyEnergyLoss(double &);
+    double ApplyEnergyLoss(double &);
     double ApplyImprovedEnergyLoss(double &, const double&);
     //void InteractionPoint(double &, double &, double &, const double);
     void ApplyLogBehavior(double &, double);
