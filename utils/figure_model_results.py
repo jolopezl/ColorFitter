@@ -4,9 +4,9 @@ from matplotlib import pyplot as plt
 # plt.style.use('seaborn')
 # plt.rc('font', family='serif', serif='Times')
 # plt.rc('text', usetex=True)
-plt.rc('xtick', labelsize=14)
-plt.rc('ytick', labelsize=14)
-plt.rc('axes', labelsize=14)
+plt.rc('xtick', labelsize=12)
+plt.rc('ytick', labelsize=12)
+plt.rc('axes', labelsize=12)
 # plt.rc('text', usetex=True)
 plt.rcParams['errorbar.capsize'] = 3
 
