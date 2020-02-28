@@ -8,32 +8,32 @@
 // ************ main function ************ //
 int main(int argc, char *argv[])
 {
-    std::string model = "BL_test";         // Name for the model you are runing
-    myConfig *config = new myConfig();     // create a configuration to call the fitter
-    config->m_subtraction = true;          // subtract Helium background
-    config->m_correlation = 0.0;           // without correlation
-    config->fixedLp = false;               // true: to use fixed production length, false: exponential distribution
-    config->m_preh = false;                // true: fit the prehadron cross section - false: don't fit the prehadron cross section
-    config->m_initial_sigma = 30.0;        // legacy, now input is from pdf cross sections
-    config->m_energyloss = true;           // do energy loss
-    config->m_testing = true;              // active testing parameters
-    config->m_Q2BinOfInterest = -1;        // do not change
-    config->m_zBinOfInterest = -1;         // value in between 1 and 4
-    config->m_input_pt = "hermesData.txt"; // ONLY FOR HERMES
-    config->writeCorrectedValues = false;  // text file from dataHandler
-    config->correctionPlots = false;       // from dataHandler
-    config->outputPlots = true;            // model and data, very useful
-    config->doMINOSErrors = false;         // usually false
-    config->Update();
+    // std::string model = "BL_test";         // Name for the model you are runing
+    // myConfig *config = new myConfig();     // create a configuration to call the fitter
+    // config->m_subtraction = true;          // subtract Helium background
+    // config->m_correlation = 0.0;           // without correlation
+    // config->fixedLp = false;               // true: to use fixed production length, false: exponential distribution
+    // config->m_preh = false;                // true: fit the prehadron cross section - false: don't fit the prehadron cross section
+    // config->m_initial_sigma = 30.0;        // legacy, now input is from pdf cross sections
+    // config->m_energyloss = true;           // do energy loss
+    // config->m_testing = true;              // active testing parameters
+    // config->m_Q2BinOfInterest = -1;        // do not change
+    // config->m_zBinOfInterest = -1;         // value in between 1 and 4
+    // config->m_input_pt = "hermesData.txt"; // ONLY FOR HERMES
+    // config->writeCorrectedValues = false;  // text file from dataHandler
+    // config->correctionPlots = false;       // from dataHandler
+    // config->outputPlots = true;            // model and data, very useful
+    // config->doMINOSErrors = false;         // usually false
+    // config->Update();
 
-    // Call the fitter with the configured setup
-    std::cout << "Running iFit now:" << std::endl;
-    std::vector<myResult> resultCont = ifit(config);
-    std::cout << "Fit is done." << std::endl;
+    // // Call the fitter with the configured setup
+    // std::cout << "Running iFit now:" << std::endl;
+    // std::vector<myResult> resultCont = ifit(config);
+    // std::cout << "Fit is done." << std::endl;
 
-    // Call the data handler to output results
-    OutputResultsToFile(model, resultCont);
-    return 0; // done
+    // // Call the data handler to output results
+    // OutputResultsToFile(model, resultCont);
+    // return 0; // done
     ///// **** Access to other methods **** /////
     // runColorFitter(true, true,  0.0); // EnergyLoss, Subtraction, Correlation
     // runColorFitter(true, true, -0.5);
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     // runColorFitterVariant(argv[1], true, 0); // If you want to pass the model variant from execution "$ ifit.exe BLE30"
     // runColorFitterVariant("BL", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
     // runColorFitterVariant("BL25",  true, 0.0);
-    // runColorFitterVariant("BLE30",  true, 0.0);
+    runColorFitterVariant("BL30",  true, 0.0);
     // runColorFitterVariant("BL40",  true, 0.0);
     // runColorFitterVariant("BLE",   true, 0.0);
     // runColorFitterVariant("BLE25", true, 0.0);
@@ -61,29 +61,38 @@ int main(int argc, char *argv[])
 }
 
 int monitoring() {
+    constexpr int ZDIM = 4;
+    double binratios[ZDIM] = {0.214848, 0.432318, 0.440678, 0.125506}; // PI+ with cuts !!
+    double zbinw[ZDIM] = {0.2, 0.2, 0.2, 0.2};                         // Exact !!
+
     Model *model = new Model("Monitoring");
     model->DoMonitoring(true);
     model->Initialization();
     // model->DoFixedLp(true);
-    model->DoEnergyLoss(false);
-    model->SetMaxMonteCarloSteps(1e5); // 1e6, 1e7
+    model->DoEnergyLoss(true);
+
+    model->SetMaxMonteCarloSteps(1e6); // 1e6, 1e7
     model->MonitoringStart();
-    double q0_values[4] = {2.21,2.57,1.15,1.19};
-    double lp_values[4] = {8.15,6.11,4.45,2.35};
+    double q0_values[4] = {2.21, 2.57, 1.15, 1.19};
+    double lp_values[4] = {8.15, 6.11, 4.45, 2.35};
     double A[3];
     A[0] = 20.1797; // Ne
     A[1] = 83.7980; // Kr
     A[2] = 131.293; // Xe
-    for (int zbin=0; zbin<4; ++zbin) {
-        model->defineZbin(zbin+1);
-        model->SetParameters("q0", q0_values[zbin]);
-        model->SetParameters("lp", lp_values[zbin]);
-        model->SetParameters("sigma", 30.);
-        for (int i=0; i<3; ++i) {
-            std::cout << "Calling A = " << A[i] << std::endl;
-            model->Compute(A[i]);
-        }
-    }
+                    // for (int zbin=3; zbin<4; ++zbin) {
+    int zbin = 2;
+    model->defineZbin(zbin + 1);
+    model->SetBinRatio(zbin, zbinw[zbin], binratios[zbin]); // For energy loss
+    model->SetParameters("q0", q0_values[zbin]);
+    model->SetParameters("lp", lp_values[zbin]);
+    model->SetParameters("sigma", 30.);
+    model->SetTestParameter(3.0, 0.0085);
+    // for (int i=0; i<3; ++i) {
+    int i = 1;
+    std::cout << "Calling A = " << A[i] << std::endl;
+    model->Compute(A[i]);
+    // }
+    // }
     model->MonitoringFinish();
     return 0;
 }

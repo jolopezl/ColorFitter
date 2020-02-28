@@ -253,6 +253,8 @@ void Model::MonitoringStart() {
     tree->Branch("theta",&m_theta,"theta/D");
     tree->Branch("phi",&m_phi,"phi/D");
     tree->Branch("rs",&m_rs,"rs/D");
+    tree->Branch("eloss", &m_normalized_energy_loss, "eloss/D");
+    tree->Branch("multiplicative_factor", &m_multiplicative_factor, "multiplicative_factor/D");
 }
 
 void Model::MonitoringFinish() {
@@ -383,8 +385,11 @@ int Model::Compute(const double A){
             else {
                 double exponential_value = exp(-temp*m_sigma_ph/10.);
                 if (m_DoEnergyLoss == true) {
-                    ApplyEnergyLoss(exponential_value);
-                    // ApplyImprovedEnergyLoss(exponential_value, L);
+                    // ApplyEnergyLoss(exponential_value);
+                    double before = exponential_value; // before correction;
+                    m_normalized_energy_loss = ApplyImprovedEnergyLoss(exponential_value, L);
+                    double after = exponential_value; // after correction
+                    m_multiplicative_factor = after/before;
                 }
                 accumulator2 += exponential_value*weight;
             }
@@ -473,8 +478,8 @@ void Model::ApplyEnergyLoss(double &temp) {
     }
 }
 
-void Model::ApplyImprovedEnergyLoss(double &temp, const double &L) {
-    // const double NU[4] = {14.37, 13.03, 12.33, 10.70};
+double Model::ApplyImprovedEnergyLoss(double &temp, const double &L) {
+    const double NU[4] = {14.37, 13.03, 12.33, 10.70};
     const int BIN = m_iz;
     const double b = m_zbinwidth;
     const double ratio = m_binratio;
@@ -482,8 +487,10 @@ void Model::ApplyImprovedEnergyLoss(double &temp, const double &L) {
     // shift = delta E / nu
     // dividing by NU provides m_coeff_2 with units of GeV/fm
 
-    double a = m_random3->Exp(m_coeff_2);
-    double Lcrit = m_random3->Exp(m_coeff_1);
+    // double a = m_random3->Exp(m_coeff_2);
+    // double Lcrit = m_random3->Exp(m_coeff_1);
+    double a = m_coeff_2;
+    double Lcrit = m_coeff_1;
 
     double shift = 0.0;
     if (L  < Lcrit) {
@@ -497,6 +504,7 @@ void Model::ApplyImprovedEnergyLoss(double &temp, const double &L) {
     } else {
         temp *= 1 - shift / b + shift / b * ratio; // middle bins gain and lose events
     }
+    return shift * NU[BIN];
 }
 
 void Model::ApplyLogBehavior(double &zrange, double L) {

@@ -266,8 +266,12 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     time_t t = time(NULL);
     auto my_time = localtime(&t);
     std::string dd = "";
-    dd += std::to_string(my_time->tm_year);
-    dd += std::to_string(my_time->tm_mon+1);
+    dd += std::to_string(my_time->tm_year + 1900);
+    if ((my_time->tm_mon+1) < 10) {
+        dd += "0"+std::to_string(my_time->tm_mon+1);
+    } else {
+        dd += std::to_string(my_time->tm_mon+1);
+    }
     dd += std::to_string(my_time->tm_mday);
     std::string ffout = "OutputROOT."+dd+"."+model+".root";
     TFile *OutputROOT = new TFile(ffout.c_str(), "RECREATE");

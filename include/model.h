@@ -58,6 +58,8 @@ public:
     int m_zin_monitoring;
     double m_xp,m_yp,m_zp,m_rr;
     double m_theta, m_phi, m_rs;
+    double m_normalized_energy_loss;
+    double m_multiplicative_factor;
     void defineZbin(int foo) {m_zin_monitoring=foo;}
 
 private:
@@ -66,7 +68,7 @@ private:
     double FindR(const double, const double);
     void SortProductionLength(double &);
     void ApplyEnergyLoss(double &);
-    void ApplyImprovedEnergyLoss(double &, const double&);
+    double ApplyImprovedEnergyLoss(double &, const double&);
     //void InteractionPoint(double &, double &, double &, const double);
     void ApplyLogBehavior(double &, double);
     // private members
