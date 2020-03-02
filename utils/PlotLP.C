@@ -6,7 +6,7 @@ void PlotLP() {
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
     fin[0] = new TFile("OutputROOT.20191115.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20200221.BLE30.root","READ");
+    fin[1] = new TFile("OutputROOT.20200228.BL_test.root","READ");
     fin[2] = new TFile("OutputROOT.20191115.BLE.root","READ");
     fin[3] = new TFile("OutputROOT.20191115.BLE30.root","READ");
 
@@ -139,7 +139,7 @@ void PlotLP() {
     fg0->SetParName(3,"Q2"); 
     fg0->FixParameter(3,2.4);
 
-    TF1 *fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0,1.2);
+    TF1 *fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0.5,0.95);
     fg1->SetParName(0, "KAPPA");
     fg1->SetParName(1, "MP");
     fg1->SetParName(2, "NU");
@@ -195,7 +195,7 @@ void PlotLP() {
     }
 
     int npoints = 500;
-    model->Fit("fg1", "EMN0", "", 0.2, 0.96);
+    model->Fit("fg1", "EMN0", "", 0.5, 0.95);
     TH1F *h1 = new TH1F("h1","auxs",npoints+1,0,1);
     auto gg1 = TH1TOTGraph(h1);
     TGraphErrors *grint1 = new TGraphErrors(99);

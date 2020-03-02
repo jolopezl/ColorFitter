@@ -10,10 +10,10 @@ class myData; // I would like to remove this fordward declaration
 // class myConfig;
 
 //void modelplot(TMinuit*, std::string, int, int, double, double, double,double*,double*,double*);
-void doDataPlots(myConfig*,myData*,myData*, myData*, myData*);
+void doDataPlots(myConfig*, myData*, myData*, myData*, myData*);
 void plotFitOutput(std::string);
 
-void UTFSMLabel(double,double,const char*);
-void AddLabel(double,double,const char*);
+void UTFSMLabel(double, double, const char*);
+void AddLabel(double, double, const char*);
 
 #endif

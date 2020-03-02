@@ -19,18 +19,18 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-// 
+//
 #include "model.h"
 #include "dataHandler.h"
 #include "configuration.h"
 
-double fermi(double,double,int);
+double fermi(double, double, int);
 void callModel(const double, double*);
 double chisq(double*);
 void fcn(int&, double*, double&, double*, int);
 // void ifit(bool,bool,bool,int,int,double,std::string);
 std::vector<myResult> ifit(myConfig*);
-void modelplot(TMinuit*, myConfig*, std::string, int, int, double, double, double,std::string,myResult&);
+void modelplot(TMinuit*, myConfig*, std::string, int, int, double, double, double, std::string, myResult&);
 void justCompute(myConfig*);
 int test();
 
