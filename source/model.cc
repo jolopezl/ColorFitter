@@ -431,8 +431,8 @@ int Model::Compute(const double A)
     /// *** ENERGY LOSS *** //
     if (m_DoEnergyLoss == true) {
       double before = multiplicity_ratio; // before correction;
-      // m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
-      m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, L);
+      m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
+    //   m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, L);
       double after = multiplicity_ratio; // after correction
       m_multiplicative_factor = after / before;
     }
@@ -514,8 +514,8 @@ double Model::ApplyEnergyLoss(double& temp)
   //     temp *= 1 + m_dz / b * ratio; // first bin gains events
   // } else if (BIN == kBINS - 1) {
   double shift = 0.0;
-  // shift = m_dz;
-  shift = m_random3->Exp(m_dz);
+  shift = m_dz;
+//   shift = m_random3->Exp(m_dz);
   if (BIN == kBINS - 1) {
     temp *= 1 - shift / b; // last bin loses events
   } else {
