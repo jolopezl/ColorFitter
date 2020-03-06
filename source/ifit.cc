@@ -28,6 +28,8 @@ double Rm[3] = { 0, 0, 0 };
 
 double SIG[4] = { 27.0363, 25.4381, 25.098, 24.9184 }; // interpolated cross-section
 
+double PROD_LEN_INTERP[4] = { 9.61702, 6.60402, 3.85302, 1.36402 };
+
 /* values from python/interpolate.py */
 // PI+
 // double binratios[ZDIM] = {0.482203,0.461464,0.249762,0}; // PI+ no cuts
@@ -295,7 +297,7 @@ std::vector<myResult> ifit(myConfig* config)
       V(5, 5) = TMath::Power(errorzzz[5], 2);
       V(3, 3) = TMath::Power(errorzzz[3], 2);
 
-      const double rho = 0.0;
+      const double rho = 0;
       V(0, 3) = rho * errorzzz[0] * errorzzz[3];
       V(1, 4) = rho * errorzzz[1] * errorzzz[4];
       V(2, 5) = rho * errorzzz[2] * errorzzz[5];
@@ -317,39 +319,39 @@ std::vector<myResult> ifit(myConfig* config)
       arglist[0] = 3;
       gMinuit->mnexcm("SET PRI", arglist, 1, ierflg);
       // const double sigma0 = config->m_initial_sigma;
-      const double sigma0 = SIG[iz];
+      const double sigma0 = SIG[iz] * 0.5;
       double vstart[] = { 0.4775, 1.6, sigma0, 2.5, 0.0, 0.2 };
       double step[] = { 0.01, 0.01, 0.01, 0.5, 0.00001, 0.01 };
-      double lim_lo[] = { 0., 0.0001, -0.01, 0.1, -1.0, -0.1 };
-      double lim_hi[] = { 10., 400., 400., 100.0, 1.0, 10.0 };
+      double lim_lo[] = { 0., 0.0001, -0.01, 0.0, -1.0, -0.1 };
+      double lim_hi[] = { 10., 400., sigma0, 100, 1.0, 10.0 };
       if (false) {
         lim_lo[4] = -10.0;
         lim_hi[4] = +10.0;
       }
       // gMinuit->mnparm(0, "Q0",    2.286, step[0], lim_lo[0],lim_hi[0],ierflg); // q-hat
-      gMinuit->mnparm(0, "Q0", 3, step[0], lim_lo[0], lim_hi[0], ierflg);            // q-hat
-      gMinuit->mnparm(1, "LP", 1.6, step[1], lim_lo[1], lim_hi[1], ierflg);          // production length
+      gMinuit->mnparm(0, "Q0", 2.0, step[0], lim_lo[0], lim_hi[0], ierflg);          // q-hat
+      gMinuit->mnparm(1, "LP", vstart[1], step[1], lim_lo[1], lim_hi[1], ierflg);    // production length
       gMinuit->mnparm(2, "SIGMA", vstart[2], step[2], lim_lo[2], lim_hi[2], ierflg); // prehadron cross section
       gMinuit->mnparm(3, "DLOG", vstart[3], step[3], lim_lo[3], lim_hi[3], ierflg);  // parameter needed for log description
       gMinuit->mnparm(4, "DZ",
-                      0.001,    // start
-                      0.0001,   // step
-                      0.0, 1.0, // limits
-                      ierflg);  // z shift due to energy loss
+                      0.001,     // start
+                      0.0001,    // step
+                      -1.0, 1.0, // limits
+                      ierflg);   // z shift due to energy loss
 
       gMinuit->mnparm(5, "CASCAD", vstart[5], step[5], lim_lo[5], lim_hi[5], ierflg); // Cascade parameter
 
       // New parameters that should be treated perturbatively
       gMinuit->mnparm(6, "LCRIT",
-                      10.0,    // start
-                      0.01,    // step
-                      0, 50,   // limits
+                      2.5,     // start
+                      0.1,     // step
+                      0, 30,   // limits
                       ierflg); // new coeff 1
       gMinuit->mnparm(7, "SHAPE",
-                      0.002,     // start
-                      0.0000001, // step
-                      0, 0.01,   // limits
-                      ierflg);   // new coeff 2
+                      0.0001,      // start
+                      0.000005,    // step
+                      -0.1, 0.1, // limits
+                      ierflg);     // new coeff 2
       // Parameter fixing
       if (!config->m_qhat)
         gMinuit->FixParameter(0); // q-hat
@@ -364,9 +366,9 @@ std::vector<myResult> ifit(myConfig* config)
       if (!config->m_cascade)
         gMinuit->FixParameter(5); // Cascade Parameter
 
-      //   gMinuit->FixParameter(4);
-      gMinuit->FixParameter(6); // Lcrit
-      gMinuit->FixParameter(7); // a - shape parameter
+      gMinuit->FixParameter(4);
+      // gMinuit->Release(6); // Lcrit
+      // gMinuit->Release(7); // a - shape parameter
 
       // Now ready for minimization step
       arglist[0] = 500;
@@ -374,8 +376,10 @@ std::vector<myResult> ifit(myConfig* config)
       gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
       // gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
 
-      // gMinuit->FixParameter(0); gMinuit->FixParameter(1);
-      // gMinuit->Release(6); gMinuit->Release(7);
+      // gMinuit->FixParameter(0);
+      // gMinuit->FixParameter(1);
+      // gMinuit->Release(4);
+      // // gMinuit->Release(6); gMinuit->Release(7);
       // gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
 
       /*
@@ -419,7 +423,7 @@ std::vector<myResult> ifit(myConfig* config)
         for (int i = 0; i < 5; ++i) {
           int nsigma = i + 1;
           gMinuit->SetErrorDef(nsigma * nsigma);
-          gr_contours[i] = (TGraph*)gMinuit->Contour(number_of_points, 0, 1);
+          gr_contours[i] = (TGraph*)gMinuit->Contour(number_of_points, 1, 4);
           gr_contours[i]->SetName(Form("contour_%d", i));
           gr_contours[i]->Write();
         }

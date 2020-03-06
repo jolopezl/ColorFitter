@@ -13,7 +13,7 @@ plt.rcParams['errorbar.capsize'] = 3
 
 def create_plot():
     print("Model results")
-    f = ROOT.TFile.Open("OutputROOT.20200228.BL30.root", "READ")
+    f = ROOT.TFile.Open("OutputROOT.20200306.BL_debug_energy_loss.root", "READ")
 
     fig, axs = plt.subplots(2, 4, sharey='row', sharex='col',
                             constrained_layout=True, figsize=(9, 4.5))

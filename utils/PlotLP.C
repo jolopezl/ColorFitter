@@ -6,7 +6,7 @@ void PlotLP() {
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
     fin[0] = new TFile("OutputROOT.20191115.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20200228.BL_test.root","READ");
+    fin[1] = new TFile("OutputROOT.20200306.BL_debug_energy_loss.root","READ");
     fin[2] = new TFile("OutputROOT.20191115.BLE.root","READ");
     fin[3] = new TFile("OutputROOT.20191115.BLE30.root","READ");
 
@@ -292,4 +292,8 @@ void PlotLP() {
 //    myText(0.2, 0.4, kBlack, "Fit uncorrected for kinematics", 0.05, 0);
     c2->Print("figure_models_lundfit_lp.pdf");
 
+    double zbin[4] = { 0.31, 0.54, 0.75, 0.94 };
+    for (int i = 0; i<4; ++i) {
+        std::cout << zbin[i] << "\t" << fg0->Eval(zbin[i]) << std::endl;
+    }
 }

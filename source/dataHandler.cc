@@ -313,12 +313,15 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
   tg_dz->SetName("tg_dz");
   TGraphErrors* tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err);
   tg_c1->SetName("tg_c1");
+  tg_c1->SetTitle(";#it{z};#it{L}_{crit} (fm)");
   TGraphErrors* tg_c2 = new TGraphErrors(fNzbins, z, c2, zErr, c2Err);
   tg_c2->SetName("tg_c2");
+  tg_c2->SetTitle(";#it{z};Shape parameter #it{a} (GeV)");
   TGraphErrors* tg_cascade = new TGraphErrors(fNzbins, z, cascade, zErr, cascade_err);
   tg_cascade->SetName("tg_cascade");
   TGraph* tg_chisquared = new TGraph(fNzbins, z, chisquared);
   tg_chisquared->SetName("tg_chisquared");
+  tg_chisquared->SetTitle(";#it{z};#chi^{2}");
   std::cout << "Writing first set of plots" << std::endl;
   tg_q0->Write();
   tg_lp->Write();

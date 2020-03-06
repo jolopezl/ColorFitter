@@ -431,8 +431,8 @@ int Model::Compute(const double A)
     /// *** ENERGY LOSS *** //
     if (m_DoEnergyLoss == true) {
       double before = multiplicity_ratio; // before correction;
-      m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
-    //   m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, L);
+      // m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
+      m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, m_parton_length);
       double after = multiplicity_ratio; // after correction
       m_multiplicative_factor = after / before;
     }
@@ -517,9 +517,9 @@ double Model::ApplyEnergyLoss(double& temp)
   shift = m_dz;
 //   shift = m_random3->Exp(m_dz);
   if (BIN == kBINS - 1) {
-    temp *= 1 - shift / b; // last bin loses events
+    temp *= 1 + shift / b; // last bin loses events
   } else {
-    temp *= 1 - shift / b + m_dz / b * ratio; // middle bins gain and lose events
+    temp *= 1 + shift / b - shift / b * ratio; // middle bins gain and lose events
   }
   return shift;
 }
@@ -547,9 +547,9 @@ double Model::ApplyImprovedEnergyLoss(double& temp, const double& L)
   }
   //
   if (BIN == kBINS - 1) {
-    temp *= 1 - shift / b;
+    temp *= 1 + shift / b;
   } else {
-    temp *= 1 - shift / b + shift / b * ratio; // middle bins gain and lose events
+    temp *= 1 + shift / b - shift / b * ratio; // middle bins gain and lose events
   }
   return shift * NU[BIN];
 }
