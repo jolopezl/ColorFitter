@@ -494,28 +494,12 @@ int Model::Compute(const double A)
 
 double Model::ApplyEnergyLoss(double& temp)
 {
-  /*    
-    if (m_DoEnergyLossWeighted == true) {
-        if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz*m_A13/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
-        else {temp *= (1.+(m_binratio*m_dz*m_A13)/m_zbinwidth);} // events increase in the lowest z bin.
-    }
-    // SIMPLE CASE - DEFAULT
-    else {
-        // if (m_iz == 0) {m_dz=0;}
-        // else {m_dz =  -0.03;}
-        if (m_iz > 0) {temp *= (1.-(1.-m_binratio)*m_dz/m_zbinwidth);} // add effect of energy loss; par[4] is the average z shift due to energy loss
-        else {temp *= (1.+(m_binratio*m_dz)/m_zbinwidth);} // events increase in the lowest z bin.
-    }
-*/
   const int BIN = m_iz;
   const double b = m_zbinwidth;
   const double ratio = m_binratio;
-  // if (BIN == 0) {
-  //     temp *= 1 + m_dz / b * ratio; // first bin gains events
-  // } else if (BIN == kBINS - 1) {
   double shift = 0.0;
   shift = m_dz;
-//   shift = m_random3->Exp(m_dz);
+  //   shift = m_random3->Exp(m_dz);
   if (BIN == kBINS - 1) {
     temp *= 1 + shift / b; // last bin loses events
   } else {
@@ -533,7 +517,6 @@ double Model::ApplyImprovedEnergyLoss(double& temp, const double& L)
   // Now the z-shift is calculated using model
   // shift = delta E / nu
   // dividing by NU provides m_coeff_2 with units of GeV/fm
-
   // double a = m_random3->Exp(m_coeff_2);
   // double Lcrit = m_random3->Exp(m_coeff_1);
   double a = m_coeff_2;
@@ -545,16 +528,23 @@ double Model::ApplyImprovedEnergyLoss(double& temp, const double& L)
   } else {
     shift = a * Lcrit * (2 * L - Lcrit);
   }
-  //
+  
   if (BIN == kBINS - 1) {
     temp *= 1 + shift / b;
   } else {
-    temp *= 1 + shift / b - shift / b * ratio; // middle bins gain and lose events
+    temp *= 1 + shift * (1 - ratio) / b; // middle bins gain and lose events
   }
+
   return shift * NU[BIN];
 }
 
 void Model::ApplyLogBehavior(double& zrange, double L)
 {
   zrange *= log(pow(L / m_dlog, 2)) * log(pow(L / m_dlog, 2));
+}
+
+double Model::Average_density_interpolation(const double& x)
+{
+  double ans = 0.0857276 + 0.192709 * x - 0.00978284 * pow(x, 2);
+  return ans;
 }

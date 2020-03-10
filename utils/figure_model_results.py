@@ -1,3 +1,4 @@
+import subprocess
 import numpy as np
 import ROOT
 from matplotlib import pyplot as plt
@@ -13,13 +14,14 @@ plt.rcParams['errorbar.capsize'] = 3
 
 def create_plot():
     print("Model results")
-    f = ROOT.TFile.Open("OutputROOT.20200306.BL_debug_energy_loss.root", "READ")
+    f = ROOT.TFile.Open(
+        "OutputROOT.20200310.BL.root", "READ")
 
     fig, axs = plt.subplots(2, 4, sharey='row', sharex='col',
                             constrained_layout=True, figsize=(9, 4.5))
 
     axs[0, 0].set_ylim(-0.029, 0.039)
-    # axs[1,0].set_ylim(-0.029,0.039)
+    axs[1, 0].set_ylim(0.41, 0.99)
 
     for i in range(4):
         axs[0, i].set_xlim(2.5, 5.5)
@@ -108,7 +110,10 @@ def create_plot():
 
     fig.align_ylabels(axs[:, 0])
 
-    plt.savefig("modelplot_result.pdf")
+    output_file_name = "modelplot_result.pdf"
+    plt.savefig(output_file_name)
+
+    subprocess.call(["open", output_file_name])
 
 
 if __name__ == "__main__":

@@ -72,6 +72,7 @@ class Model
   double ApplyImprovedEnergyLoss(double&, const double&);
   //void InteractionPoint(double &, double &, double &, const double);
   void ApplyLogBehavior(double&, double);
+  double Average_density_interpolation(const double&);
   // private members
   std::string m_ModelName;
   int kBINS;

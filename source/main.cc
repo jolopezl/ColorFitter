@@ -8,7 +8,7 @@
 // ************ main function ************ //
 int main(int argc, char* argv[])
 {
-
+/*****
   std::string model = "BL_debug_energy_loss"; // Name for the model you are runing
   myConfig* config = new myConfig();                // create a configuration to call the fitter
   config->m_subtraction = true;                     // subtract Helium background
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   // Call the data handler to output results
   OutputResultsToFile(model, resultCont);
   return 0; // done
-
+*****/
   ///// **** Access to other methods **** /////
   // runColorFitter(true, true,  0.0); // EnergyLoss, Subtraction, Correlation
   // runColorFitter(true, true, -0.5);
@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
   // runColorFitterVariant("BL", true, 0.0); // Model variant (known), subtraction (true or false), correlation (usually zero)
   // runColorFitterVariant("BL25",  true, 0.0);
   // runColorFitterVariant("BL30",  true, 0.0);
+  runColorFitterVariant("BL",  true, 0.0);
   // runColorFitterVariant("BL40",  true, 0.0);
   // runColorFitterVariant("BLE",   true, 0.0);
   // runColorFitterVariant("BLE25", true, 0.0);
