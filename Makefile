@@ -1,5 +1,5 @@
 CC        = g++
-CCFLAGS   = -c -g -Wall
+CCFLAGS   = -c -Wall
 CCFLAGS  += -fPIC -Wno-deprecated
 CCFLAGS  += -O2
 CCFLAGS  += `root-config --cflags`
