@@ -20,6 +20,8 @@ def create_plot():
     fig, axs = plt.subplots(2, 4, sharey='row', sharex='col',
                             constrained_layout=True, figsize=(9, 4.5))
 
+    # fig.subplots_adjust(left=0.11, right=0.98, bottom=0.11, top=0.98, wspace=0, hspace=0)
+
     axs[0, 0].set_ylim(-0.029, 0.039)
     axs[1, 0].set_ylim(0.41, 0.99)
 
@@ -34,9 +36,9 @@ def create_plot():
         extrapolation_up_name = "tg_model_pT_extrapolation_up_"+str(i)
         extrapolation_down_name = "tg_model_pT_extrapolation_down_"+str(i)
         axs[0, i].errorbar(f.Get(graph_name).GetX(), f.Get(graph_name).GetY(), f.Get(
-            graph_name).GetEY(), marker="o", linestyle="", color='black', zorder=2)
+            graph_name).GetEY(), marker="o", linestyle="", color='black', zorder=2, label='Data')
         axs[0, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
-            extrapolation_name).GetY(), "b-", zorder=1)
+            extrapolation_name).GetY(), "b-", zorder=1, label='Model')
         axs[0, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
                                alpha=0.4, facecolor='blue', zorder=0)
 
@@ -46,9 +48,9 @@ def create_plot():
         extrapolation_up_name = "tg_model_Rm_extrapolation_up_"+str(i)
         extrapolation_down_name = "tg_model_Rm_extrapolation_down_"+str(i)
         axs[1, i].errorbar(f.Get(graph_name).GetX(), f.Get(graph_name).GetY(), f.Get(
-            graph_name).GetEY(), marker="o", linestyle="", color='black', zorder=2)
+            graph_name).GetEY(), marker="o", linestyle="", color='black', zorder=2, label='Data')
         axs[1, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
-            extrapolation_name).GetY(), "r-", zorder=1)
+            extrapolation_name).GetY(), "r-", zorder=1, label='Model')
         axs[1, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
                                alpha=0.4, facecolor='red', zorder=0)
 
@@ -107,6 +109,9 @@ def create_plot():
     axs[1, 0].text(xpos[0], ypos[0]-0.1, 'Ne')
     axs[1, 0].text(xpos[1], ypos[1]-0.1, 'Kr')
     axs[1, 0].text(xpos[2], ypos[2]-0.1, 'Xe')
+
+    axs[0, 0].legend(loc='lower left')
+    axs[1, 0].legend(loc='lower left')
 
     fig.align_ylabels(axs[:, 0])
 
