@@ -45,6 +45,18 @@ Model::~Model()
   std::cout << "Model destructed: " << m_ModelName << std::endl;
 }
 
+ModelOutput Model::GetResultStruct()
+{
+  ModelOutput output;
+  output.pt_broadening = m_dPt2;
+  output.multiplicity_ratio = m_Rm;
+  output.average_density = m_average_density;
+  output.average_multiplicity_density = m_multip_density;
+  output.average_production_length = m_average_length;
+  output.average_parton_length = m_average_parton_length;
+  return output;
+}
+
 std::vector<double> Model::GetResult()
 {
   std::vector<double> output = { m_dPt2, m_Rm };
@@ -333,6 +345,7 @@ int Model::Compute(const double A)
   // MC part
   double average_density = 0;
   double average_length = 0;
+  double average_parton_length = 0;
   double multiplicity_density = 0;
   for (int mcStep = 0; mcStep < m_maxmcSteps; ++mcStep) {
     InteractionPoint(x, y, z, R);
@@ -364,6 +377,7 @@ int Model::Compute(const double A)
       m_hadron_length = 0;      // hadron path length is zero
       m_parton_length = ul - z; // parton path length goes up to the surface
     }
+    average_parton_length += m_parton_length;
     /* rest of the code */
     bool isOutside = false;
     // Next, integrate from the starting vertex up to the end of the production length
@@ -431,8 +445,8 @@ int Model::Compute(const double A)
     /// *** ENERGY LOSS *** //
     if (m_DoEnergyLoss == true) {
       double before = multiplicity_ratio; // before correction;
-      m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
-      // m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, m_parton_length);
+      // m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
+      m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, m_parton_length);
       double after = multiplicity_ratio; // after correction
       m_multiplicative_factor = after / before;
     }
@@ -478,6 +492,7 @@ int Model::Compute(const double A)
   m_average_density = average_density / average_length;
   m_multip_density = multiplicity_density / average_length;
   m_average_length = average_length;
+  m_average_parton_length = average_parton_length / m_maxmcSteps;
   // ADD ENERGY LOSS, From Will's original code:
   temp = accumulator2 / normalize;
   // if (m_DoEnergyLoss == true) {
@@ -528,7 +543,7 @@ double Model::ApplyImprovedEnergyLoss(double& temp, const double& L)
   } else {
     shift = a * Lcrit * (2 * L - Lcrit);
   }
-  
+
   if (BIN == kBINS - 1) {
     temp *= 1 + shift / b;
   } else {

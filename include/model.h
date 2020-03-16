@@ -9,6 +9,8 @@
 #include "Math/WrappedTF1.h"
 #include "Math/GSLIntegrator.h"
 
+#include "dataFormat.h"
+
 class Model
 {
  public:
@@ -43,6 +45,7 @@ class Model
   double Get4() const { return m_multip_density; };
   double GetAverageLength() const { return m_average_length; }
   std::vector<double> GetResult();
+  ModelOutput GetResultStruct();
   void GetResult(double&, double&);
 
   // Monitoring code
@@ -75,12 +78,14 @@ class Model
   double Average_density_interpolation(const double&);
   // private members
   std::string m_ModelName;
+
   int kBINS;
   double m_dPt2;
   double m_Rm;
   double m_average_density;
   double m_multip_density;
   double m_average_length;
+  double m_average_parton_length;
   // physical input parameters
   double m_q0;
   double m_lp;       // production lenght

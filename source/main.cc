@@ -9,7 +9,7 @@
 int main(int argc, char* argv[])
 {
 
-  std::string model = "BLE_simple";      // Name for the model you are runing
+  std::string model = "BLE_fixed_free";      // Name for the model you are runing
   myConfig* config = new myConfig();     // create a configuration to call the fitter
   config->m_subtraction = true;          // subtract Helium background
   config->m_correlation = 0.0;           // without correlation
@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
   config->m_preh = false;                // true: fit the prehadron cross section - false: don't fit the prehadron cross section
   config->m_initial_sigma = 30.0;        // legacy, now input is from pdg cross sections
   config->m_energyloss = true;           // do energy loss
-  config->m_testing = false;             // active testing parameters
+  config->m_testing = true;             // active testing parameters
   config->m_Q2BinOfInterest = -1;        // do not change
   config->m_zBinOfInterest = -1;         // value in between 1 and 4
   config->m_input_pt = "hermesData.txt"; // ONLY FOR HERMES

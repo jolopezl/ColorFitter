@@ -311,6 +311,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
   tg_sigma->SetTitle(";#it{z};#it{#sigma} (mbarn)");
   TGraphErrors* tg_dz = new TGraphErrors(fNzbins, z, dz, zErr, dzErr);
   tg_dz->SetName("tg_dz");
+  tg_dz->SetTitle(";#it{z};#delta#it{z} (GeV)");
   TGraphErrors* tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err);
   tg_c1->SetName("tg_c1");
   tg_c1->SetTitle(";#it{z};#it{L}_{crit} (fm)");
@@ -345,6 +346,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
   TGraph* tg_average_density[fNzbins];
   TGraph* tg_multiplicity_density[fNzbins];
   TGraph* tg_average_length[fNzbins];
+  TGraph* tg_average_parton_length[fNzbins];
 
   std::string title = ";A^{1/3};#Delta#LTp_{t}^{2}#GT";
   for (int i = 0; i < fNzbins; ++i) {
@@ -393,6 +395,10 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     tg_average_length[i] = &(resultCont.at(i).m_tg_average_length);
     tg_average_length[i]->SetName(Form("tg_average_length_%d", i));
     tg_average_length[i]->SetTitle(title.c_str());
+    title = ";A^{1/3};#LT l_parton #GT (fm)";
+    tg_average_parton_length[i] = &(resultCont.at(i).m_tg_average_length);
+    tg_average_parton_length[i]->SetName(Form("tg_average_parton_length_%d", i));
+    tg_average_parton_length[i]->SetTitle(title.c_str());
     tg_data_pT[i]->Write();
     tg_data_Rm[i]->Write();
     tg_model_pT[i]->Write();
@@ -406,6 +412,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     tg_average_density[i]->Write();
     tg_multiplicity_density[i]->Write();
     tg_average_length[i]->Write();
+    tg_average_parton_length[i]->Write();
   }
   std::cout << "Done." << std::endl;
   OutputROOT->Close();

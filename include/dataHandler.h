@@ -62,6 +62,7 @@ class myResult
   TGraph m_tg_average_density;
   TGraph m_tg_multiplicity_density;
   TGraph m_tg_average_length;
+  TGraph m_tg_average_parton_length;
   // constructor
   myResult();
   ~myResult();

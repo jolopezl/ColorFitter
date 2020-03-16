@@ -6,6 +6,8 @@
 #include "TMatrixD.h"
 #include "TVectorD.h"
 
+#include "dataFormat.h"
+
 // const double SYSTEMATIC_DPT2 = 0.04;
 // const double SYSTEMATIC_RM = 0.03;
 const int ZDIM = 4;
@@ -117,6 +119,7 @@ K+ multiplicty ratio (Xenon/Deuterium) as a function of Z.
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model* m;
+ModelOutput model_output;
 
 const int DIM = 6;
 TMatrixD V(DIM, DIM);
@@ -136,6 +139,7 @@ void callModel(const double A13, double* par)
   func_array[2] = m->Get3();             // average density
   func_array[3] = m->Get4();             // average multiplicity
   func_array[4] = m->GetAverageLength(); // average length
+  model_output = m->GetResultStruct();   // get the full output
 }
 
 // I will write the Chi-Squared and some other functions here
@@ -324,10 +328,10 @@ std::vector<myResult> ifit(myConfig* config)
       gMinuit->mnparm(1, "LP", 1.6, 0.01, 0.0001, 40, ierflg);         // production length
       gMinuit->mnparm(2, "SIGMA", SIG[iz], 0.01, 0.0001, 100, ierflg); // prehadron cross section
       gMinuit->mnparm(3, "DLOG", 2.5, 0.01, 0.0001, 100, ierflg);      // parameter needed for log description
-      gMinuit->mnparm(4, "DZ", 0.01, 0.0001, -0.1, 0.0, ierflg);      // z shift due to energy loss
+      gMinuit->mnparm(4, "DZ", 0.01, 0.0001, -0.1, 0.1, ierflg);       // z shift due to energy loss
       gMinuit->mnparm(5, "CASCAD", 0.2, 0.01, -0.1, 10, ierflg);       // Cascade parameter
       gMinuit->mnparm(6, "LCRIT", 0, 0.1, 0, 30, ierflg);              // new coeff 1
-      gMinuit->mnparm(7, "SHAPE", 0, 0.00001, -0.5, 0.5, ierflg);      // new coeff 2
+      gMinuit->mnparm(7, "SHAPE", 0, 0.00001, -0.5, 0, ierflg);      // new coeff 2
 
       // Parameter fixing
       if (!config->m_qhat) {
@@ -355,9 +359,9 @@ std::vector<myResult> ifit(myConfig* config)
 
       // For testing only - Force fixing some parameters.
       // gMinuit->FixParameter(0);
-      // gMinuit->FixParameter(4); // simple energy loss shift
-      gMinuit->FixParameter(6); // Lcrit
-      gMinuit->FixParameter(7); // a - shape parameter
+      gMinuit->FixParameter(4); // simple energy loss shift
+      // gMinuit->FixParameter(6); // Lcrit
+      // gMinuit->FixParameter(7); // a - shape parameter
 
       // Now ready for minimization step
       arglist[0] = 500;
@@ -543,6 +547,7 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
     std::vector<double> average_density_fit;
     std::vector<double> multiplicity_density_fit;
     std::vector<double> average_length_fit;
+    std::vector<double> average_parton_length_fit;
 
     double q0 = result.m_qhat;
     std::vector<double> d_pT_dq0;
@@ -561,9 +566,10 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
       double multiplicty_density = func_array[3];
       double average_length = func_array[4];
 
-      average_density_fit.push_back(average_density);
-      multiplicity_density_fit.push_back(multiplicty_density);
-      average_length_fit.push_back(average_length);
+      average_density_fit.push_back(model_output.average_density);
+      multiplicity_density_fit.push_back(model_output.average_multiplicity_density);
+      average_length_fit.push_back(model_output.average_production_length);
+      average_parton_length_fit.push_back(model_output.average_parton_length);
 
       pt_fit.push_back(pT2);
       pt_fiterr.push_back(0);
@@ -633,6 +639,7 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
     result.m_tg_average_density = TGraph(npoints, pt_x.data(), average_density_fit.data());
     result.m_tg_multiplicity_density = TGraph(npoints, pt_x.data(), multiplicity_density_fit.data());
     result.m_tg_average_length = TGraph(npoints, pt_x.data(), average_length_fit.data());
+    result.m_tg_average_parton_length = TGraph(npoints, pt_x.data(), average_parton_length_fit.data());
     result.m_tg_pT_extrapolation = TGraphErrors(npoints, pt_x.data(), pt_fit.data(), pt_fiterr.data(), pt_fiterr.data());
     result.m_tg_pT_extrapolation_up = TGraphErrors(npoints, pt_x.data(), pt_fit_up.data(), pt_fiterr.data(), pt_fiterr.data());
     result.m_tg_pT_extrapolation_down = TGraphErrors(npoints, pt_x.data(), pt_fit_down.data(), pt_fiterr.data(), pt_fiterr.data());
