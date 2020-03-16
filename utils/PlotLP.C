@@ -6,7 +6,7 @@ void PlotLP() {
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
     fin[0] = new TFile("backup-202003/OutputROOT.20191115.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20200310.BL30.root","READ");
+    fin[1] = new TFile("OutputROOT.20200313.BLE_simple_free.root","READ");
     fin[2] = new TFile("backup-202003/OutputROOT.20191115.BLE.root","READ");
     fin[3] = new TFile("backup-202003/OutputROOT.20191115.BLE30.root","READ");
 
@@ -297,7 +297,7 @@ void PlotLP() {
         std::cout << zbin[i] << "\t" << fg0->Eval(zbin[i]) << std::endl;
     }
 
-    return;
+    // return;
     auto fout = TFile::Open("FitOutput_production_length.root", "RECREATE");
     fout->cd();
     model->SetName("model");

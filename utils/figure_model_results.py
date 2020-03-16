@@ -3,11 +3,11 @@ import numpy as np
 import ROOT
 from matplotlib import pyplot as plt
 # plt.style.use('seaborn')
-# plt.rc('font', family='serif', serif='Times')
-# plt.rc('text', usetex=True)
-plt.rc('xtick', labelsize=12)
-plt.rc('ytick', labelsize=12)
-plt.rc('axes', labelsize=12)
+plt.rc('font', family='serif', serif='Times')
+plt.rc('text', usetex=True)
+plt.rc('xtick', labelsize=10)
+plt.rc('ytick', labelsize=10)
+plt.rc('axes', labelsize=10)
 # plt.rc('text', usetex=True)
 plt.rcParams['errorbar.capsize'] = 3
 
@@ -15,12 +15,15 @@ plt.rcParams['errorbar.capsize'] = 3
 def create_plot():
     print("Model results")
     f = ROOT.TFile.Open(
-        "OutputROOT.20200310.BL.root", "READ")
+        "OutputROOT.20200310.BL30.root", "READ")
 
     fig, axs = plt.subplots(2, 4, sharey='row', sharex='col',
-                            constrained_layout=True, figsize=(9, 4.5))
-
-    # fig.subplots_adjust(left=0.11, right=0.98, bottom=0.11, top=0.98, wspace=0, hspace=0)
+                            constrained_layout=True)#, figsize=(9, 4.5))
+    width = 7.056870070568701
+    height = 2.1806927789016632 * 1.5
+    fig.set_size_inches(width, height)
+    # fig.subplots_adjust(left=.11, bottom=.15, right=.96, top=.9)
+    # fig.subplots_adjust(wspace=0, hspace=0)
 
     axs[0, 0].set_ylim(-0.029, 0.039)
     axs[1, 0].set_ylim(0.41, 0.99)
@@ -110,12 +113,12 @@ def create_plot():
     axs[1, 0].text(xpos[1], ypos[1]-0.1, 'Kr')
     axs[1, 0].text(xpos[2], ypos[2]-0.1, 'Xe')
 
-    axs[0, 0].legend(loc='lower left')
-    axs[1, 0].legend(loc='lower left')
+    axs[0, 0].legend(frameon=False, loc='lower left')
+    axs[1, 0].legend(frameon=False, loc='lower left')
 
     fig.align_ylabels(axs[:, 0])
 
-    output_file_name = "modelplot_result.pdf"
+    output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig03_ModelOutput_BL_FixedSIG_MPL.pdf"
     plt.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])

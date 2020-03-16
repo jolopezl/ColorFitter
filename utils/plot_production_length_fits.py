@@ -4,12 +4,13 @@ import ROOT
 from matplotlib import pyplot as plt
 from itertools import product
 # plt.style.use('seaborn')
-# plt.rc('font', family='serif', serif='Times')
+plt.rc('font', family='serif')#, serif='Times')
+plt.rc('text', usetex=True)
+plt.rc('xtick', labelsize=10)
+plt.rc('ytick', labelsize=10)
+plt.rc('axes', labelsize=10)
 # plt.rc('text', usetex=True)
-plt.rc('xtick', labelsize=12)
-plt.rc('ytick', labelsize=12)
-plt.rc('axes', labelsize=12)
-# plt.rc('text', usetex=True)
+
 plt.rcParams['errorbar.capsize'] = 3
 
 
@@ -33,7 +34,11 @@ def create_plot():
         xerrors[1, i] = xerrors_high[i]
     yerrors = np.ndarray(4, dtype=float, buffer=model.GetEYhigh())
 
-    fig, ax = plt.subplots(figsize=(5, 3.75))
+    fig, ax = plt.subplots(constrained_layout=True)
+    width = 3.4039020340390205
+    height = width * 0.75
+    fig.set_size_inches(width, height)
+    
     # plt.errorbar(x, y, yerr=None, xerr=None, fmt='', ecolor=None,
     #              elinewidth=None, capsize=None, barsabove=False, lolims=False,
     #              uplims=False, xlolims=False, xuplims=False, errorevery=1,
@@ -41,9 +46,12 @@ def create_plot():
     ax.errorbar(xp, yp, yerr=yerrors, xerr=xerrors, capsize=0,
                 marker="o", linestyle="", color='black', zorder=5, label='Fit result')
     ax.plot(grint1.GetX(), grint1.GetY(), 'b-',
-            label='Lund String Model\n $\chi^2/\mathrm{dof} = 1.1$, $\kappa = 1.04\pm0.06$ (GeV/fm)')
+            label='LSM, $\chi^2/\mathrm{dof} = 1.1$\n $\kappa = 1.04\pm0.06$ (GeV/fm)')
     ax.plot(grint2.GetX(), grint2.GetY(), 'r-',
-            label='Bialas et. al.\n $\chi^2/\mathrm{dof} = 0.35$, $\kappa = 0.86\pm0.05$ (GeV/fm)')
+            label='Bialas et. al, $\chi^2/\mathrm{dof} = 0.35$\n $\kappa = 0.86\pm0.05$ (GeV/fm)')
+
+    ax.annotate(r'$\langle Q^{2} \rangle = 2.4$ GeV$^{2}$, $\langle \nu \rangle = 12.4$ GeV',
+                xy=(0.02, 0.03), xycoords='axes fraction')
 
     Npoints = grint1.GetN()
     xg1 = np.ndarray(Npoints, dtype=float, buffer=grint1.GetX())
@@ -75,11 +83,11 @@ def create_plot():
 
     ax.set(xlabel='$z$', ylabel='$L_\mathrm{c}$ (fm)')
 
-    fig.tight_layout()
-    ax.legend(title=r'$\langle Q^{2} \rangle = 2.4$ GeV$^{2}$, $\langle \nu \rangle = 12.4$ GeV',
-              frameon=False)
+    # fig.tight_layout()
+    # ax.legend(frameon=False,loc='upper right', borderaxespad=0.)
 
-    output_file_name = "production_length_fits.pdf"
+    # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig04_Production_Length_MPL.pdf"
+    output_file_name = "Fig04_Production_Length_MPL.pdf"
     fig.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])
