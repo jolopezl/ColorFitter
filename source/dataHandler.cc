@@ -396,7 +396,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     tg_average_length[i]->SetName(Form("tg_average_length_%d", i));
     tg_average_length[i]->SetTitle(title.c_str());
     title = ";A^{1/3};#LT l_parton #GT (fm)";
-    tg_average_parton_length[i] = &(resultCont.at(i).m_tg_average_length);
+    tg_average_parton_length[i] = &(resultCont.at(i).m_tg_average_parton_length);
     tg_average_parton_length[i]->SetName(Form("tg_average_parton_length_%d", i));
     tg_average_parton_length[i]->SetTitle(title.c_str());
     tg_data_pT[i]->Write();

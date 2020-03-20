@@ -9,7 +9,7 @@
 int main(int argc, char* argv[])
 {
 
-  std::string model = "BLE_fixed_free";      // Name for the model you are runing
+  std::string model = "BLE_extended_free_critical_len_2";      // Name for the model you are runing
   myConfig* config = new myConfig();     // create a configuration to call the fitter
   config->m_subtraction = true;          // subtract Helium background
   config->m_correlation = 0.0;           // without correlation

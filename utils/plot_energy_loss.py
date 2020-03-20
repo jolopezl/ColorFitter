@@ -15,7 +15,7 @@ plt.rcParams['errorbar.capsize'] = 3
 
 def create_plot():
     print("Energy loss fit results")
-    f = ROOT.TFile.Open("OutputROOT.20200316.BLE_extended_fixed.root", "READ")
+    f = ROOT.TFile.Open("OutputROOT.20200316.BLE_extended_fixed_critical_len_100.root", "READ")
 
     critical_length = f.Get("tg_c1")
     shape_parameter = f.Get("tg_c2")
@@ -52,11 +52,15 @@ def create_plot():
     for i in range(3):
         for j in range(4):
             lp = average_parton_length[j].Eval(A13[i])
-            # yp[i][j] = y_input_val[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
-            # yerr[i][j] = y_input_err[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
-            Lc = critical_length.GetX()[j]
-            yp[i][j] = y_input_val[j] * Lc * (2*lp - Lc) * photon_energy[j] * (1.0 / 25.7)
-            yerr[i][j] = y_input_err[j] * Lc * (2*lp - Lc) * photon_energy[j] * (1.0 / 25.7)
+            yp[i][j] = y_input_val[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
+            yerr[i][j] = y_input_err[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
+            # if j < 2:
+            #     yp[i][j] = y_input_val[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
+            #     yerr[i][j] = y_input_err[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
+            # else:
+            #     Lc = 2.0
+            #     yp[i][j] = y_input_val[j] * Lc * (2*lp - Lc) * photon_energy[j] * (1.0 / 25.7)
+            #     yerr[i][j] = y_input_err[j] * Lc * (2*lp - Lc) * photon_energy[j] * (1.0 / 25.7)
 
     fig, ax = plt.subplots(constrained_layout=True)
     width = 3.4039020340390205
@@ -83,48 +87,47 @@ def create_plot():
     ax.set(xlabel='$z_\mathrm{h}$', ylabel='$E_\mathrm{loss}$ (GeV)')
 
 #     fig.tight_layout()
-    ax.legend(frameon=False, loc='lower right', borderaxespad=0.)
+    ax.legend(frameon=False, loc='upper left', borderaxespad=0.)
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig05_Qhat_MPL.pdf"
     output_file_name = "Fig_Energy_Loss.pdf"
     fig.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])
-
-    fig2, ax2 = plt.subplots(constrained_layout=True)
-    width = 3.4039020340390205
-    height = width * 0.75
-    fig2.set_size_inches(width, height)
-    ax2.plot(f.Get('tg_average_parton_length_0').GetX(),
-               f.Get('tg_average_parton_length_0').GetY(),
-               label = 'bin 1')
-    ax2.plot(f.Get('tg_average_parton_length_1').GetX(),
-               f.Get('tg_average_parton_length_1').GetY(),
-               label = 'bin 2')
-    ax2.plot(f.Get('tg_average_parton_length_2').GetX(),
-               f.Get('tg_average_parton_length_2').GetY(),
-               label = 'bin 3')
-    ax2.plot(f.Get('tg_average_parton_length_3').GetX(),
-               f.Get('tg_average_parton_length_3').GetY(),
-               label = 'bin 4')
-    ax2.legend(frameon=False, loc='lower right', borderaxespad=0.)
-    ax2.set(xlabel='$A^{1/3}$', ylabel='$L_\mathrm{parton}^\mathrm{in-medium}$ (fm)')
-    output_file_name = 'temp.pdf'
-    fig2.savefig(output_file_name)
-    subprocess.call(["open", output_file_name])
-
-    fig3, ax3 = plt.subplots(constrained_layout=True)
-    width = 3.4039020340390205
-    height = width * 0.75
-    fig3.set_size_inches(width, height)
-    ax3.errorbar(f.Get('tg_c1').GetX(),
-               f.Get('tg_c1').GetY(),
-               f.Get('tg_c1').GetEY())
+    # fig2, ax2 = plt.subplots(constrained_layout=True)
+    # width = 3.4039020340390205
+    # height = width * 0.75
+    # fig2.set_size_inches(width, height)
+    # ax2.plot(f.Get('tg_average_parton_length_0').GetX(),
+    #            f.Get('tg_average_parton_length_0').GetY(),
+    #            label = 'bin 1')
+    # ax2.plot(f.Get('tg_average_parton_length_1').GetX(),
+    #            f.Get('tg_average_parton_length_1').GetY(),
+    #            label = 'bin 2')
+    # ax2.plot(f.Get('tg_average_parton_length_2').GetX(),
+    #            f.Get('tg_average_parton_length_2').GetY(),
+    #            label = 'bin 3')
+    # ax2.plot(f.Get('tg_average_parton_length_3').GetX(),
+    #            f.Get('tg_average_parton_length_3').GetY(),
+    #            label = 'bin 4')
     # ax2.legend(frameon=False, loc='lower right', borderaxespad=0.)
-    ax3.set(xlabel='$z_\mathrm{h}$', ylabel='$L_\mathrm{critical}$ (fm)')
-    output_file_name = 'temp2.pdf'
-    fig3.savefig(output_file_name)
-    subprocess.call(["open", output_file_name])
+    # ax2.set(xlabel='$A^{1/3}$', ylabel='$L_\mathrm{parton}^\mathrm{in-medium}$ (fm)')
+    # output_file_name = 'temp.pdf'
+    # fig2.savefig(output_file_name)
+    # subprocess.call(["open", output_file_name])
+
+    # fig3, ax3 = plt.subplots(constrained_layout=True)
+    # width = 3.4039020340390205
+    # height = width * 0.75
+    # fig3.set_size_inches(width, height)
+    # ax3.errorbar(f.Get('tg_c1').GetX(),
+    #            f.Get('tg_c1').GetY(),
+    #            f.Get('tg_c1').GetEY())
+    # # ax2.legend(frameon=False, loc='lower right', borderaxespad=0.)
+    # ax3.set(xlabel='$z_\mathrm{h}$', ylabel='$L_\mathrm{critical}$ (fm)')
+    # output_file_name = 'temp2.pdf'
+    # fig3.savefig(output_file_name)
+    # subprocess.call(["open", output_file_name])
 
 
 if __name__ == "__main__":
