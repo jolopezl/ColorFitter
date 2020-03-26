@@ -509,16 +509,17 @@ int Model::Compute(const double A)
 
 double Model::ApplyEnergyLoss(double& temp)
 {
+  const double NU[4] = { 14.37, 13.03, 12.33, 10.70 };
+  const double ZH[4] = { 0.31, 0.54, 0.75, 0.94 };
   const int BIN = m_iz;
   const double b = m_zbinwidth;
   const double ratio = m_binratio;
-  double shift = 0.0;
-  shift = m_dz;
-  //   shift = m_random3->Exp(m_dz);
+  double shift = ZH[BIN] * (NU[BIN] / (NU[BIN] - m_dz) - 1);
+  // shift = ZH[BIN] * NU[BIN] / (NU[BIN] - m_dz);
   if (BIN == kBINS - 1) {
-    temp *= 1 + shift / b; // last bin loses events
+    temp *= 1 - shift; // last bin loses events
   } else {
-    temp *= 1 + shift / b - shift / b * ratio; // middle bins gain and lose events
+    temp *= 1 - shift * (1 - ratio); // middle bins gain and lose events
   }
   return shift;
 }
@@ -526,6 +527,7 @@ double Model::ApplyEnergyLoss(double& temp)
 double Model::ApplyImprovedEnergyLoss(double& temp, const double& L)
 {
   const double NU[4] = { 14.37, 13.03, 12.33, 10.70 };
+  const double ZH[4] = { 0.31, 0.54, 0.75, 0.94 };
   const int BIN = m_iz;
   const double b = m_zbinwidth;
   const double ratio = m_binratio;
@@ -537,17 +539,19 @@ double Model::ApplyImprovedEnergyLoss(double& temp, const double& L)
   double a = m_coeff_2;
   double Lcrit = m_coeff_1;
 
-  double shift = 0.0;
+  double eloss = 0;
   if (L < Lcrit) {
-    shift = a * pow(L, 2);
+    eloss = a * pow(L, 2);
   } else {
-    shift = a * Lcrit * (2 * L - Lcrit);
+    eloss = a * Lcrit * (2 * L - Lcrit);
   }
 
+  double shift = ZH[BIN] * (NU[BIN] / (NU[BIN] - eloss) - 1);
+
   if (BIN == kBINS - 1) {
-    temp *= 1 + shift / b;
+    temp *= 1 - shift;
   } else {
-    temp *= 1 + shift * (1 - ratio) / b; // middle bins gain and lose events
+    temp *= 1 - shift * (1 - ratio); // middle bins gain and lose events
   }
 
   return shift * NU[BIN];

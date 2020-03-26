@@ -13,9 +13,11 @@ plt.rc('axes', labelsize=10)
 plt.rcParams['errorbar.capsize'] = 3
 
 
-def create_plot():
+def create_plot(input_file = "OutputROOT.20200325.BLEI_single_par.root", critical_length_value = 100):
     print("Energy loss fit results")
-    f = ROOT.TFile.Open("OutputROOT.20200316.BLE_extended_fixed_critical_len_100.root", "READ")
+    f = ROOT.TFile.Open(input_file, "READ")
+
+    text = "$L_\mathrm{crit} = "+str(critical_length_value)+"$ (fm)"
 
     critical_length = f.Get("tg_c1")
     shape_parameter = f.Get("tg_c2")
@@ -52,35 +54,34 @@ def create_plot():
     for i in range(3):
         for j in range(4):
             lp = average_parton_length[j].Eval(A13[i])
-            yp[i][j] = y_input_val[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
-            yerr[i][j] = y_input_err[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
-            # if j < 2:
-            #     yp[i][j] = y_input_val[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
-            #     yerr[i][j] = y_input_err[j] * (lp**2) * photon_energy[j] * (1.0 / 25.7)
-            # else:
-            #     Lc = 2.0
-            #     yp[i][j] = y_input_val[j] * Lc * (2*lp - Lc) * photon_energy[j] * (1.0 / 25.7)
-            #     yerr[i][j] = y_input_err[j] * Lc * (2*lp - Lc) * photon_energy[j] * (1.0 / 25.7)
+            Lc = critical_length_value
+            if (lp < Lc):
+                yp[i][j] = y_input_val[j] * (lp**2) * photon_energy[j]
+                yerr[i][j] = y_input_err[j] * (lp**2) * photon_energy[j]
+            else:
+                yp[i][j] = y_input_val[j] * Lc * (2*lp - Lc) * photon_energy[j]
+                yerr[i][j] = y_input_err[j] * Lc * \
+                    (2*lp - Lc) * photon_energy[j]
 
     fig, ax = plt.subplots(constrained_layout=True)
     width = 3.4039020340390205
     height = width * 0.75
     fig.set_size_inches(width, height)
 
-    ax.errorbar(xp[0], yp[0], yerr[0], uplims=True,  # capsize=0,
+    ax.errorbar(xp[0], yp[0], yerr[0],  # uplims=True,  # capsize=0,
                 marker="o", linestyle="", color='red', zorder=5,
                 label='Neon')
-    ax.errorbar(xp[1], yp[1], yerr[1], uplims=True,  # capsize=0,
+    ax.errorbar(xp[1], yp[1], yerr[1],  # uplims=True,  # capsize=0,
                 marker="s", linestyle="", color='blue', zorder=5,
                 label='Kripton')
-    ax.errorbar(xp[2], yp[2], yerr[2], uplims=True,  # capsize=0,
+    ax.errorbar(xp[2], yp[2], yerr[2],  # uplims=True,  # capsize=0,
                 marker="X", linestyle="", color='green', zorder=5,
                 label='Xenon')
 
-    ax.plot([0,1],[0,0],'k--')
+    ax.plot([0, 1], [0, 0], 'k--')
 
     ax.locator_params(axis='y', nbins=6)
-    # ax.set_ylim(-2, 0)
+    # ax.set_ylim(-0.25, 0.75)
     ax.set_xlim(0, 1)
 
     # ax.set(xlabel='$A^{1/3}$', ylabel='$E_\mathrm{loss}$ (GeV)')
@@ -89,46 +90,20 @@ def create_plot():
 #     fig.tight_layout()
     ax.legend(frameon=False, loc='upper left', borderaxespad=0.)
 
+    ax.annotate(text,
+                xy=(0.02, 0.03), xycoords='axes fraction')
+
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig05_Qhat_MPL.pdf"
-    output_file_name = "Fig_Energy_Loss.pdf"
+    output_file_name = "Fig_Energy_Loss__Lc="+str(critical_length_value)+".pdf"
     fig.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])
-    # fig2, ax2 = plt.subplots(constrained_layout=True)
-    # width = 3.4039020340390205
-    # height = width * 0.75
-    # fig2.set_size_inches(width, height)
-    # ax2.plot(f.Get('tg_average_parton_length_0').GetX(),
-    #            f.Get('tg_average_parton_length_0').GetY(),
-    #            label = 'bin 1')
-    # ax2.plot(f.Get('tg_average_parton_length_1').GetX(),
-    #            f.Get('tg_average_parton_length_1').GetY(),
-    #            label = 'bin 2')
-    # ax2.plot(f.Get('tg_average_parton_length_2').GetX(),
-    #            f.Get('tg_average_parton_length_2').GetY(),
-    #            label = 'bin 3')
-    # ax2.plot(f.Get('tg_average_parton_length_3').GetX(),
-    #            f.Get('tg_average_parton_length_3').GetY(),
-    #            label = 'bin 4')
-    # ax2.legend(frameon=False, loc='lower right', borderaxespad=0.)
-    # ax2.set(xlabel='$A^{1/3}$', ylabel='$L_\mathrm{parton}^\mathrm{in-medium}$ (fm)')
-    # output_file_name = 'temp.pdf'
-    # fig2.savefig(output_file_name)
-    # subprocess.call(["open", output_file_name])
 
-    # fig3, ax3 = plt.subplots(constrained_layout=True)
-    # width = 3.4039020340390205
-    # height = width * 0.75
-    # fig3.set_size_inches(width, height)
-    # ax3.errorbar(f.Get('tg_c1').GetX(),
-    #            f.Get('tg_c1').GetY(),
-    #            f.Get('tg_c1').GetEY())
-    # # ax2.legend(frameon=False, loc='lower right', borderaxespad=0.)
-    # ax3.set(xlabel='$z_\mathrm{h}$', ylabel='$L_\mathrm{critical}$ (fm)')
-    # output_file_name = 'temp2.pdf'
-    # fig3.savefig(output_file_name)
-    # subprocess.call(["open", output_file_name])
+    return ax
 
 
 if __name__ == "__main__":
-    create_plot()
+    create_plot("OutputROOT.20200325.BLEI_single_par.root", 100)
+    create_plot("OutputROOT.20200325.BLEI_single_par_Lcrit3.root", 3)
+    create_plot("OutputROOT.20200325.BLEI_single_par_Lcrit_one_and_a_half_fm.root", 1.5)
+    create_plot("OutputROOT.20200325.BLEI_single_par_Lcrit_half_fm.root", 0.5)

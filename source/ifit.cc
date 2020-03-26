@@ -328,10 +328,10 @@ std::vector<myResult> ifit(myConfig* config)
       gMinuit->mnparm(1, "LP", 1.6, 0.01, 0.0001, 40, ierflg);         // production length
       gMinuit->mnparm(2, "SIGMA", SIG[iz], 0.01, 0.0001, 100, ierflg); // prehadron cross section
       gMinuit->mnparm(3, "DLOG", 2.5, 0.01, 0.0001, 100, ierflg);      // parameter needed for log description
-      gMinuit->mnparm(4, "DZ", 0.01, 0.0001, -0.1, 0.1, ierflg);       // z shift due to energy loss
+      gMinuit->mnparm(4, "ELOSS", 0.3, 0.01, -2, 14, ierflg);          // z shift due to energy loss
       gMinuit->mnparm(5, "CASCAD", 0.2, 0.01, -0.1, 10, ierflg);       // Cascade parameter
-      gMinuit->mnparm(6, "LCRIT", 10, 0.1, 0, 30, ierflg);             // new coeff 1
-      gMinuit->mnparm(7, "SHAPE", 0, 0.00001, -0.5, +0.5, ierflg);     // new coeff 2
+      gMinuit->mnparm(6, "LCRIT", 100, 0.1, 0, 25, ierflg);            // new coeff 1
+      gMinuit->mnparm(7, "SHAPE", 0, 0.1, -0.5, +50, ierflg);          // new coeff 2
 
       // Parameter fixing
       if (!config->m_qhat) {
@@ -361,18 +361,27 @@ std::vector<myResult> ifit(myConfig* config)
       // gMinuit->FixParameter(0);
       gMinuit->FixParameter(4); // simple energy loss shift
       gMinuit->FixParameter(6); // Lcrit
-      // gMinuit->FixParameter(7); // a - shape parameter
+      gMinuit->FixParameter(7); // a - shape parameter
 
       // Now ready for minimization step
       arglist[0] = 500;
       arglist[1] = 1.;
       gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
       std::cout << "Completed MIGRAD for iz " << iz << " with ierflg " << ierflg << std::endl;
+      if (ierflg) {
+        std::cerr << "Check the output of your fit, something went wrong with bin-#" << iz + 1 << std::endl;
+      }
       // gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
 
-      // gMinuit->FixParameter(1);
-      // gMinuit->Release(4);
-      // // gMinuit->Release(6); gMinuit->Release(7);
+      gMinuit->FixParameter(0);
+      gMinuit->FixParameter(1);
+      // gMinuit->Release(6);
+      gMinuit->Release(7);
+      gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
+
+      // gMinuit->Release(0);
+      // gMinuit->Release(1);
+      // gMinuit->FixParameter(4);
       // gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
 
       /*
@@ -384,31 +393,20 @@ std::vector<myResult> ifit(myConfig* config)
             gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
 */
       // gMinuit->mnexcm("IMPROVE", arglist, 8,ierflg);
-      double p0[10];
-      p0[1] = 0;
-      gMinuit->mnexcm("MINOS", p0, 6, ierflg);
-      p0[1] = 1;
-      gMinuit->mnexcm("MINOS", p0, 6, ierflg);
-      p0[1] = 7;
-      gMinuit->mnexcm("MINOS", p0, 6, ierflg);
-
-      double eplus, eminus, eparab, gcc;
-      gMinuit->mnerrs(0, eplus, eminus, eparab, gcc);
-      std::cout << "MINOS Errors for parameter " << 0 << " eplus = " << eplus << ", eminus = " << eminus << ", eparab = " << eparab << ", and gcc = " << gcc << std::endl;
-      gMinuit->mnerrs(1, eplus, eminus, eparab, gcc);
-      std::cout << "MINOS Errors for parameter " << 1 << " eplus = " << eplus << ", eminus = " << eminus << ", eparab = " << eparab << ", and gcc = " << gcc << std::endl;
-      gMinuit->mnerrs(7, eplus, eminus, eparab, gcc);
-      std::cout << "MINOS Errors for parameter " << 7 << " eplus = " << eplus << ", eminus = " << eminus << ", eparab = " << eparab << ", and gcc = " << gcc << std::endl;
-
-      // p0[1]=7; gMinuit->mnexcm("MINOS", p0, 6,ierflg);
-      // p0[1]=8; gMinuit->mnexcm("MINOS", p0, 6,ierflg);
       // if (config->doMINOSErrors == true) {
       //   double p0[10];
-      //   for (int i = 1; i <= 3; i++) {
-      //     p0[1] = i;
+      //   std::vector<int> parVec = { 1, 2, 8 };
+      //   for (const auto& p : parVec) {
+      //     p0[1] = p; // Use external parameter number
       //     gMinuit->mnexcm("MINOS", p0, 6, ierflg);
       //   }
+      //   double eplus, eminus, eparab, gcc;
+      //   for (const auto& p : parVec) {
+      //     gMinuit->mnerrs(p - 1, eplus, eminus, eparab, gcc); // use internal parameter number
+      //     std::cout << "MINOS Errors for parameter " << p - 1 << " eplus = " << eplus << ", eminus = " << eminus << ", eparab = " << eparab << ", and gcc = " << gcc << std::endl;
+      //   }
       // }
+
       // Print results
       double amin, edm, errdef;
       int nvpar, nparx, icstat;
@@ -422,16 +420,17 @@ std::vector<myResult> ifit(myConfig* config)
       resultCont.push_back(result);
       // fout->Write();
 
-      // if (iz == (ZDIM-1)) {
+      // if (iz == (ZDIM - 1)) {
       //   TFile* fout = TFile::Open("correlation_test.root", "RECREATE");
       //   int number_of_points = 50;
       //   TGraph* gr_contours[5];
-      //   for (int i = 0; i < 5; ++i) {
+      //   for (int i = 0; i < 1; ++i) {
       //     int nsigma = i + 1;
       //     gMinuit->SetErrorDef(nsigma * nsigma);
       //     gr_contours[i] = (TGraph*)gMinuit->Contour(number_of_points, 1, 7);
       //     gr_contours[i]->SetName(Form("contour_%d", i));
       //     gr_contours[i]->Write();
+      //     break;
       //   }
       //   fout->Close();
       // }
