@@ -375,8 +375,18 @@ std::vector<myResult> ifit(myConfig* config)
 
       gMinuit->FixParameter(0);
       gMinuit->FixParameter(1);
-      // gMinuit->Release(6);
-      gMinuit->Release(7);
+      gMinuit->Release(4);
+      // gMinuit->Release(7);
+      gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
+
+      gMinuit->Release(0);
+      gMinuit->Release(1);
+      gMinuit->FixParameter(4);
+      gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
+
+      gMinuit->Release(0);
+      gMinuit->Release(1);
+      gMinuit->Release(4);
       gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
 
       // gMinuit->Release(0);

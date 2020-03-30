@@ -9,7 +9,7 @@
 int main(int argc, char* argv[])
 {
 
-  std::string model = "BLEI_single_par";      // Name for the model you are runing
+  std::string model = "BLEy";      // Name for the model you are runing
   myConfig* config = new myConfig();     // create a configuration to call the fitter
   config->m_subtraction = true;          // subtract Helium background
   config->m_correlation = 0.0;           // without correlation

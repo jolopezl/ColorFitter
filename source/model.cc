@@ -445,8 +445,8 @@ int Model::Compute(const double A)
     /// *** ENERGY LOSS *** //
     if (m_DoEnergyLoss == true) {
       double before = multiplicity_ratio; // before correction;
-      // m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
-      m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, m_parton_length);
+      m_normalized_energy_loss = ApplyEnergyLoss(multiplicity_ratio);
+      // m_normalized_energy_loss = ApplyImprovedEnergyLoss(multiplicity_ratio, m_parton_length);
       double after = multiplicity_ratio; // after correction
       m_multiplicative_factor = after / before;
     }

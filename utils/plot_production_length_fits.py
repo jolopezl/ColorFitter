@@ -28,7 +28,7 @@ def create_plot():
     xerrors_high = np.ndarray(4, dtype=float, buffer=model.GetEXhigh())
     xerrors_low = np.ndarray(4, dtype=float, buffer=model.GetEXlow())
     xerrors = np.ndarray((2, 4), dtype=float)
-    print "assign"
+
     for i in range(4):
         xerrors[0, i] = 0
         xerrors[1, i] = xerrors_high[i]
@@ -84,7 +84,7 @@ def create_plot():
     ax.set(xlabel='$z$', ylabel='$L_\mathrm{c}$ (fm)')
 
     # fig.tight_layout()
-    # ax.legend(frameon=False,loc='upper right', borderaxespad=0.)
+    ax.legend(frameon=False,loc='upper right', borderaxespad=0.)
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig04_Production_Length_MPL.pdf"
     output_file_name = "Fig04_Production_Length_MPL.pdf"
