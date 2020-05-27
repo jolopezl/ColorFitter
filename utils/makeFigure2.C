@@ -22,7 +22,7 @@ void makeFigure2() {
 
     const char *variantname = "BL30";
 
-    TFile *fin = TFile::Open(Form("OutputROOT.20191115.%s.root",variantname)); // 20181229 nominal
+    TFile *fin = TFile::Open(Form("OutputROOT.20200319.%s.root",variantname)); // 20181229 nominal
     // TFile *fin_uncertainties = TFile::Open("./OutputROOT_ToyMC_ModelUncertianties.root");
     std::pair<TGraphErrors*,TGraphErrors*> tg[4];
     std::pair<TGraphErrors*,TGraphErrors*> tg_up[4];
@@ -80,7 +80,7 @@ void makeFigure2() {
         data[i].second->GetYaxis()->SetRangeUser(0.41,0.99);
         data[i].second->GetYaxis()->SetNdivisions(505);
         data[i].first->GetYaxis()->SetTitle("#Delta #LT #it{p}_{T}^{2} #GT (GeV^{2})");
-        data[i].first->GetYaxis()->SetTitle("#Delta #it{p}_{T}^{2} (GeV^{2})");
+        data[i].first->GetYaxis()->SetTitle("#Delta #LT #it{p}_{T}^{2} #GT (GeV^{2})");
         data[i].first->GetXaxis()->SetTitle("#it{A}^{1/3}");
         data[i].second->GetYaxis()->SetTitle("#it{R}_{M}");
         data[i].second->GetXaxis()->SetTitle("#it{A}^{1/3}");
@@ -128,6 +128,8 @@ void makeFigure2() {
     c1->cd(3); myText(0.15,0.9,1,"#it{z}_{h} = 0.75",22);
     c1->cd(4); myText(0.15,0.9,1,"#it{z}_{h} = 0.94",22);
 
+
+    variantname = "";
     c1->cd(1);
     TLegend* legend = new TLegend(0.38,0.1,0.65,0.35);
     legend->SetBorderSize(0);  // no border
@@ -137,7 +139,7 @@ void makeFigure2() {
     legend->SetTextSize(22); // Increase entry font size! 
     legend->AddEntry(data[0].first, "Data", "pe");
     legend->AddEntry(tg[0].first, Form("Fit result %s",variantname), "L");
-    // legend->Draw();
+    legend->Draw();
     c1->cd(5);
     TLegend* legend2 = new TLegend(0.38,0.3,0.65,0.5);
     legend2->SetBorderSize(0);  // no border
@@ -147,8 +149,8 @@ void makeFigure2() {
     legend2->SetTextSize(22); // Increase entry font size! 
     legend2->AddEntry(data[0].second, "Data", "pe");
     legend2->AddEntry(tg[0].second, Form("Fit result %s",variantname), "L");
-    // legend2->Draw();
+    legend2->Draw();
    
     // c1->SetGrayscale(kTRUE);
-    c1->Print(Form("modelplot_%s.pdf",variantname));
+    c1->Print(Form("modelplot_%s__temp.pdf",variantname));
 }

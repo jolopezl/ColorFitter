@@ -7,6 +7,6 @@
 
 void MultiGaus(const TVectorD& parMeans, const TMatrixDSym& covMatrix, TVectorD& genPars);
 
-void conv2double(std::vector<std::string>,double&,double&,double&);
+void conv2double(std::vector<std::string>, double&, double&, double&);
 double pow2(double);
-double fcn_gaus_2d_cov(double *x, double *par);
+double fcn_gaus_2d_cov(double* x, double* par);

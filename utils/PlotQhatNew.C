@@ -4,10 +4,10 @@ void PlotQhatNew()
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
-    fin[0] = new TFile("OutputROOT.20191115.BL.root", "READ");
-    fin[1] = new TFile("OutputROOT.20200218.BL30.root", "READ");
-    fin[2] = new TFile("OutputROOT.20191115.BLE.root", "READ");
-    fin[3] = new TFile("OutputROOT.20191115.BLE30.root", "READ");
+    fin[0] = new TFile("backup-202003/OutputROOT.20191115.BL.root","READ");
+    fin[1] = new TFile("OutputROOT.20200310.BL30.root","READ");
+    fin[2] = new TFile("backup-202003/OutputROOT.20191115.BLE.root","READ");
+    fin[3] = new TFile("backup-202003/OutputROOT.20191115.BLE30.root","READ");
 
     TGraphErrors *tg_lp[4][4];
     TGraphErrors *tg_q0[4];
