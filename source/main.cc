@@ -9,14 +9,14 @@
 int main(int argc, char* argv[])
 {
 
-  std::string model = "BLEy";      // Name for the model you are runing
+  std::string model = "BL30_alpha_s_test_03"; // Name for the model you are runing
   myConfig* config = new myConfig();     // create a configuration to call the fitter
   config->m_subtraction = true;          // subtract Helium background
   config->m_correlation = 0.0;           // without correlation
   config->fixedLp = false;               // true: to use fixed production length, false: exponential distribution
   config->m_preh = false;                // true: fit the prehadron cross section - false: don't fit the prehadron cross section
   config->m_initial_sigma = 30.0;        // legacy, now input is from pdg cross sections
-  config->m_energyloss = true;           // do energy loss
+  config->m_energyloss = false;          // do energy loss
   config->m_testing = false;             // active testing parameters
   config->m_Q2BinOfInterest = -1;        // do not change
   config->m_zBinOfInterest = -1;         // value in between 1 and 4

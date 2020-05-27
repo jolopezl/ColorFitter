@@ -328,7 +328,7 @@ std::vector<myResult> ifit(myConfig* config)
       gMinuit->mnparm(1, "LP", 1.6, 0.01, 0.0001, 40, ierflg);         // production length
       gMinuit->mnparm(2, "SIGMA", SIG[iz], 0.01, 0.0001, 100, ierflg); // prehadron cross section
       gMinuit->mnparm(3, "DLOG", 2.5, 0.01, 0.0001, 100, ierflg);      // parameter needed for log description
-      gMinuit->mnparm(4, "ELOSS", 0.3, 0.01, -2, 14, ierflg);          // z shift due to energy loss
+      gMinuit->mnparm(4, "ELOSS", 0, 0.01, -2, 14, ierflg);            // z shift due to energy loss
       gMinuit->mnparm(5, "CASCAD", 0.2, 0.01, -0.1, 10, ierflg);       // Cascade parameter
       gMinuit->mnparm(6, "LCRIT", 100, 0.1, 0, 25, ierflg);            // new coeff 1
       gMinuit->mnparm(7, "SHAPE", 0, 0.1, -0.5, +50, ierflg);          // new coeff 2
@@ -371,28 +371,7 @@ std::vector<myResult> ifit(myConfig* config)
       if (ierflg) {
         std::cerr << "Check the output of your fit, something went wrong with bin-#" << iz + 1 << std::endl;
       }
-      // gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
-
-      gMinuit->FixParameter(0);
-      gMinuit->FixParameter(1);
-      gMinuit->Release(4);
-      // gMinuit->Release(7);
-      gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
-
-      gMinuit->Release(0);
-      gMinuit->Release(1);
-      gMinuit->FixParameter(4);
-      gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
-
-      gMinuit->Release(0);
-      gMinuit->Release(1);
-      gMinuit->Release(4);
-      gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
-
-      // gMinuit->Release(0);
-      // gMinuit->Release(1);
-      // gMinuit->FixParameter(4);
-      // gMinuit->mnexcm("MIGRAD", arglist, 8,ierflg);
+      // gMinuit->mnexcm("HESSE", arglist, 8,ierflg)
 
       /*
             std::cout << "STARTING TO SEARCH FOR A FIT IMPROVEMENT" << std::endl;

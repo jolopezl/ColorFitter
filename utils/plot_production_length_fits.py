@@ -9,7 +9,6 @@ plt.rc('text', usetex=True)
 plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
 plt.rc('axes', labelsize=10)
-# plt.rc('text', usetex=True)
 
 plt.rcParams['errorbar.capsize'] = 3
 
@@ -43,8 +42,12 @@ def create_plot():
     #              elinewidth=None, capsize=None, barsabove=False, lolims=False,
     #              uplims=False, xlolims=False, xuplims=False, errorevery=1,
     #              capthick=None, *, data=None, **kwargs)
+    ax.errorbar(xp, yp, yerr=yerrors, #capsize=0,
+                marker="o", linestyle="", markerfacecolor='grey',
+                color='black', zorder=5, label='Fit result')
     ax.errorbar(xp, yp, yerr=yerrors, xerr=xerrors, capsize=0,
-                marker="o", linestyle="", color='black', zorder=5, label='Fit result')
+                marker="o", linestyle="", markerfacecolor='grey',
+                color='black')
     ax.plot(grint1.GetX(), grint1.GetY(), 'b-',
             label='LSM, $\chi^2/\mathrm{dof} = 1.1$\n $\kappa = 1.04\pm0.06$ (GeV/fm)')
     ax.plot(grint2.GetX(), grint2.GetY(), 'r-',

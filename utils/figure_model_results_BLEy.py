@@ -9,7 +9,34 @@ plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
 plt.rc('axes', labelsize=10)
 # plt.rc('text', usetex=True)
-plt.rcParams['errorbar.capsize'] = 3
+plt.rcParams['errorbar.capsize'] = 0
+
+fin = ROOT.TFile.Open("OutputROOT.20200326.BLE.root", "READ")
+zh = np.array([0.31, 0.54, 0.75, 0.94])
+nu = np.array([14.37, 13.03, 12.33, 10.70])
+
+
+def getUncertaintyFactor(bin):
+    graph = fin.Get("tg_dz")
+    yval = np.ndarray(4, dtype=float, buffer=graph.GetY())
+    yerr = np.ndarray(4, dtype=float, buffer=graph.GetEY())
+    error = (zh[bin] * nu[bin] / (nu[bin] - yval[bin])**2) * yerr[bin]
+    return error
+
+
+def addAdditionalUncertainty(bin, N, yme, ylo, yup):
+    error_to_add = getUncertaintyFactor(bin)
+    yupf = np.zeros(N)
+    ylof = np.zeros(N)
+    for i in range(N):
+        RM = yme[i]
+        err_up = yup[i] - RM
+        err_low = RM - ylo[i]
+        err_up = np.sqrt(err_up**2 + error_to_add**2)
+        err_low = np.sqrt(err_low**2 + error_to_add**2)
+        yupf[i] = RM + err_up
+        ylof[i] = RM - err_low
+    return yupf, ylof
 
 
 def getChiSq(data, model):
@@ -21,11 +48,12 @@ def getChiSq(data, model):
         chisq = chisq + ((y[i] - model.Eval(x[i]))**2) / (yerr[i]**2)
     return chisq
 
+
 def create_plot():
     print("Model results")
     f = ROOT.TFile.Open(
-        "OutputROOT.20200310.BL30.root", "READ")
-    
+        "OutputROOT.20200326.BLEy.root", "READ")
+
     dof = 6 - 3
 
     fig, axs = plt.subplots(2, 4, sharey='row', sharex='col',
@@ -47,9 +75,14 @@ def create_plot():
         extrapolation_name = "tg_model_pT_extrapolation_"+str(i)
         extrapolation_up_name = "tg_model_pT_extrapolation_up_"+str(i)
         extrapolation_down_name = "tg_model_pT_extrapolation_down_"+str(i)
+        errors = np.ndarray(3, float, f.Get(graph_name).GetEY())
+        errors = errors * 0.75
+        axs[0, i].errorbar(f.Get(graph_name).GetX(), f.Get(
+            graph_name).GetY(), errors, marker="o", linestyle="", ecolor='lightgray', elinewidth=7, capsize=0, zorder=1)
+
         axs[0, i].errorbar(f.Get(graph_name).GetX(), f.Get(graph_name).GetY(), f.Get(
-            graph_name).GetEY(), marker="o", linestyle="", markerfacecolor='grey',
-            color='black', zorder=2, label='Data')
+            graph_name).GetEY(), marker="o", linestyle="", color='black', zorder=2, label='Data')
+
         axs[0, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
             extrapolation_name).GetY(), "b-", zorder=1, label='Model')
         axs[0, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
@@ -63,12 +96,24 @@ def create_plot():
         extrapolation_up_name = "tg_model_Rm_extrapolation_up_"+str(i)
         extrapolation_down_name = "tg_model_Rm_extrapolation_down_"+str(i)
         axs[1, i].errorbar(f.Get(graph_name).GetX(), f.Get(graph_name).GetY(), f.Get(
-            graph_name).GetEY(), marker="o", linestyle="",  markerfacecolor='grey',
-            color='black', zorder=2, label='Data')
+            graph_name).GetEY(), marker="o", linestyle="", color='black', zorder=2, label='Data')
         axs[1, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
             extrapolation_name).GetY(), "r-", zorder=1, label='Model')
-        axs[1, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
-                               alpha=0.4, facecolor='red', zorder=0)
+
+        N = f.Get(extrapolation_name).GetN()
+        xp = np.ndarray(N, dtype=float, buffer=f.Get(
+            extrapolation_name).GetX())
+        yme = np.ndarray(N, dtype=float, buffer=f.Get(
+            extrapolation_name).GetY())
+        ylo = np.ndarray(N, dtype=float, buffer=f.Get(
+            extrapolation_down_name).GetY())
+        yup = np.ndarray(N, dtype=float, buffer=f.Get(
+            extrapolation_up_name).GetY())
+
+        yupf, ylof = addAdditionalUncertainty(i, N, yme, ylo, yup)
+
+        axs[1, i].fill_between(xp, ylof, yupf, alpha=0.4,
+                               facecolor='red', zorder=0)
 
         chisq2 = getChiSq(f.Get(graph_name), f.Get(extrapolation_name))
         chisq = chisq1+chisq2
@@ -115,7 +160,7 @@ def create_plot():
     fig.align_ylabels(axs[:, 0])
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig03_ModelOutput_BL_FixedSIG_MPL.pdf"
-    output_file_name = "Fig03_ModelOutput_BL30.pdf"
+    output_file_name = "Fig03_ModelOutput_BLEy.pdf"
     plt.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])

@@ -21,7 +21,7 @@ def main():
 
     fig, axs = plt.subplots(2, 3, sharex='col',constrained_layout=True)
     width = 7.056870070568701
-    height = 2.1806927789016632 * 1.6
+    height = 2.1806927789016632 * 1.5
     fig.set_size_inches(width, height)
     # fig.subplots_adjust(left=.11, bottom=.15, right=.96, top=.9)
     # fig.subplots_adjust(wspace=0, hspace=0)
@@ -33,19 +33,19 @@ def main():
         current_style = style.next()
         ## Probability distribution
         lambdaL = 1.0 / (1.0*lc)
-        axs[0,0].plot(x, lambdaL*np.exp(-lambdaL * x), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
-        axs[1,0].plot((lc,lc),(0,1), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
+        axs[0,0].plot(x, lambdaL*np.exp(-lambdaL * x), current_style, label='$L_\mathrm{c} = '+str(lc)+'$ (fm)')
+        axs[1,0].plot((lc,lc),(0,1), current_style, label='$L_\mathrm{c} = '+str(lc)+'$ (fm)')
         ## pT-broadening
         graph_name = "pT2_lp_"+str(lc)
-        axs[0, 1].plot(fe.Get(graph_name).GetX(), fe.Get(graph_name).GetY(), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
-        axs[1, 1].plot(ff.Get(graph_name).GetX(), ff.Get(graph_name).GetY(), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
+        axs[0, 1].plot(fe.Get(graph_name).GetX(), fe.Get(graph_name).GetY(), current_style, label='$L_\mathrm{c} = '+str(lc)+'$ (fm)')
+        axs[1, 1].plot(ff.Get(graph_name).GetX(), ff.Get(graph_name).GetY(), current_style, label='$L_\mathrm{c} = '+str(lc)+'$ (fm)')
         ## Multiplicity ratio
         graph_name = "RM_lp_"+str(lc)
-        axs[0, 2].plot(fe.Get(graph_name).GetX(), fe.Get(graph_name).GetY(), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
-        axs[1, 2].plot(ff.Get(graph_name).GetX(), ff.Get(graph_name).GetY(), current_style, label='$L_{c} = '+str(lc)+'$ (fm)')
+        axs[0, 2].plot(fe.Get(graph_name).GetX(), fe.Get(graph_name).GetY(), current_style, label='$L_\mathrm{c} = '+str(lc)+'$ (fm)')
+        axs[1, 2].plot(ff.Get(graph_name).GetX(), ff.Get(graph_name).GetY(), current_style, label='$L_\mathrm{c} = '+str(lc)+'$ (fm)')
    
-    axs[0,0].set(xlabel='', ylabel=r'$f_p (L; L_\mathrm{c})$')
-    axs[1,0].set(xlabel=r'$L$ (fm)', ylabel=r'$f_p (L; L_\mathrm{c})$')
+    axs[0,0].set(xlabel='', ylabel=r'$f_\mathrm{p} (L; L_\mathrm{c})$')
+    axs[1,0].set(xlabel=r'$L$ (fm)', ylabel=r'$f_\mathrm{p} (L; L_\mathrm{c})$')
     axs[0,1].set(xlabel='', ylabel=r'$\Delta \langle p_\mathrm{T}^2\rangle$ (GeV$^2$)')
     axs[1,1].set(xlabel='$A^{1/3}$', ylabel=r'$\Delta \langle p_\mathrm{T}^2\rangle$ (GeV$^2$)')
     axs[0,2].set(xlabel='', ylabel='$R_\mathrm{M}$')
@@ -89,6 +89,7 @@ def main():
                     loc='upper left', borderaxespad=0.)
     # fig.tight_layout()
     output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig02_Predictions.pdf"
+    # output_file_name = "Fig02_Predictions.pdf"
     plt.savefig(output_file_name)
     subprocess.call(["open", output_file_name])    
 

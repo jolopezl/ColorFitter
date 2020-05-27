@@ -1,4 +1,4 @@
-#include "model.h"
+#include "../include/model.h"
 
 Model::Model() : m_ModelName("Default"),
                  m_dPt2(0.0),
@@ -57,7 +57,7 @@ ModelOutput Model::GetResultStruct()
   return output;
 }
 
-std::vector<double> Model::GetResult()
+std::vector<double> Model::GetResultVector()
 {
   std::vector<double> output = { m_dPt2, m_Rm };
   return output;

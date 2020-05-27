@@ -44,7 +44,7 @@ class Model
   double Get3() const { return m_average_density; };
   double Get4() const { return m_multip_density; };
   double GetAverageLength() const { return m_average_length; }
-  std::vector<double> GetResult();
+  std::vector<double> GetResultVector();
   ModelOutput GetResultStruct();
   void GetResult(double&, double&);
 
