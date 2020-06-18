@@ -139,7 +139,7 @@ void PlotLP() {
     fg0->SetParName(3,"Q2"); 
     fg0->FixParameter(3,2.4);
 
-    TF1 *fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0,1.2);
+    TF1 *fg1 = new TF1("fg1","1/(2*[0]) * ((1-x)*([1] + 2*[2]) - TMath::Power([3],2)/(x*([1] + 2*[2])))",0.001,0.9995);
     fg1->SetParName(0, "KAPPA");
     fg1->SetParName(1, "MP");
     fg1->SetParName(2, "NU");
@@ -195,7 +195,7 @@ void PlotLP() {
     }
 
     int npoints = 500;
-    model->Fit("fg1", "EMN0", "", 0.2, 0.96);
+    model->Fit("fg1", "EMN0", "", 0.25, 0.95);
     TH1F *h1 = new TH1F("h1","auxs",npoints+1,0,1);
     auto gg1 = TH1TOTGraph(h1);
     TGraphErrors *grint1 = new TGraphErrors(99);
@@ -243,7 +243,7 @@ void PlotLP() {
     TCanvas *c2 = new TCanvas("c2","c2 title",800,600);
 
     model->Draw("APEZ"); 
-    variants->Draw("SAME5");
+    // variants->Draw("SAME5");
     fg1->Draw("SAME");
     fg2->Draw("SAME");
     grint2->Draw("SAME 3");
@@ -292,4 +292,24 @@ void PlotLP() {
 //    myText(0.2, 0.4, kBlack, "Fit uncorrected for kinematics", 0.05, 0);
     c2->Print("figure_models_lundfit_lp.pdf");
 
+    double zbin[4] = { 0.31, 0.54, 0.75, 0.94 };
+    for (int i = 0; i<4; ++i) {
+        std::cout << zbin[i] << "\t" << fg0->Eval(zbin[i]) << std::endl;
+    }
+
+    // return;
+    auto fout = TFile::Open("FitOutput_production_length.root", "RECREATE");
+    fout->cd();
+    model->SetName("model");
+    model->Write();
+    fg1->SetName("fg1");
+    fg1->Write();
+    fg2->SetName("fg2");
+    fg2->Write();
+    grint1->SetName("grint1");
+    grint1->Write();
+    grint2->SetName("grint2");
+    grint2->Write();
+    fout->Write();
+    fout->Close();
 }

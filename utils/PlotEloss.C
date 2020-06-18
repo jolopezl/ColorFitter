@@ -7,8 +7,8 @@ void PlotEloss() {
     // fin[1] = new TFile("backup-201911-4/OutputROOT.20181229.BLE30.root","READ");
     // fin[2] = new TFile("backup-201911-4/OutputROOT.20181229.BLE40.root","READ");
     fin[0] = new TFile("OutputROOT.20200218.BLE.root","READ");
-    fin[1] = new TFile("OutputROOT.20200218.BLE30.root","READ");
-    fin[2] = new TFile("OutputROOT.20200218.BLE30.root","READ");
+    fin[1] = new TFile("OutputROOT.20200221.BLE30.root","READ");
+    fin[2] = new TFile("OutputROOT.20200221.BLE30.root","READ");
 
     TGraphErrors *tg[3];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_dz");
