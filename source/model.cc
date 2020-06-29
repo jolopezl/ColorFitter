@@ -407,7 +407,8 @@ int Model::Compute(const double A)
     if (temp == 0)
       zrange1 = 1.; // dummy value
     if (zrange1 > 0)
-      accumulator1 += m_q0 * temp * weight;
+      accumulator1 += m_q0 * temp * weight + pow(m_zbinvalue, 2) * m_coeff_1;
+    // accumulator1 += m_zbinvalue * m_zbinvalue * m_q0 * temp * weight;
     else {
       std::cout << "zrange1 of length zero or negative encountered: " << zrange1 << " \n";
       std::cout << "Point B: ul = " << ul << " temp, R, x, y, z,  R*R-x*x-y*y " << temp << " " << R << " " << x << " " << y << " " << z << " " << R * R - x * x - y * y << std::endl;

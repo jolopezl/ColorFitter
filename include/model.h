@@ -39,6 +39,8 @@ class Model
   double GetC(double);
   double Fermi(int inucleus);
 
+  void setZ(double z) { m_zbinvalue = z; }
+
   double Get1() const { return m_dPt2; };
   double Get2() const { return m_Rm; };
   double Get3() const { return m_average_density; };

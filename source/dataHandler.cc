@@ -314,7 +314,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
   tg_dz->SetTitle(";#it{z};#delta#it{z} (GeV)");
   TGraphErrors* tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err);
   tg_c1->SetName("tg_c1");
-  tg_c1->SetTitle(";#it{z};#it{L}_{crit} (fm)");
+  tg_c1->SetTitle(";#it{z};#Delta#it{k}_{#perp} (Gev^{2})");
   TGraphErrors* tg_c2 = new TGraphErrors(fNzbins, z, c2, zErr, c2Err);
   tg_c2->SetName("tg_c2");
   tg_c2->SetTitle(";#it{z};Shape parameter #it{a} (GeV)");

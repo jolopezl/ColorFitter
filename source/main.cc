@@ -9,9 +9,9 @@
 int main(int argc, char* argv[])
 {
 
-  std::string model = "BL30_alpha_s_test_03"; // Name for the model you are runing
+  std::string model = "BL30_deltakT_D_Kplus"; // Name for the model you are runing
   myConfig* config = new myConfig();     // create a configuration to call the fitter
-  config->m_subtraction = true;          // subtract Helium background
+  config->m_subtraction = false;          // subtract Helium background
   config->m_correlation = 0.0;           // without correlation
   config->fixedLp = false;               // true: to use fixed production length, false: exponential distribution
   config->m_preh = false;                // true: fit the prehadron cross section - false: don't fit the prehadron cross section
