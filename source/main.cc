@@ -8,23 +8,24 @@
 // ************ main function ************ //
 int main(int argc, char* argv[])
 {
-
-  std::string model = "BL30_deltakT_D_Kplus"; // Name for the model you are runing
-  myConfig* config = new myConfig();     // create a configuration to call the fitter
-  config->m_subtraction = false;          // subtract Helium background
-  config->m_correlation = 0.0;           // without correlation
-  config->fixedLp = false;               // true: to use fixed production length, false: exponential distribution
-  config->m_preh = false;                // true: fit the prehadron cross section - false: don't fit the prehadron cross section
-  config->m_initial_sigma = 30.0;        // legacy, now input is from pdg cross sections
-  config->m_energyloss = false;          // do energy loss
-  config->m_testing = false;             // active testing parameters
-  config->m_Q2BinOfInterest = -1;        // do not change
-  config->m_zBinOfInterest = -1;         // value in between 1 and 4
-  config->m_input_pt = "hermesData.txt"; // ONLY FOR HERMES
-  config->writeCorrectedValues = false;  // text file from dataHandler
-  config->correctionPlots = false;       // from dataHandler
-  config->outputPlots = true;            // model and data, very useful
-  config->doMINOSErrors = false;         // usually false
+  std::string particle = "piminus";
+  std::string model = "BL30_deltakT_D_" + particle; // Name for the model you are runing
+  myConfig* config = new myConfig();                // create a configuration to call the fitter
+  config->m_particletype = particle;                //
+  config->m_subtraction = false;                    // subtract Helium background
+  config->m_correlation = 0.0;                      // without correlation
+  config->fixedLp = false;                          // true: to use fixed production length, false: exponential distribution
+  config->m_preh = false;                           // true: fit the prehadron cross section - false: don't fit the prehadron cross section
+  config->m_initial_sigma = 30.0;                   // legacy, now input is from pdg cross sections
+  config->m_energyloss = false;                     // do energy loss
+  config->m_testing = false;                        // active testing parameters
+  config->m_Q2BinOfInterest = -1;                   // do not change
+  config->m_zBinOfInterest = -1;                    // value in between 1 and 4
+  config->m_input_pt = "hermesData.txt";            // ONLY FOR HERMES
+  config->writeCorrectedValues = false;             // text file from dataHandler
+  config->correctionPlots = false;                  // from dataHandler
+  config->outputPlots = true;                       // model and data, very useful
+  config->doMINOSErrors = false;                    // usually false
   config->Update();
 
   // Call the fitter with the configured setup

@@ -21,7 +21,10 @@ double xxx[8] = { 0, 0, 0, 0, 0, 0 };
 double pT2[4] = { 0, 0, 0 };
 double Rm[4] = { 0, 0, 0 };
 
-double SIG[4] = { 27.0363, 25.4381, 25.098, 24.9184 }; // interpolated cross-section
+double SIG[4];
+double SIG1[4] = { 27.075, 25.604, 25.109, 24.946 }; // interpolated cross-section for pi+
+double SIG2[4] = { 29.669, 27.653, 26.929, 26.717 }; // interpolated cross-section for pi-
+double SIG3[4] = { 17.281, 17.265, 17.264, 17.267 }; // interpolated cross-section for K+
 double PROD_LEN_INTERP[4] = { 9.61702, 6.60402, 3.85302, 1.36402 };
 
 double binratios[ZDIM] = { 0.214848, 0.432318, 0.440678, 0.125506 }; // PI+ with cuts !!
@@ -97,6 +100,19 @@ std::vector<myResult> ifit(myConfig* config)
   m->DoCascade(config->m_cascade);
   m->DoFixedLp(config->fixedLp);
 
+  if (config->m_particletype == "piplus") {
+    for (int i = 0; i < 4; i++)
+      SIG[i] = SIG1[i];
+  } else if (config->m_particletype == "piminus") {
+    for (int i = 0; i < 4; i++)
+      SIG[i] = SIG2[i];
+  } else if (config->m_particletype == "Kplus") {
+    for (int i = 0; i < 4; i++)
+      SIG[i] = SIG3[i];
+  } else {
+    std::cerr << "Wrong particle type *****!!" << std::endl;
+  }
+
   xxx[0] = pow(4.0026, 1. / 3.);  // He
   xxx[1] = pow(20.1797, 1. / 3.); // Ne
   xxx[2] = pow(83.7980, 1. / 3.); // Kr
@@ -126,8 +142,18 @@ std::vector<myResult> ifit(myConfig* config)
         std::cout << "Ignoring this bin" << std::endl;
         continue;
       }
-      tge.first = (TGraphErrors*)fInputData->Get(Form("tg_pt_Kplus_slice_0_zbin_%d", iz));
-      tge.second = (TGraphErrors*)fInputData->Get(Form("tg_RM_Kplus_slice_0_zbin_%d", iz));
+      if (config->m_particletype == "piplus") {
+        tge.first = (TGraphErrors*)fInputData->Get(Form("tg_pt_piplus_slice_0_zbin_%d", iz));
+        tge.second = (TGraphErrors*)fInputData->Get(Form("tg_RM_piplus_slice_0_zbin_%d", iz));
+      } else if (config->m_particletype == "piminus") {
+        tge.first = (TGraphErrors*)fInputData->Get(Form("tg_pt_piminus_slice_0_zbin_%d", iz));
+        tge.second = (TGraphErrors*)fInputData->Get(Form("tg_RM_piminus_slice_0_zbin_%d", iz));
+      } else if (config->m_particletype == "Kplus") {
+        tge.first = (TGraphErrors*)fInputData->Get(Form("tg_pt_Kplus_slice_0_zbin_%d", iz));
+        tge.second = (TGraphErrors*)fInputData->Get(Form("tg_RM_Kplus_slice_0_zbin_%d", iz));
+      } else {
+        std::cerr << "Wrong 0!!" << std::endl;
+      }
       if (tge.first == nullptr) {
         std::cerr << "Wrong 1!!" << std::endl;
       }
@@ -236,7 +262,7 @@ std::vector<myResult> ifit(myConfig* config)
 
       // For testing only - Force fixing some parameters.
       // gMinuit->FixParameter(0);
-      gMinuit->Release(4);      // simple energy loss shift
+      // gMinuit->Release(4);      // simple energy loss shift
       gMinuit->Release(6);      // Lcrit
       gMinuit->FixParameter(7); // a - shape parameter
 
