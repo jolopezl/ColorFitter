@@ -24,7 +24,9 @@ def getChiSq(data, model):
 def create_plot():
     print("Model results")
     f = ROOT.TFile.Open(
-        "OutputROOT.20200310.BL30.root", "READ")
+        # "OutputROOT.20200310.BL30.root", "READ")
+        # "OutputROOT.20200626.BL30_fit_raw_data.root", "READ")
+        "OutputROOT.20200629.BL30_deltakT_D_piminus.root", "READ")
     
     dof = 6 - 3
 
@@ -34,13 +36,13 @@ def create_plot():
     height = 2.1806927789016632 * 1.5
     fig.set_size_inches(width, height)
 
-    axs[0, 0].set_ylim(-0.029, 0.039)
-    axs[1, 0].set_ylim(0.41, 0.99)
+    # axs[0, 0].set_ylim(-0.029, 0.039)
+    # axs[1, 0].set_ylim(0.41, 1.19)
 
     for i in range(4):
-        axs[0, i].set_xlim(2.5, 5.5)
-        axs[1, i].set_xlim(2.5, 5.5)
-        # axs[1,i].set_xlim(2.5,5.5)
+        axs[0, i].set_xlim(0.5, 5.5)
+        axs[1, i].set_xlim(0.5, 5.5)
+        # axs[1,i].set_xlim(0.5,5.5)
 
         graph_name = "tg_data_pT_"+str(i)
         model_result_name = "tg_model_pT_"+str(i)
@@ -52,8 +54,8 @@ def create_plot():
             color='black', zorder=2, label='Data')
         axs[0, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
             extrapolation_name).GetY(), "b-", zorder=1, label='Model')
-        axs[0, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
-                               alpha=0.4, facecolor='blue', zorder=0)
+        # axs[0, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
+                            #    alpha=0.4, facecolor='blue', zorder=0)
 
         chisq1 = getChiSq(f.Get(graph_name), f.Get(extrapolation_name))
 
@@ -105,9 +107,9 @@ def create_plot():
     #         )
     xpos = f.Get("tg_data_Rm_0").GetX()
     ypos = f.Get("tg_data_Rm_0").GetY()
-    axs[1, 0].text(xpos[0], ypos[0]-0.1, 'Ne')
-    axs[1, 0].text(xpos[1], ypos[1]-0.1, 'Kr')
-    axs[1, 0].text(xpos[2], ypos[2]-0.1, 'Xe')
+    # axs[1, 0].text(xpos[0], ypos[0]-0.1, 'Ne')
+    # axs[1, 0].text(xpos[1], ypos[1]-0.1, 'Kr')
+    # axs[1, 0].text(xpos[2], ypos[2]-0.1, 'Xe')
 
     axs[0, 0].legend(frameon=False, loc='lower left')
     axs[1, 0].legend(frameon=False, loc='lower left')
@@ -115,7 +117,7 @@ def create_plot():
     fig.align_ylabels(axs[:, 0])
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig03_ModelOutput_BL_FixedSIG_MPL.pdf"
-    output_file_name = "Fig03_ModelOutput_BL30.pdf"
+    output_file_name = "Fig03_ModelOutput_BL30_deltakT_D_piminus.pdf"
     plt.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])
