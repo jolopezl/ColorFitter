@@ -396,6 +396,10 @@ void setupMultiplicityRatio()
   dataRM["tg_RM_piminus_Neon"]->SetName("tg_RM_piminus_Neon");
   dataRM["tg_RM_piminus_Krypton"]->SetName("tg_RM_piminus_Krypton");
   dataRM["tg_RM_piminus_Xenon"]->SetName("tg_RM_piminus_Xenon");
+  dataRM["tg_RM_Kplus_Helium"]->SetName("tg_RM_Kplus_Helium");
+  dataRM["tg_RM_Kplus_Neon"]->SetName("tg_RM_Kplus_Neon");
+  dataRM["tg_RM_Kplus_Krypton"]->SetName("tg_RM_Kplus_Krypton");
+  dataRM["tg_RM_Kplus_Xenon"]->SetName("tg_RM_Kplus_Xenon");
   dataRM["tg_RM_piplus_Helium"]->SetTitle(";z_{h};R_{M}");
   dataRM["tg_RM_piplus_Neon"]->SetTitle(";z_{h};R_{M}");
   dataRM["tg_RM_piplus_Krypton"]->SetTitle(";z_{h};R_{M}");
