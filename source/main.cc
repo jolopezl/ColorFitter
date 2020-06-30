@@ -8,10 +8,8 @@
 // ************ main function ************ //
 int main(int argc, char* argv[])
 {
-  std::string particle = "piminus";
-  std::string model = "BL30_deltakT_D_" + particle; // Name for the model you are runing
+  std::string model = "BL30";                       // Name for the model you are runing
   myConfig* config = new myConfig();                // create a configuration to call the fitter
-  config->m_particletype = particle;                //
   config->m_subtraction = false;                    // subtract Helium background
   config->m_correlation = 0.0;                      // without correlation
   config->fixedLp = false;                          // true: to use fixed production length, false: exponential distribution
