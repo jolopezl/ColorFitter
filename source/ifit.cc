@@ -113,10 +113,10 @@ std::vector<myResult> ifit(myConfig* config)
     std::cerr << "Wrong particle type *****!!" << std::endl;
   }
 
-  xxx[0] = pow(4.0026, 1. / 3.);  // He
-  xxx[1] = pow(20.1797, 1. / 3.); // Ne
-  xxx[2] = pow(83.7980, 1. / 3.); // Kr
-  xxx[3] = pow(131.293, 1. / 3.); // Xe
+  xxx[0] = std::cbrt(4.0026);  // Helium
+  xxx[1] = std::cbrt(20.1797); // Neon
+  xxx[2] = std::cbrt(83.7980); // Krypton
+  xxx[3] = std::cbrt(131.293); // Xenon
   xxx[4] = xxx[0];
   xxx[5] = xxx[1];
   xxx[6] = xxx[2];
