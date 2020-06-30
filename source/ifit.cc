@@ -334,18 +334,8 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
   // TRandom3* rr = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
   // rr->SetSeed(9234);
 
-  double z1[4], x1[4], errorz1[4];
-  double z2[4], x2[4], errorz2[4];
-  z1[0] = zzz[0];
-  z1[1] = zzz[1];
-  z1[2] = zzz[2];
-  z1[3] = zzz[3];
-
-  z2[0] = zzz[4];
-  z2[1] = zzz[5];
-  z2[2] = zzz[6];
-  z2[3] = zzz[7];
-
+  double z1[4][3], x1[4], errorz1[4][3];
+  double z2[4][3], x2[4], errorz2[4][3];
   x1[0] = xxx[0];
   x1[1] = xxx[1];
   x1[2] = xxx[2];
@@ -356,15 +346,55 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
   x2[2] = xxx[2];
   x2[3] = xxx[3];
 
-  errorz1[0] = errorzzz[0];
-  errorz1[1] = errorzzz[1];
-  errorz1[2] = errorzzz[2];
-  errorz1[3] = errorzzz[3];
+  z1[0][0] = zzz[0];
+  z1[1][0] = zzz[1];
+  z1[2][0] = zzz[2];
+  z1[3][0] = zzz[3];
+  z2[0][0] = zzz[4];
+  z2[1][0] = zzz[5];
+  z2[2][0] = zzz[6];
+  z2[3][0] = zzz[7];
+  z1[0][1] = zzz[0 + 8];
+  z1[1][1] = zzz[1 + 8];
+  z1[2][1] = zzz[2 + 8];
+  z1[3][1] = zzz[3 + 8];
+  z2[0][1] = zzz[4 + 8];
+  z2[1][1] = zzz[5 + 8];
+  z2[2][1] = zzz[6 + 8];
+  z2[3][1] = zzz[7 + 8];
+  z1[0][2] = zzz[0 + 16];
+  z1[1][2] = zzz[1 + 16];
+  z1[2][2] = zzz[2 + 16];
+  z1[3][2] = zzz[3 + 16];
+  z2[0][2] = zzz[4 + 16];
+  z2[1][2] = zzz[5 + 16];
+  z2[2][2] = zzz[6 + 16];
+  z2[3][2] = zzz[7 + 16];
 
-  errorz2[0] = errorzzz[4];
-  errorz2[1] = errorzzz[5];
-  errorz2[2] = errorzzz[6];
-  errorz2[3] = errorzzz[7];
+  errorz1[0][0] = errorzzz[0];
+  errorz1[1][0] = errorzzz[1];
+  errorz1[2][0] = errorzzz[2];
+  errorz1[3][0] = errorzzz[3];
+  errorz2[0][0] = errorzzz[4];
+  errorz2[1][0] = errorzzz[5];
+  errorz2[2][0] = errorzzz[6];
+  errorz2[3][0] = errorzzz[7];
+  errorz1[0][1] = errorzzz[0 + 8];
+  errorz1[1][1] = errorzzz[1 + 8];
+  errorz1[2][1] = errorzzz[2 + 8];
+  errorz1[3][1] = errorzzz[3 + 8];
+  errorz2[0][1] = errorzzz[4 + 8];
+  errorz2[1][1] = errorzzz[5 + 8];
+  errorz2[2][1] = errorzzz[6 + 8];
+  errorz2[3][1] = errorzzz[7 + 8];
+  errorz1[0][2] = errorzzz[0 + 16];
+  errorz1[1][2] = errorzzz[1 + 16];
+  errorz1[2][2] = errorzzz[2 + 16];
+  errorz1[3][2] = errorzzz[3 + 16];
+  errorz2[0][2] = errorzzz[4 + 16];
+  errorz2[1][2] = errorzzz[5 + 16];
+  errorz2[2][2] = errorzzz[6 + 16];
+  errorz2[3][2] = errorzzz[7 + 16];
 
   double val = 0;
   double err = 0;
@@ -506,8 +536,8 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
       }
       const double zeros[3] = { 0, 0, 0 };
       const int npoints = pt_x.size();
-      result.m_tg_data_pT.push_back(TGraphErrors(4, x1, z1, errorz1, errorz1));
-      result.m_tg_data_Rm.push_back(TGraphErrors(4, x2, z2, errorz2, errorz2));
+      result.m_tg_data_pT.push_back(TGraphErrors(4, x1, z1[i], zeros, errorz1[i]));
+      result.m_tg_data_Rm.push_back(TGraphErrors(4, x2, z2[i], zeros, errorz2[i]));
       result.m_tg_pT.push_back(TGraphErrors(4, x1, pT2, zeros, zeros));
       result.m_tg_Rm.push_back(TGraphErrors(4, x2, Rm, zeros, zeros));
       result.m_tg_average_density.push_back(TGraph(npoints, pt_x.data(), average_density_fit.data()));
