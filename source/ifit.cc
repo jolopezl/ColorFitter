@@ -123,8 +123,6 @@ std::vector<myResult> ifit(myConfig* config)
   xxx[2] = std::cbrt(83.7980); // Krypton
   xxx[3] = std::cbrt(131.293); // Xenon
 
-  double input_value = 0;
-  double input_error = 0;
   for (int i = 0; i < 4; ++i) {
     double A = pow(xxx[i], 3.0);
     std::cout << "Value of c " << m->GetC((int)A) << " for A " << (int)A << std::endl;
@@ -245,9 +243,11 @@ std::vector<myResult> ifit(myConfig* config)
       gMinuit->mnparm(8, "DELTA-KT2", -0.025, 0.0001, -0.05, 0.05, ierflg); // delta kt
 
       // Parameter fixing
-      gMinuit->FixParameter(4); // prehadron cross section
-      gMinuit->FixParameter(5); // prehadron cross section
-      gMinuit->FixParameter(6); // prehadron cross section
+      if (!config->m_preh) {
+        gMinuit->FixParameter(4); // prehadron cross section
+        gMinuit->FixParameter(5); // prehadron cross section
+        gMinuit->FixParameter(6); // prehadron cross section
+      }
       gMinuit->FixParameter(7); // Energy Loss
 
       // Now ready for minimization step
@@ -502,7 +502,7 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
         double RM = func_array[1];
         double average_density = func_array[2];
         double multiplicty_density = func_array[3];
-        double average_length = func_array[4];
+        // double average_length = func_array[4];
         average_density_fit.push_back(model_output.average_density);
         multiplicity_density_fit.push_back(model_output.average_multiplicity_density);
         average_length_fit.push_back(model_output.average_production_length);
@@ -519,7 +519,9 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
         /** We will keep the uncertainties to first order only **/
         /** higher orders do not agree with Toy MC, so something can be wrongly derived **/
         double uncertainty = 0;
-        uncertainty += pow(pT2 / q0 * result.m_q0_err, 2) + pow(z * result.m_dkt2_err, 2);
+        // uncertainty += pow(pT2 / q0 * result.m_q0_err, 2) + pow(z * result.m_dkt2_err, 2);
+        uncertainty += pow((pT2 / q0 - z * z * result.m_dkt2) * result.m_q0_err, 2);
+        uncertainty += pow(z * z * result.m_dkt2_err, 2);
         uncertainty = sqrt(uncertainty);
         pt_fit_up.push_back(pT2 + uncertainty);
         pt_fit_down.push_back(pT2 - uncertainty);

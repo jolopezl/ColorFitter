@@ -24,7 +24,10 @@ def getChiSq(data, model):
 
 def create_plot():
     print("Model results")
-    f = ROOT.TFile.Open("OutputROOT.20200630.BL30.root", "READ")
+    f = ROOT.TFile.Open("OutputROOT.20200630.BL30_2.root", "READ")
+    files = [ROOT.TFile.Open("../test_HERMES/OutputROOT.20200629.BL30_deltakT_D_piplus.root", "READ"),
+             ROOT.TFile.Open("../test_HERMES/OutputROOT.20200629.BL30_deltakT_D_piminus.root", "READ"),
+             ROOT.TFile.Open("../test_HERMES/OutputROOT.20200629.BL30_deltakT_D_Kplus.root", "READ")]
 
     dof = 8 - 3
 
@@ -47,14 +50,19 @@ def create_plot():
     # axs[0, 0].set_ylim(-0.029, 0.039)
     # axs[1, 0].set_ylim(0.41, 1.19)
     p = 0
+    idx = 0
     particles = ["pip", "pim", "Kp"]
     for particle in particles:
         for i in range(4):
-            # axs[p, i].set_ylim(0, 5.5)
-            # axs[p+1, i].set_ylim(0.5, 1.1)
+            if (p==4):
+                axs[p, i].set_ylim(-0.085, 0.09)
+            else:
+                axs[p, i].set_ylim(-0.03, 0.04)
+            
+            axs[p+1, i].set_ylim(0.4, 1.1)
             # axs[1,i].set_xlim(0.5,5.5)
 
-            graph_name = "tg_data_pT_"+str(i)+"_"+str(particle)
+            graph_name = "tg_data_pT_"+str(i)
             model_result_name = "tg_model_pT_"+str(i)+"_"+str(particle)
             extrapolation_name = "tg_model_pT_extrapolation_" + \
                 str(i)+"_"+str(particle)
@@ -62,18 +70,21 @@ def create_plot():
                 str(i)+"_"+str(particle)
             extrapolation_down_name = "tg_model_pT_extrapolation_down_" + \
                 str(i)+"_"+str(particle)
-            axs[p, i].errorbar(f.Get(graph_name).GetX(), f.Get(graph_name).GetY(), f.Get(
-                graph_name).GetEY(), marker="o", linestyle="", markerfacecolor='grey',
-                color='black', zorder=2, label='Data')
-            axs[p, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
-                extrapolation_name).GetY(), "b-", zorder=1, label='Model')
-            if (i != 3):
-                axs[p, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
-                                       alpha=0.4, facecolor='blue', zorder=0)
+            axs[p, i].errorbar(files[idx].Get(graph_name).GetX(),
+                               files[idx].Get(graph_name).GetY(),
+                               files[idx].Get(graph_name).GetEY(),
+                               marker="o", linestyle="", markerfacecolor='grey',color='black', zorder=2, label='Data')
+            axs[p, i].plot(f.Get(extrapolation_name).GetX(),
+                           f.Get(extrapolation_name).GetY(),
+                           "b-", zorder=1, label='Model')
+            # if (i != 3):
+            axs[p, i].fill_between(f.Get(extrapolation_name).GetX(),
+                                   f.Get(extrapolation_down_name).GetY(),
+                                   f.Get(extrapolation_up_name).GetY(), alpha=0.4, facecolor='blue', zorder=0)
 
-            chisq1 = getChiSq(f.Get(graph_name), f.Get(extrapolation_name))
+            chisq1 = getChiSq(files[idx].Get(graph_name), f.Get(extrapolation_name))
 
-            graph_name = "tg_data_Rm_"+str(i)+"_"+str(particle)
+            graph_name = "tg_data_Rm_"+str(i)
             model_result_name = "tg_model_Rm_"+str(i)+"_"+str(particle)
             extrapolation_name = "tg_model_Rm_extrapolation_" + \
                 str(i)+"_"+str(particle)
@@ -81,19 +92,21 @@ def create_plot():
                 str(i)+"_"+str(particle)
             extrapolation_down_name = "tg_model_Rm_extrapolation_down_" + \
                 str(i)+"_"+str(particle)
-            axs[p + 1, i].errorbar(f.Get(graph_name).GetX(), f.Get(graph_name).GetY(), f.Get(
-                graph_name).GetEY(), marker="o", linestyle="",  markerfacecolor='grey',
-                color='black', zorder=2, label='Data')
+            axs[p + 1, i].errorbar(files[idx].Get(graph_name).GetX(),
+                                   files[idx].Get(graph_name).GetY(),
+                                   files[idx].Get(graph_name).GetEY(),
+                                   marker="o", linestyle="",  markerfacecolor='grey', color='black', zorder=2, label='Data')
             axs[p + 1, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
                 extrapolation_name).GetY(), "r-", zorder=1, label='Model')
             axs[p + 1, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
                                        alpha=0.4, facecolor='red', zorder=0)
 
-            chisq2 = getChiSq(f.Get(graph_name), f.Get(extrapolation_name))
+            chisq2 = getChiSq(files[idx].Get(graph_name), f.Get(extrapolation_name))
             chisq = chisq1+chisq2
             print("Chi-square = "+str(chisq))
             print("Chi-square/dof = "+str(chisq/dof))
         p = p + 2
+        idx = idx +1
 
     # fig.set_title('Baseline model with fixed cross-section 30 mb results')
     axs[0, 0].annotate(r'$z_\mathrm{h}=0.32$', xy=(
@@ -135,7 +148,7 @@ def create_plot():
     fig.align_ylabels(axs[:, 0])
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig03_ModelOutput_BL_FixedSIG_MPL.pdf"
-    output_file_name = "Fig03_ModelOutput_BL30_deltakT_D_combined.pdf"
+    output_file_name = "Fig03_ModelOutput_BL30_deltakT_D_combined_2.pdf"
     plt.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])
