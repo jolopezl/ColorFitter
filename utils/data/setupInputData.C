@@ -10,6 +10,7 @@ const char* fit_function_lower = "pol2";
 map<string, TGraphErrors*> data;
 map<string, TGraphErrors*> dataRM;
 map<string, TGraphErrors*> dataRMitp;
+map<string, TGraphErrors*> dataRMunc;
 array<double, 4> A13{ pow(4.0026, 1. / 3.), pow(20.1797, 1. / 3.), pow(83.7980, 1. / 3.), pow(131.293, 1. / 3.) };
 array<double, 4> zbins{ 0.32, 0.54, 0.75, 0.94 };
 // arrat<double, 4> zbins{0.31,0.54,0.75,0.94};
@@ -31,6 +32,11 @@ void setupInputData()
     d.second->Write();
   }
   for (auto d : dataRMitp) {
+    if (d.second) {
+      d.second->Write();
+    }
+  }
+  for (auto d : dataRMunc) {
     if (d.second) {
       d.second->Write();
     }
@@ -717,7 +723,15 @@ void setupMultiplicityRatioVsA()
     // cout << "Defining " << x << endl;
     dataRMitp[x] = new TGraphErrors(4);
     dataRMitp[x]->SetName(x.c_str());
-    dataRMitp[x]->SetTitle(";z_{h}; Interpolated R_{M}");
+    dataRMitp[x]->SetTitle(";z_{h};Interpolated R_{M}");
+  }
+
+  for (string n : names) {
+    string x = n + "_unc";
+    // cout << "Defining " << x << endl;
+    dataRMunc[x] = new TGraphErrors(4);
+    dataRMunc[x]->SetName(x.c_str());
+    dataRMunc[x]->SetTitle(";z_{h};Closest z-bin R_{M}");
   }
 
   for (auto d : dict) {
@@ -745,7 +759,6 @@ void setupMultiplicityRatioVsA()
         cout << "Something went wrong" << endl;
       }
       R = func->Eval(z);
-      data[key]->SetPoint(i, A13[i], R);
 
       // Compute the uncertainty
       TGraphErrors* upper = (TGraphErrors*)input_data->Clone("upper");
@@ -764,12 +777,23 @@ void setupMultiplicityRatioVsA()
         Rerr = upper->GetFunction(fit_function_nominal)->Eval(z) - lower->GetFunction(fit_function_nominal)->Eval(z);
       }
       // Rerr = upper->GetFunction(fit_function_nominal)->Eval(z) - lower->GetFunction(fit_function_nominal)->Eval(z);
-      data[key]->SetPointError(i, 0, Rerr);
 
       string x = key2 + "_itp";
       dataRMitp[x]->SetPoint(z_index, z, R);
       dataRMitp[x]->SetPointError(z_index, 0, Rerr);
-      // }
+
+      // get the closest data point for the given z-bin, and add an uncertainty penalty
+      double z1 = input_data->GetX()[2 * z_index + 2];
+      double R1 = input_data->GetY()[2 * z_index + 2];
+      double R1err = input_data->GetEY()[2 * z_index + 2];
+      R1err = sqrt(pow(R1err, 2) + pow(R1 - R, 2));
+      string nn = key2 + "_unc";
+      dataRMunc[nn]->SetPoint(z_index, z, R1);
+      dataRMunc[nn]->SetPointError(z_index, 0, R1err);
+
+      // Fill the map vs A13
+      data[key]->SetPoint(i, A13[i], R1);
+      data[key]->SetPointError(i, 0, R1err);
     }
   }
 }
