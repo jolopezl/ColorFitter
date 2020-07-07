@@ -4,6 +4,7 @@
 #include "TH1.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TGraph.h"
 #include "TRandom3.h"
 #include "Math/Interpolator.h"
 #include "Math/WrappedTF1.h"
@@ -123,9 +124,12 @@ class Model
   // tools
   std::vector<double> m_c_interpolation;
   // Other parameters
-  int m_maxmcSteps = 100000; // number of mc steps in the calculation
+  // int m_maxmcSteps = 100000; // number of mc steps in the calculation
+  int m_maxmcSteps = 50000; // number of mc steps in the calculation
   double m_density_threshold = 0.005;
   int irun = -1;
+
+  TGraph g_c_interp;
 };
 
 #endif
