@@ -274,7 +274,8 @@ std::vector<myResult> ifit(myConfig* config)
       if (ierflg) {
         std::cerr << "Check the output of your fit, something went wrong with bin-#" << iz + 1 << std::endl;
       }
-      // gMinuit->mnexcm("HESSE", arglist, 8,ierflg)
+
+      // gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
 
       /*
             std::cout << "STARTING TO SEARCH FOR A FIT IMPROVEMENT" << std::endl;
@@ -473,9 +474,9 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
     std::vector<double> d_pT_dL;
 
     int i = 0;
-    double x = 1.0;
+    double x = 1.4;
     double dx = (6.0 - 1.0) / 25;
-    while (x < 6.0) {
+    while (x <= 6.0) {
       std::cout << "Modelplot for A^1/3 = " << x << std::endl;
       callModel(x, par);
 
