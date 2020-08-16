@@ -1,16 +1,21 @@
 import subprocess
 import numpy as np
 import ROOT
-from matplotlib import pyplot as plt
 from itertools import product
-# plt.style.use('seaborn')
-plt.rc('font', family='serif')#, serif='Times')
+import matplotlib
+from matplotlib import pyplot as plt
+# # plt.style.use('seaborn')
+# plt.rc('font', family='serif', serif='Times')
 plt.rc('text', usetex=True)
 plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
 plt.rc('axes', labelsize=10)
-
 plt.rcParams['errorbar.capsize'] = 3
+
+# matplotlib.rcParams.update({'font.size': 8})
+matplotlib.rcParams['mathtext.fontset'] = 'cm'
+matplotlib.rcParams['font.family'] = 'cm'
+matplotlib.pyplot.title(r'ABC123 vs $\mathrm{ABC123}^{123}$')
 
 
 def create_plot():
@@ -49,9 +54,9 @@ def create_plot():
                 marker="o", linestyle="", markerfacecolor='grey',
                 color='black')
     ax.plot(grint1.GetX(), grint1.GetY(), 'b-',
-            label='LSM, $\chi^2/\mathrm{dof} = 1.1$\n $\kappa = 1.04\pm0.06$ (GeV/fm)')
+            label='LSM, $\chi^2/\mathrm{dof} = 1.32$\n $\kappa = 1.00\pm0.05$ (GeV/fm)')
     ax.plot(grint2.GetX(), grint2.GetY(), 'r-',
-            label='Bialas et. al, $\chi^2/\mathrm{dof} = 0.35$\n $\kappa = 0.86\pm0.05$ (GeV/fm)')
+            label='Bialas et al, $\chi^2/\mathrm{dof} = 0.68$\n $\kappa = 0.85\pm0.05$ (GeV/fm)')
 
     ax.annotate(r'$\langle Q^{2} \rangle = 2.4$ GeV$^{2}$, $\langle \nu \rangle = 12.4$ GeV',
                 xy=(0.02, 0.03), xycoords='axes fraction')

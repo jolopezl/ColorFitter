@@ -9,6 +9,7 @@ Model::Model() : m_ModelName("Default"),
                  m_dlog(0.0),      // log description?
                  m_dz(0.0),        // energy loss parameter
                  m_cascade(0.0),
+                 m_kt2(0.0),
                  m_coeff_1(0),
                  m_coeff_2(0),
                  m_DoEnergyLoss(false),
@@ -29,6 +30,7 @@ Model::Model(std::string name) : m_ModelName(name),
                                  m_dlog(0.0),      // log description?
                                  m_dz(0.0),        // energy loss parameter
                                  m_cascade(0.0),
+                                 m_kt2(0.0),
                                  m_coeff_1(0),
                                  m_coeff_2(0),
                                  m_DoEnergyLoss(false),
@@ -117,8 +119,9 @@ void Model::SetParameters(std::string parameter, double value)
     std::cout << "Not a valid parameter name" << std::endl;
 }
 
-void Model::SetTestParameter(double c1, double c2)
+void Model::SetTestParameter(double aa, double c1, double c2)
 {
+  m_kt2 = aa;
   m_coeff_1 = c1;
   m_coeff_2 = c2;
 }
@@ -176,12 +179,12 @@ void Model::Initialization()
                         6.860608284735964, 6.870369086672824, 6.880102704917282, 6.889809327296487, 6.899489139573279, 6.909142325477218, 6.918769066735028,
                         6.928369543100458, 6.937943932383601, 6.947492410479616, 6.957015151396957, 6.966512327285054, 6.975984108461481 };
 
-  vector<double> x_range;
+  std::vector<double> x_range;
   for (int i = 0; i < m_c_interpolation.size(); ++i) {
-    x_range.push_back(i)
+    x_range.push_back(i);
   }
   g_c_interp = TGraph(m_c_interpolation.size(), &x_range[0], &m_c_interpolation[0]);
-  
+
   m_random3 = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
 
   std::cout << "Model parameters initialized" << std::endl;
@@ -298,8 +301,13 @@ void Model::InteractionPoint(double& x, double& y, double& z, const double R)
 
 void Model::SortProductionLength(double& L)
 {
-  // double mean = m_lp + m_coeff_1*m_A13 + m_coeff_2*m_A23; // testing idea
-  double mean = m_lp;
+  double mean = m_lp + m_coeff_1*m_A13 + m_coeff_2*m_A23; // testing idea
+  // const double NU[4] = { 14.37, 13.03, 12.33, 10.70 };
+  // const double ZH[4] = { 0.31, 0.54, 0.75, 0.94 };
+  // const int BIN = m_iz;
+  // double z = ZH[BIN];
+  // double mean = 0.5 * (1 + 2 * NU[BIN]) * z * (TMath::Log(1 / (z * z)) - 1 + z * z) / (1 - z * z); // testing idea
+  // double mean = m_lp;
   // double mean = m_lp; // original idea
   if (m_doFixedLp)
     L = mean;
@@ -434,7 +442,8 @@ int Model::Compute(const double A)
     if (temp == 0)
       zrange1 = 1.; // dummy value
     if (zrange1 > 0)
-      accumulator1 += m_q0 * temp * weight + pow(m_zbinvalue, 2) * m_coeff_1;
+      accumulator1 += m_q0 * temp * weight + pow(m_zbinvalue, 2) * m_kt2;
+    // accumulator1 += m_q0 * temp * weight + m_coeff_1;
     // accumulator1 += m_zbinvalue * m_zbinvalue * m_q0 * temp * weight;
     else {
       std::cout << "zrange1 of length zero or negative encountered: " << zrange1 << " \n";

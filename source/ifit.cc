@@ -27,7 +27,7 @@ double SIG2[4] = { 29.669, 27.653, 26.929, 26.717 }; // interpolated cross-secti
 double SIG3[4] = { 17.281, 17.265, 17.264, 17.267 }; // interpolated cross-section for K+
 double PROD_LEN_INTERP[4] = { 9.61702, 6.60402, 3.85302, 1.36402 };
 
-double binratios[ZDIM] = { 0.214848, 0.432318, 0.440678, 0.125506 }; // PI+ with cuts !!
+double binratios[ZDIM] = { 0.22, 0.43, 0.44, 0.18 }; // PI+ with HERMES cuts
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model* m;
@@ -44,7 +44,10 @@ void callModel(const double A13, double* par)
   std::vector<double> my_pars = { par[0], par[1], par[2], par[3], par[4], par[5] };
   double nucleus = (double)A13 * A13 * A13;
   m->SetParameters(my_pars);
-  m->SetTestParameter(par[6], par[7]); // new coefficients
+  m->SetTestParameter(par[6], // KT2
+                      par[7], // C1
+                      par[8]  // C2
+  );                          // new coefficients
   m->Compute(nucleus);
   func_array[0] = m->Get1();             // pt-broadening
   func_array[1] = m->Get2();             // multiplicity ratio
@@ -217,7 +220,7 @@ std::vector<myResult> ifit(myConfig* config)
       V.Print();
       data.Print();
 
-      TMinuit* gMinuit = new TMinuit(8); //initialize TMinuit with a maximum of N params
+      TMinuit* gMinuit = new TMinuit(9); //initialize TMinuit with a maximum of N params
       gMinuit->SetFCN(fcn);
       double arglist[10];
       int ierflg = 0;
@@ -227,14 +230,15 @@ std::vector<myResult> ifit(myConfig* config)
       gMinuit->mnexcm("SET PRI", arglist, 1, ierflg);
       // const double sigma0 = config->m_initial_sigma;
 
-      gMinuit->mnparm(0, "Q0", 2.0, 0.01, 0, 10, ierflg);               // q-hat
-      gMinuit->mnparm(1, "LP", 1.6, 0.01, 0.0001, 40, ierflg);          // production length
-      gMinuit->mnparm(2, "SIGMA", SIG[iz], 0.01, 0.0001, 100, ierflg);  // prehadron cross section
-      gMinuit->mnparm(3, "DLOG", 2.5, 0.01, 0.0001, 100, ierflg);       // parameter needed for log description
-      gMinuit->mnparm(4, "ELOSS", 0, 0.01, -2, 14, ierflg);             // z shift due to energy loss
-      gMinuit->mnparm(5, "CASCAD", 0.2, 0.01, -0.1, 10, ierflg);        // Cascade parameter
-      gMinuit->mnparm(6, "kT2_D", -0.025, 0.0001, -0.05, 0.05, ierflg); // new coeff 1
-      gMinuit->mnparm(7, "SHAPE", 0, 0.1, -0.5, +50, ierflg);           // new coeff 2
+      gMinuit->mnparm(0, "Q0", 2.0, 0.01, 0, 10, ierflg);              // q-hat
+      gMinuit->mnparm(1, "LP", 1.6, 0.01, 0.0001, 40, ierflg);         // production length
+      gMinuit->mnparm(2, "SIGMA", SIG[iz], 0.01, 0.0001, 100, ierflg); // prehadron cross section
+      gMinuit->mnparm(3, "DLOG", 2.5, 0.01, 0.0001, 100, ierflg);      // parameter needed for log description
+      gMinuit->mnparm(4, "ELOSS", 0, 0.1, -10, 10, ierflg);         // z shift due to energy loss
+      gMinuit->mnparm(5, "CASCAD", 0.2, 0.01, -0.1, 10, ierflg);       // Cascade parameter
+      gMinuit->mnparm(6, "kT2", -0.0038, 0.0001, -0.05, 0.05, ierflg); // new coeff 1
+      gMinuit->mnparm(7, "C1", 0, 0.1, -10, 10, ierflg);               // new coeff 2
+      gMinuit->mnparm(8, "C2", 0, 0.1, -10, 10, ierflg);               // new coeff 2
 
       // Parameter fixing
       if (!config->m_qhat) {
@@ -256,26 +260,30 @@ std::vector<myResult> ifit(myConfig* config)
         gMinuit->FixParameter(5); // Cascade Parameter
       }
       if (!config->m_testing) {
-        gMinuit->FixParameter(6); // Lcrit
-        gMinuit->FixParameter(7); // a - shape parameter
+        gMinuit->FixParameter(7); // C1
+        gMinuit->FixParameter(8); // C2
       }
 
       // For testing only - Force fixing some parameters.
-      // gMinuit->FixParameter(0);
+      // gMinuit->FixParameter(1);
       // gMinuit->Release(4);      // simple energy loss shift
-      gMinuit->Release(6);      // Lcrit
-      gMinuit->FixParameter(7); // a - shape parameter
+      // gMinuit->Release(6);      // kT
+      // gMinuit->FixParameter(7); // C1
+      // gMinuit->FixParameter(8); // C2
 
       // Now ready for minimization step
       arglist[0] = 500;
       arglist[1] = 1.;
-      gMinuit->mnexcm("MIGRAD", arglist, 8, ierflg);
+      gMinuit->mnexcm("MIGRAD", arglist, 9, ierflg);
       std::cout << "Completed MIGRAD for iz " << iz << " with ierflg " << ierflg << std::endl;
       if (ierflg) {
         std::cerr << "Check the output of your fit, something went wrong with bin-#" << iz + 1 << std::endl;
       }
 
-      // gMinuit->mnexcm("HESSE", arglist, 8,ierflg);
+      gMinuit->FixParameter(1); // L0
+      gMinuit->Release(7);      // C1
+      // gMinuit->Release(8);      // C2
+      gMinuit->mnexcm("MIGRAD", arglist, 9, ierflg);
 
       /*
             std::cout << "STARTING TO SEARCH FOR A FIT IMPROVEMENT" << std::endl;
@@ -389,7 +397,8 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
   double xlolim = 0;
   double xuplim = 0;
   int iuint = 0;
-  int NPAR = 8;
+  int NPAR = gMinuit->GetNumPars();
+  std::cout << "Storing " << NPAR << " parameters" << std::endl;
   TString chnam;
   double par[NPAR], par_errors[NPAR];
 
@@ -411,16 +420,18 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
   result.m_log = par[3];
   result.m_dz = par[4];
   result.m_cascade = par[5];
-  result.m_c1 = par[6];
-  result.m_c2 = par[7];
+  result.m_kt = par[6];
+  result.m_c1 = par[7];
+  result.m_c2 = par[8];
   result.m_qhat_err = par_errors[0];
   result.m_lp_err = par_errors[1];
   result.m_sigma_ph_err = par_errors[2];
   result.m_log_err = par_errors[3];
   result.m_dz_err = par_errors[4];
   result.m_cascade = par_errors[5];
-  result.m_c1_err = par_errors[6];
-  result.m_c2_err = par_errors[7];
+  result.m_kt_err = par_errors[6];
+  result.m_c1_err = par_errors[7];
+  result.m_c2_err = par_errors[8];
   result.m_chi2 = chisquared;
 
   // At this point, we know the parameters, so let's write them out

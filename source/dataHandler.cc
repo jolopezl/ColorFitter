@@ -250,8 +250,8 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     It still needs some tweakign for instance reading from somewhere else the number of z-bins.
     */
   const int fNzbins = 4; // 10 for JLab and 4 for HERMES !
-  double z[fNzbins], q0[fNzbins], lp[fNzbins], sigma[fNzbins], dz[fNzbins], c1[fNzbins], c2[fNzbins], cascade[fNzbins];
-  double zErr[fNzbins], q0Err[fNzbins], lpErr[fNzbins], sigmaErr[fNzbins], dzErr[fNzbins], c1Err[fNzbins], c2Err[fNzbins], cascade_err[fNzbins];
+  double z[fNzbins], q0[fNzbins], lp[fNzbins], sigma[fNzbins], dz[fNzbins], kt[fNzbins], c1[fNzbins], c2[fNzbins], cascade[fNzbins];
+  double zErr[fNzbins], q0Err[fNzbins], lpErr[fNzbins], sigmaErr[fNzbins], dzErr[fNzbins], ktErr[fNzbins], c1Err[fNzbins], c2Err[fNzbins], cascade_err[fNzbins];
   double chisquared[fNzbins];
   if (resultCont.size() != fNzbins) {
     std::cout << "I cannot produce a ROOT output file, please check the produced CSV file" << std::endl;
@@ -270,6 +270,8 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     sigmaErr[i] = resultCont.at(i).m_sigma_ph_err;
     dz[i] = resultCont.at(i).m_dz;
     dzErr[i] = resultCont.at(i).m_dz_err;
+    kt[i] = resultCont.at(i).m_kt;
+    ktErr[i] = resultCont.at(i).m_kt_err;
     c1[i] = resultCont.at(i).m_c1;
     c1Err[i] = resultCont.at(i).m_c1_err;
     c2[i] = resultCont.at(i).m_c2;
@@ -312,12 +314,15 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
   TGraphErrors* tg_dz = new TGraphErrors(fNzbins, z, dz, zErr, dzErr);
   tg_dz->SetName("tg_dz");
   tg_dz->SetTitle(";#it{z};#delta#it{z} (GeV)");
+  TGraphErrors* tg_kt = new TGraphErrors(fNzbins, z, kt, zErr, ktErr);
+  tg_kt->SetName("tg_kt");
+  tg_kt->SetTitle(";#it{z};#Delta#it{k}_{#perp} (Gev^{2})");
   TGraphErrors* tg_c1 = new TGraphErrors(fNzbins, z, c1, zErr, c1Err);
   tg_c1->SetName("tg_c1");
-  tg_c1->SetTitle(";#it{z};#Delta#it{k}_{#perp} (Gev^{2})");
+  tg_c1->SetTitle(";#it{z};#it{c}_{1}");
   TGraphErrors* tg_c2 = new TGraphErrors(fNzbins, z, c2, zErr, c2Err);
   tg_c2->SetName("tg_c2");
-  tg_c2->SetTitle(";#it{z};Shape parameter #it{a} (GeV)");
+  tg_c2->SetTitle(";#it{z};#it{c}_{2}");
   TGraphErrors* tg_cascade = new TGraphErrors(fNzbins, z, cascade, zErr, cascade_err);
   tg_cascade->SetName("tg_cascade");
   TGraph* tg_chisquared = new TGraph(fNzbins, z, chisquared);
@@ -328,6 +333,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
   tg_lp->Write();
   tg_sigma->Write();
   tg_dz->Write();
+  tg_kt->Write();
   tg_c1->Write();
   tg_c2->Write();
   tg_cascade->Write();

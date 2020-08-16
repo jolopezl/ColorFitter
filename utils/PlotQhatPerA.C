@@ -3,7 +3,8 @@ const double factor = 0.1 * 3. / (4. * 3.141592); // to be removed!!
 void PlotQhatPerA()
 {
   SetAtlasStyle(43, 22);
-  TFile* fin = TFile::Open("OutputROOT.20200310.BL30.root", "READ");
+  TFile* fin = TFile::Open("OutputROOT.20200707.BL30_piplus.root", "READ");
+  // TFile* fin = TFile::Open("OutputROOT.20200310.BL30.root", "READ");
 
   TGraphErrors* tg_q0;
   std::vector<TGraphErrors*> tg_average_density;
@@ -15,7 +16,7 @@ void PlotQhatPerA()
     tg_average_density.push_back(temp);
   }
 
-  std::vector<float> nucleus_list = { 20.1797, 83.7980, 131.293 };
+  std::vector<float> nucleus_list = { 4.0026, 20.1797, 83.7980, 131.293 };
   std::vector<float> A13list;
   for (const auto& A : nucleus_list) {
     auto A13 = TMath::Power(A, 1. / 3.);
@@ -55,7 +56,7 @@ void PlotQhatPerA()
     tg_qhat.at(i)->Draw("APE");
   }
 
-  TGraphErrors* means = new TGraphErrors(3);
+  TGraphErrors* means = new TGraphErrors(4);
   means->SetTitle(";A^{1/3};#it{#hat{q}} (GeV^{2}/fm)");
   means->GetXaxis()->CenterTitle();
   means->GetYaxis()->CenterTitle();
@@ -65,7 +66,7 @@ void PlotQhatPerA()
   means->GetYaxis()->SetNdivisions(505);
   // means->GetYaxis()->SetTitleOffset(2.8);
 
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 4; ++i) {
     means->GetX()[i] = A13list.at(i);
     double average_qhat = 0, average_qhat_err = 0, weight = 0;
     auto model = tg_qhat.at(i);

@@ -21,7 +21,7 @@ class Model
   ~Model();
   void SetParameters(std::vector<double>);
   void SetParameters(std::string, double);
-  void SetTestParameter(double, double);
+  void SetTestParameter(double, double, double);
   void SetBinRatio(int, double, double);
   void SetFermiValues(double, double);
   void SetMaxMonteCarloSteps(int);
@@ -96,6 +96,8 @@ class Model
   double m_dlog;     // log description?
   double m_dz;       // energy loss parameter
   double m_cascade;
+
+  double m_kt2;
 
   // two new parameters August 30, 2017
   // now used to implement improved energy loss model Feb 19, 2020
