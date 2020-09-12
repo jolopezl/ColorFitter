@@ -1,7 +1,7 @@
 void compPythiaDSS()
 {
   TTree* tree = new TTree("tree", "tree");
-  tree->ReadFile("values_pion.dat", "ZH:ZL:XB:Q2:NU:W2");
+  tree->ReadFile("pythia_run_output.txt", "ZH:XB:Q2:NU:W2");
 
   TFile fdss("esteban/d3sigma.root", "READ");
   auto dss = (TGraph*)fdss.Get("Graph");

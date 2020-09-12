@@ -1,5 +1,5 @@
+C... Jorge Lopez
 C... February 2015
-C...Jorge Lopez
 C-----------------------------------------------------------------
 C...Preamble: declarations.
 C...All real arithmetic in double precision.
@@ -26,13 +26,13 @@ C...Parameters.
 C-----------------------------------------------------------------
 C... Requiered variables
       INTEGER I
-      DOUBLE PRECISION Z, PZ, NU, XB, ZL, LP
+      DOUBLE PRECISION Z, PZ, NU, XB, ZL
       DOUBLE PRECISION q0, q1, q2, q3, W2
       DOUBLE PRECISION EB, ES
       DOUBLE PRECISION ELECTRON_MASS, PROTON_MASS
 C...Files requiered to save output
-      OPEN(10,file='values_pion.dat',status='unknown')
-      OPEN(20,file='values_Q2nu.dat',status='unknown')
+      OPEN(10,file='pythia_run_output.txt',status='unknown')
+      OPEN(20,file='pythia_run_output_Q2nu.txt',status='unknown')
 C...Set some useful values
       ELECTRON_MASS = 5.1000000000000004E-004
       PROTON_MASS   = 0.93827000000000005
@@ -42,10 +42,9 @@ C...Energy should be given in the laboratory frame
 C...For Hermes the energy of the electron beam is 27.6 GeV
 C...The energy is given in the selected frame Pythia will transformations as it requieres them
       NEV=10000!0000000
-       WIN=27.6D0 ! HERMES
-C       WIN=6 ! JLab .
-C       WIN=12 ! JLab upgrad.
-C      WIN=100
+      WIN=27.6D0 ! HERMES
+C     WIN=6 ! JLab .
+C     WIN=12 ! JLab upgrad.
 C...Minimum cms energy to make this work
       PARP(2)=0.1
 C...Choose fragmentation scheme
@@ -63,7 +62,6 @@ C       MSUB(135) = 0
 C       MSUB(135) = 0
 C...Initialize PYINIT
       CALL PYINIT('FIXT','gamma/e-','p',WIN)
-C...Second section: event loop.
 C...Begin event loop.
       DO 100 IEV=1,NEV
   200    CALL PYEVNT
@@ -99,13 +97,8 @@ C        IF( (Q2.GT.1).and.(W2.GT.4) ) THEN
           DO 201 I=1,N
             Z=P(I,4)/NU
             PZ=P(I,3)
-            ZL = (P(I,4)+PZ)/(PROTON_MASS+2*NU)
-            LP = (1.38668 / 7.14) * SQRT(NU/(2*0.938*XB) - 1)
             IF(K(I,2)==211) THEN
-C              IF ((Z.GT.0.9).AND.(Z.LT.0.98)) THEN
-C                WRITE(10,*)Z,ZL,LP,XB,NU !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
-C              ENDIF
-              WRITE(10,*)Z,ZL,XB,Q2,NU,W2 !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
+              WRITE(10,*)Z,XB,Q2,NU,W2 !,P(I,4),PZ,P(I,4)+PZ,PROTON_MASS+2*NU
             ENDIF
   201     CONTINUE
         ENDIF
