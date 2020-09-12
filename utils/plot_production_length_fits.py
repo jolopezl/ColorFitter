@@ -56,7 +56,7 @@ def create_plot():
     ax.plot(grint1.GetX(), grint1.GetY(), 'b-',
             label='LSM, $\chi^2/\mathrm{dof} = 1.32$\n $\kappa = 1.00\pm0.05$ (GeV/fm)')
     ax.plot(grint2.GetX(), grint2.GetY(), 'r-',
-            label='Bialas et al, $\chi^2/\mathrm{dof} = 0.68$\n $\kappa = 0.85\pm0.05$ (GeV/fm)')
+            label='Bialas et al., $\chi^2/\mathrm{dof} = 0.68$\n $\kappa = 0.85\pm0.05$ (GeV/fm)')
 
     ax.annotate(r'$\langle Q^{2} \rangle = 2.4$ GeV$^{2}$, $\langle \nu \rangle = 12.4$ GeV',
                 xy=(0.02, 0.03), xycoords='axes fraction')
@@ -95,7 +95,7 @@ def create_plot():
     ax.legend(frameon=False,loc='upper right', borderaxespad=0.)
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig04_Production_Length_MPL.pdf"
-    output_file_name = "Fig04_Production_Length_MPL.pdf"
+    output_file_name = "Fig04_Production_Length_MPL_fixed.pdf"
     fig.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])
