@@ -2,9 +2,9 @@ import subprocess
 import numpy as np
 import ROOT
 from matplotlib import pyplot as plt
-# plt.style.use('seaborn')
-plt.rc('font', family='serif', serif='Times')
-plt.rc('text', usetex=True)
+
+# plt.rc('font', family='serif', serif='Times')
+# plt.rc('text', usetex=True)
 plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
 plt.rc('axes', labelsize=10)
@@ -29,7 +29,7 @@ def create_plot():
              ROOT.TFile.Open("../test_HERMES/OutputROOT.20200629.BL30_deltakT_D_piminus.root", "READ"),
              ROOT.TFile.Open("../test_HERMES/OutputROOT.20200629.BL30_deltakT_D_Kplus.root", "READ")]
 
-    dof = 8 - 3
+    dof = 24 - 5
 
     fig, axs = plt.subplots(6, 4, sharey='row', sharex='col',
                             constrained_layout=True)  # , figsize=(9, 4.5))
@@ -54,11 +54,12 @@ def create_plot():
     particles = ["pip", "pim", "Kp"]
     for particle in particles:
         for i in range(4):
-            if (p==4):
-                axs[p, i].set_ylim(-0.085, 0.09)
-            else:
-                axs[p, i].set_ylim(-0.03, 0.04)
+            # if (p==4):
+            #     axs[p, i].set_ylim(-0.085, 0.09)
+            # else:
+            #     axs[p, i].set_ylim(-0.03, 0.04)
             
+            axs[p, i].set_ylim(-0.07, 0.07)
             axs[p+1, i].set_ylim(0.4, 1.1)
             # axs[1,i].set_xlim(0.5,5.5)
 
@@ -78,9 +79,11 @@ def create_plot():
                            f.Get(extrapolation_name).GetY(),
                            "b-", zorder=1, label='Model')
             # if (i != 3):
-            axs[p, i].fill_between(f.Get(extrapolation_name).GetX(),
-                                   f.Get(extrapolation_down_name).GetY(),
-                                   f.Get(extrapolation_up_name).GetY(), alpha=0.4, facecolor='blue', zorder=0)
+            # axs[p, i].fill_between(f.Get(extrapolation_name).GetX(),
+            #                        f.Get(extrapolation_down_name).GetY(),
+            #                        f.Get(extrapolation_up_name).GetY(), alpha=0.4, facecolor='blue', zorder=0)
+
+            axs[p, i].axhline(y=0, color='grey', linewidth=0.75, linestyle="--")
 
             chisq1 = getChiSq(files[idx].Get(graph_name), f.Get(extrapolation_name))
 
@@ -98,8 +101,10 @@ def create_plot():
                                    marker="o", linestyle="",  markerfacecolor='grey', color='black', zorder=2, label='Data')
             axs[p + 1, i].plot(f.Get(extrapolation_name).GetX(), f.Get(
                 extrapolation_name).GetY(), "r-", zorder=1, label='Model')
-            axs[p + 1, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
-                                       alpha=0.4, facecolor='red', zorder=0)
+            # axs[p + 1, i].fill_between(f.Get(extrapolation_name).GetX(), f.Get(extrapolation_down_name).GetY(), f.Get(extrapolation_up_name).GetY(),
+            #                            alpha=0.4, facecolor='red', zorder=0)
+
+            axs[p + 1, i].axhline(y=1, color='grey', linewidth=0.75, linestyle="--")
 
             chisq2 = getChiSq(files[idx].Get(graph_name), f.Get(extrapolation_name))
             chisq = chisq1+chisq2
@@ -148,7 +153,7 @@ def create_plot():
     fig.align_ylabels(axs[:, 0])
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig03_ModelOutput_BL_FixedSIG_MPL.pdf"
-    output_file_name = "Fig03_ModelOutput_BL30_deltakT_D_combined_2.pdf"
+    output_file_name = "Fig03_ModelOutput_BL30_test.pdf"
     plt.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])

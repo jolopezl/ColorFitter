@@ -319,7 +319,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
   tg_sig3->SetName("tg_sig3");
   tg_sig1->SetTitle(";#it{z};#pi^{+} #it{#sigma} (mbarn)");
   tg_sig2->SetTitle(";#it{z};#pi^{-} #it{#sigma} (mbarn)");
-  tg_sig3->SetTitle(";#it{z};#K^{+} #it{#sigma} (mbarn)");
+  tg_sig3->SetTitle(";#it{z};K^{+} #it{#sigma} (mbarn)");
   TGraphErrors* tg_dz = new TGraphErrors(fNzbins, z, dz, z_err, dz_err);
   tg_dz->SetName("tg_dz");
   tg_dz->SetTitle(";#it{z};#delta#it{z} (GeV)");
