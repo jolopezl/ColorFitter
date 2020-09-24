@@ -3,7 +3,7 @@
 # ColorFitter
 ## Authors
 - William Brooks (william.brooks@usm.cl)
-- Jorge López (jall@pm.me)
+- Jorge López (jall@protonmail.com)
 
 Compile using `make`. The binary is found under `bin`.
 

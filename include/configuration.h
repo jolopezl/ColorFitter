@@ -26,6 +26,7 @@ class myConfig
   std::string m_output_fit = "testFit.txt";
   std::string m_input_pt = "hermesData.txt";
   std::string m_comment = "bin_info comment";
+  std::string m_particletype;
 
   bool doMINOSErrors = false;
 

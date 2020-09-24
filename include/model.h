@@ -4,6 +4,7 @@
 #include "TH1.h"
 #include "TFile.h"
 #include "TTree.h"
+#include "TGraph.h"
 #include "TRandom3.h"
 #include "Math/Interpolator.h"
 #include "Math/WrappedTF1.h"
@@ -20,7 +21,7 @@ class Model
   ~Model();
   void SetParameters(std::vector<double>);
   void SetParameters(std::string, double);
-  void SetTestParameter(double, double);
+  void SetTestParameter(double, double, double);
   void SetBinRatio(int, double, double);
   void SetFermiValues(double, double);
   void SetMaxMonteCarloSteps(int);
@@ -38,6 +39,8 @@ class Model
   double GetR(const double, const double);
   double GetC(double);
   double Fermi(int inucleus);
+
+  void setZ(double z) { m_zbinvalue = z; }
 
   double Get1() const { return m_dPt2; };
   double Get2() const { return m_Rm; };
@@ -94,6 +97,8 @@ class Model
   double m_dz;       // energy loss parameter
   double m_cascade;
 
+  double m_kt2;
+
   // two new parameters August 30, 2017
   // now used to implement improved energy loss model Feb 19, 2020
   double m_coeff_1; // critical length
@@ -121,9 +126,12 @@ class Model
   // tools
   std::vector<double> m_c_interpolation;
   // Other parameters
-  int m_maxmcSteps = 100000; // number of mc steps in the calculation
+  // int m_maxmcSteps = 100000; // number of mc steps in the calculation
+  int m_maxmcSteps = 50000; // number of mc steps in the calculation
   double m_density_threshold = 0.005;
   int irun = -1;
+
+  TGraph g_c_interp;
 };
 
 #endif

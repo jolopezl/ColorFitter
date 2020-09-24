@@ -1,19 +1,35 @@
 import subprocess
 import numpy as np
 import ROOT
-from matplotlib import pyplot as plt
 from itertools import product
-# plt.style.use('seaborn')
-plt.rc('font', family='serif')  # , serif='Times')
+import matplotlib
+from matplotlib import pyplot as plt
+# # plt.style.use('seaborn')
+# plt.rc('font', family='serif', serif='Times')
 plt.rc('text', usetex=True)
 plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
 plt.rc('axes', labelsize=10)
-# plt.rc('text', usetex=True)
 plt.rcParams['errorbar.capsize'] = 3
+
+# matplotlib.rcParams.update({'font.size': 8})
+matplotlib.rcParams['mathtext.fontset'] = 'cm'
+matplotlib.rcParams['font.family'] = 'cm'
+matplotlib.pyplot.title(r'ABC123 vs $\mathrm{ABC123}^{123}$')
 
 color_factor = 9.0/4.0
 
+def calculate_mean(values, errors):
+    mean = 0
+    error = 0
+    sumw = 0
+    for idx in range(len(values)):
+        mean += values[idx] / errors[idx]
+        error += errors[idx]**2
+        sumw += 1 / errors[idx]
+    mean = mean/sumw
+    error = np.sqrt(error) / 4
+    return mean, error
 
 def qhatfunc(x, Q2 = 2.4):
     """
@@ -46,24 +62,33 @@ def create_plot():
                 color='black', zorder=5,
                 label='Fit result')
 
-    average_qhat_info = r'$\langle\hat q\rangle = 0.038 \pm 0.026$ GeV$^{2}$/fm'
-    ax.annotate(average_qhat_info,
-                xy=(0.1, 0.6), xycoords='axes fraction')
+    # average_qhat_info = r'$\langle\hat q\rangle = 0.038 \pm 0.026$ GeV$^{2}$/fm'
+    # ax.annotate(average_qhat_info,
+    #             xy=(0.1, 0.6), xycoords='axes fraction')
 
-    xlim_inf = 2.5
+    xlim_inf = 1.0
     xlim_sup = 5.5
     shift = 0
     first_point = [xlim_inf + shift, xlim_inf + shift + 0.3]
 
-    theoretical_qhat = 0.075 / color_factor
-    theoretical_qhat_lo = theoretical_qhat - 0.005 / color_factor
-    theoretical_qhat_up = theoretical_qhat + 0.015 / color_factor
-    ax.plot([xlim_inf, xlim_sup], [theoretical_qhat, theoretical_qhat],
-            'b-', label=r'p+Pb, JHEP03(2013)122 ($\times 4/9$)')
-    ax.fill_between([xlim_inf, xlim_sup],
-                    [theoretical_qhat_lo, theoretical_qhat_lo],
-                    [theoretical_qhat_up, theoretical_qhat_up],
-                    alpha=0.4, facecolor='blue', zorder=0)
+    # theoretical_qhat = 0.075 / color_factor
+    # theoretical_qhat_lo = theoretical_qhat - 0.005 / color_factor
+    # theoretical_qhat_up = theoretical_qhat + 0.015 / color_factor
+    # ax.plot([xlim_inf, xlim_sup], [theoretical_qhat, theoretical_qhat],
+    #         'b-', label=r'p+Pb, JHEP03(2013)122 ($\times 4/9$)')
+    # ax.fill_between([xlim_inf, xlim_sup],
+    #                 [theoretical_qhat_lo, theoretical_qhat_lo],
+    #                 [theoretical_qhat_up, theoretical_qhat_up],
+    #                 alpha=0.4, facecolor='blue', zorder=0)
+    x_lo = 1
+    x_up = 6
+    mean, meanError = calculate_mean(yp, yerr)
+    pb = ax.plot([x_lo, x_up], [mean, mean],
+            'k--', label=r'average $= %.3f \pm %.3f$ GeV$^{2}$/fm' % (mean, meanError))
+    pc = ax.fill_between([x_lo, x_up],
+                    [mean - meanError, mean - meanError],
+                    [mean + meanError, mean + meanError],
+                    alpha=0.4, facecolor='g', hatch='/', zorder=0)
 
     # ax.plot([xlim_inf, xlim_sup], [0.015, 0.015],
     #         'r-', label='arXiv:1907.11808')
@@ -81,7 +106,7 @@ def create_plot():
     ax.locator_params(axis='y', nbins=6)
     ax.set_ylim(0.001, 0.12)
     # ax.set_xlim(2.5, 5.5)
-    ax.set_xlim(xlim_inf, xlim_sup)
+    # ax.set_xlim(xlim_inf, xlim_sup)
 
     ax.set(xlabel='$A^{1/3}$', ylabel='$\hat{q}$ (GeV$^{2}$/fm)')
 

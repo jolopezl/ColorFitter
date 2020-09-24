@@ -8,23 +8,24 @@
 // ************ main function ************ //
 int main(int argc, char* argv[])
 {
-
-  std::string model = "BL30_alpha_s_test_03"; // Name for the model you are runing
-  myConfig* config = new myConfig();     // create a configuration to call the fitter
-  config->m_subtraction = true;          // subtract Helium background
-  config->m_correlation = 0.0;           // without correlation
-  config->fixedLp = false;               // true: to use fixed production length, false: exponential distribution
-  config->m_preh = false;                // true: fit the prehadron cross section - false: don't fit the prehadron cross section
-  config->m_initial_sigma = 30.0;        // legacy, now input is from pdg cross sections
-  config->m_energyloss = false;          // do energy loss
-  config->m_testing = false;             // active testing parameters
-  config->m_Q2BinOfInterest = -1;        // do not change
-  config->m_zBinOfInterest = -1;         // value in between 1 and 4
-  config->m_input_pt = "hermesData.txt"; // ONLY FOR HERMES
-  config->writeCorrectedValues = false;  // text file from dataHandler
-  config->correctionPlots = false;       // from dataHandler
-  config->outputPlots = true;            // model and data, very useful
-  config->doMINOSErrors = false;         // usually false
+  std::string particle = "piplus";
+  std::string model = "BL30NN_" + particle; // Name for the model you are runing
+  myConfig* config = new myConfig();        // create a configuration to call the fitter
+  config->m_particletype = particle;        //
+  config->m_subtraction = false;            // subtract Helium background
+  config->m_correlation = 0.0;              // without correlation
+  config->fixedLp = false;                  // true: to use fixed production length, false: exponential distribution
+  config->m_preh = false;                   // true: fit the prehadron cross section - false: don't fit the prehadron cross section
+  config->m_initial_sigma = 30.0;           // legacy, now input is from pdg cross sections
+  config->m_energyloss = false;             // do energy loss
+  config->m_testing = false;                // active testing parameters
+  config->m_Q2BinOfInterest = -1;           // do not change
+  config->m_zBinOfInterest = -1;            // value in between 1 and 4
+  config->m_input_pt = "hermesData.txt";    // ONLY FOR HERMES
+  config->writeCorrectedValues = false;     // text file from dataHandler
+  config->correctionPlots = false;          // from dataHandler
+  config->outputPlots = true;               // model and data, very useful
+  config->doMINOSErrors = false;            // usually false
   config->Update();
 
   // Call the fitter with the configured setup
@@ -95,7 +96,7 @@ int monitoring()
   model->SetParameters("q0", q0_values[zbin]);
   model->SetParameters("lp", lp_values[zbin]);
   model->SetParameters("sigma", 30.);
-  model->SetTestParameter(3.0, 0.0085);
+  model->SetTestParameter(0, 0, 0);
   // for (int i=0; i<3; ++i) {
   int i = 1;
   std::cout << "Calling A = " << A[i] << std::endl;
@@ -266,6 +267,9 @@ int runColorFitter(const bool tEnergyLoss, const bool tSubtraction, const double
 
 int ComputeBand(int zbin = 1)
 {
+  double SIG1[4] = { 27.075, 25.604, 25.109, 24.946 }; // interpolated cross-section for pi+
+  double SIG2[4] = { 29.669, 27.653, 26.929, 26.717 }; // interpolated cross-section for pi-
+  double SIG3[4] = { 17.281, 17.265, 17.264, 17.267 }; // interpolated cross-section for K+
   /*
         Function created to study the model uncertainties
         It is called from main and takes time, usually a cluster
@@ -273,8 +277,8 @@ int ComputeBand(int zbin = 1)
         those values are not read from file and must be set by hand - see below
     */
   // x is A^1/3
-  int MCSTEPS = 2500;
-  std::cout << "ComputeBand will use " << MCSTEPS << " MCSTEPS" << std::endl;
+  int TOY_MC_STEPS = 1500;
+  std::cout << "ComputeBand will use " << TOY_MC_STEPS << " TOY_MC_STEPS" << std::endl;
 
   Model* model = new Model("ComputeBand");
   model->Initialization();
@@ -284,19 +288,19 @@ int ComputeBand(int zbin = 1)
   // If not here, model returns a bug, it is set in ifit when running the fitting
   int iz = zbin - 1;
   const int ZDIM = 4;
-  double zbinw[ZDIM] = { 0.20, 0.22, 0.22, 0.16 };              // Approx.
+  double zbinw[ZDIM] = { 0.2, 0.2, 0.2, 0.2 };                  // Approx.
   double binratios[ZDIM] = { 0.482203, 0.461464, 0.249762, 0 }; // PI+ no cuts
   model->SetBinRatio(iz, zbinw[iz], binratios[iz]);
 
   int StatusCode;
   double PT2, RM;
-  double A13 = 2.5;
+  double A13 = 1.0;
   double A13Max = 6.0;
-  double dA13 = (A13Max - 2.5) / 70;
-  double q0, lp, dz;
+  double A13Step = 0.5;
+  double q0, lp, kt2;
 
   // A13 = x/10.;
-  int nabins = 70;
+  int nabins = 12;
 
   TFile* fout = new TFile(Form("ToyMC_A13_%d_bin_%d.root", nabins, zbin), "RECREATE");
   TTree* tree = new TTree("tree", "Tree of ToyMC");
@@ -306,7 +310,7 @@ int ComputeBand(int zbin = 1)
   tree->Branch("RM", &RM, "RM/D");
   tree->Branch("q0", &q0, "q0/D");
   tree->Branch("lp", &lp, "lp/D");
-  tree->Branch("dz", &dz, "dz/D");
+  tree->Branch("kt2", &kt2, "kt2/D");
   tree->Branch("StatusCode", &StatusCode, "StatusCode/I");
   // Setup for the Toy MC with random generation
   int nDim = 3;
@@ -314,71 +318,71 @@ int ComputeBand(int zbin = 1)
   TVectorD parErrors(nDim);
   TMatrixDSym covMatrix(nDim);
   TVectorD genPars(nDim);
-  // Numbers obtained from fit to BLE30
+  // Numbers obtained from fit to BL30
   if (zbin == 1) {
-    parMeans(0) = 2.32139e+00;
-    parMeans(1) = 6.93319e+00;
-    parMeans(2) = -6.16009e-04;
-    parErrors(0) = 3.34446e-01;
-    parErrors(1) = 2.47533e+00;
-    parErrors(2) = 2.97718e-02;
+    parMeans(0) = 2.91532e+00;
+    parMeans(1) = 7.27808e+00;
+    parMeans(2) = -2.78996e-02;
+    parErrors(0) = 2.49939e-01;
+    parErrors(1) = 8.01199e-01;
+    parErrors(2) = 5.49546e-03;
     covMatrix(0, 0) = parErrors(0) * parErrors(0);
-    covMatrix(0, 1) = -0.781 * parErrors(0) * parErrors(1);
-    covMatrix(0, 2) = 0.738 * parErrors(0) * parErrors(2);
+    covMatrix(0, 1) = -0.462 * parErrors(0) * parErrors(1);
+    covMatrix(0, 2) = 0.772 * parErrors(0) * parErrors(2);
     covMatrix(1, 0) = covMatrix(0, 1);
     covMatrix(1, 1) = parErrors(1) * parErrors(1);
-    covMatrix(1, 2) = -0.945 * parErrors(1) * parErrors(2);
+    covMatrix(1, 2) = -0.103 * parErrors(1) * parErrors(2);
     covMatrix(2, 0) = covMatrix(0, 2);
     covMatrix(2, 1) = covMatrix(1, 2);
     covMatrix(2, 2) = parErrors(2) * parErrors(2);
   }
   if (zbin == 2) {
-    parMeans(0) = 2.78111e+00;
-    parMeans(1) = 4.95501e+00;
-    parMeans(2) = -1.82998e-02;
-    parErrors(0) = 5.41974e-01;
-    parErrors(1) = 1.42262e+00;
-    parErrors(2) = 2.97642e-02;
+    parMeans(0) = 3.18725e+00;
+    parMeans(1) = 5.62317e+00;
+    parMeans(2) = -6.39949e-03;
+    parErrors(0) = 4.65714e-01;
+    parErrors(1) = 4.66257e-01;
+    parErrors(2) = 3.42707e-03;
     covMatrix(0, 0) = parErrors(0) * parErrors(0);
-    covMatrix(0, 1) = -0.592 * parErrors(0) * parErrors(1);
-    covMatrix(0, 2) = -0.563 * parErrors(0) * parErrors(2);
+    covMatrix(0, 1) = -0.244 * parErrors(0) * parErrors(1);
+    covMatrix(0, 2) = -0.811 * parErrors(0) * parErrors(2);
     covMatrix(1, 0) = covMatrix(0, 1);
     covMatrix(1, 1) = parErrors(1) * parErrors(1);
-    covMatrix(1, 2) = 0.951 * parErrors(1) * parErrors(2);
+    covMatrix(1, 2) = 0.046 * parErrors(1) * parErrors(2);
     covMatrix(2, 0) = covMatrix(0, 2);
     covMatrix(2, 1) = covMatrix(1, 2);
     covMatrix(2, 2) = parErrors(2) * parErrors(2);
   }
   if (zbin == 3) {
-    parMeans(0) = 1.45245e+00;
-    parMeans(1) = 2.79043e+00;
-    parMeans(2) = -3.88610e-02;
-    parErrors(0) = 1.44045e+00;
-    parErrors(1) = 1.03990e+00;
-    parErrors(2) = 3.51889e-02;
+    parMeans(0) = 1.26238e+00;
+    parMeans(1) = 4.26355e+00;
+    parMeans(2) = -5.78123e-03;
+    parErrors(0) = 1.22416e+00;
+    parErrors(1) = 3.79033e-01;
+    parErrors(2) = 4.60122e-03;
     covMatrix(0, 0) = parErrors(0) * parErrors(0);
-    covMatrix(0, 1) = -0.203 * parErrors(0) * parErrors(1);
-    covMatrix(0, 2) = -0.196 * parErrors(0) * parErrors(2);
+    covMatrix(0, 1) = 0.045 * parErrors(0) * parErrors(1);
+    covMatrix(0, 2) = 0.826 * parErrors(0) * parErrors(2);
     covMatrix(1, 0) = covMatrix(0, 1);
     covMatrix(1, 1) = parErrors(1) * parErrors(1);
-    covMatrix(1, 2) = 0.963 * parErrors(1) * parErrors(2);
+    covMatrix(1, 2) = 0.006 * parErrors(1) * parErrors(2);
     covMatrix(2, 0) = covMatrix(0, 2);
     covMatrix(2, 1) = covMatrix(1, 2);
     covMatrix(2, 2) = parErrors(2) * parErrors(2);
   }
   if (zbin == 4) {
-    parMeans(0) = 1.71481e+00;
-    parMeans(1) = 1.38668e+00;
-    parMeans(2) = -2.39079e-02;
-    parErrors(0) = 3.16320e+00;
-    parErrors(1) = 1.02507e+00;
-    parErrors(2) = 3.32699e-02;
+    parMeans(0) = 1.20334e+00;
+    parMeans(1) = 2.09546e+00;
+    parMeans(2) = -3.99590e-03;
+    parErrors(0) = 2.62821e+00;
+    parErrors(1) = 2.41538e-01;
+    parErrors(2) = 4.81277e-03;
     covMatrix(0, 0) = parErrors(0) * parErrors(0);
-    covMatrix(0, 1) = -0.255 * parErrors(0) * parErrors(1);
-    covMatrix(0, 2) = -0.250 * parErrors(0) * parErrors(2);
+    covMatrix(0, 1) = -0.034 * parErrors(0) * parErrors(1);
+    covMatrix(0, 2) = -0.850 * parErrors(0) * parErrors(2);
     covMatrix(1, 0) = covMatrix(0, 1);
     covMatrix(1, 1) = parErrors(1) * parErrors(1);
-    covMatrix(1, 2) = 0.978 * parErrors(1) * parErrors(2);
+    covMatrix(1, 2) = 0.004 * parErrors(1) * parErrors(2);
     covMatrix(2, 0) = covMatrix(0, 2);
     covMatrix(2, 1) = covMatrix(1, 2);
     covMatrix(2, 2) = parErrors(2) * parErrors(2);
@@ -393,30 +397,38 @@ int ComputeBand(int zbin = 1)
     RM = 0;
     double nucleus = pow(A13, 3);
     std::cout << "Running Toy MC for A^1/3 = " << A13 << std::endl;
-    for (int mc = 0; mc < MCSTEPS; ++mc) {
+    for (int mc = 0; mc < TOY_MC_STEPS; ++mc) {
       if (mc % 100 == 0) {
-        std::cout << "MC Step = " << mc + 1 << " of " << MCSTEPS << std::endl;
+        std::cout << "MC Step = " << mc + 1 << " of " << TOY_MC_STEPS << std::endl;
       }
       while (true) {
+        // std::cout << "Generating point with " << std::endl;
+        // for (int i = 0; i<3; ++i) {
+        // std::cout << "parMeans(" << i << ") = " << parMeans(i) << std::endl;
+        // }
         MultiGaus(parMeans, covMatrix, genPars);
         q0 = genPars(0);
         lp = genPars(1);
-        dz = genPars(2);
+        kt2 = genPars(2);
+        // std::cout << "q0 = " << q0 << std::endl;
+        // std::cout << "lp = " << lp << std::endl;
+        // std::cout << "kt2 = " << kt2 << std::endl;
         if (q0 > 0 && lp > 0) {
+          //   std::cout << "Point found" << std::endl;
           break;
         }
         // std::cout << "Searching for a new random set of parameters within the physics limits" << std::endl;
       }
       model->SetParameters("q0", q0);
       model->SetParameters("lp", lp);
-      model->SetParameters("sigma", 30);
-      model->SetParameters("dz", dz);
+      model->SetParameters("sigma", SIG1[iz]);
+      model->SetTestParameter(kt2, 0.0, 0.0);
       StatusCode = model->Compute(nucleus);
       PT2 = model->Get1();
       RM = model->Get2();
       tree->Fill();
     }
-    A13 += dA13; // go to next nucleus
+    A13 += A13Step; // go to next nucleus
   }
   tree->Write();
   fout->Close();

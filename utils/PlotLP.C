@@ -5,10 +5,12 @@ void PlotLP() {
 
     // TFile *fin = TFile::Open("OutputROOT.20180806.BLE30.root", "READ");
     TFile *fin[4];
-    fin[0] = new TFile("backup-202003/OutputROOT.20191115.BL.root","READ");
-    fin[1] = new TFile("OutputROOT.20200310.BL30.root","READ");
-    fin[2] = new TFile("backup-202003/OutputROOT.20191115.BLE.root","READ");
-    fin[3] = new TFile("backup-202003/OutputROOT.20191115.BLE30.root","READ");
+    fin[0] = new TFile("../test_HERMES/backup-202003/OutputROOT.20191115.BL.root","READ");
+    // fin[1] = new TFile("OutputROOT.20200310.BL30.root","READ");
+    fin[1] = new TFile("OutputROOT.20200707.BL30_piplus.root","READ");
+    // fin[1] = new TFile("OutputROOT.20200718.BL_SIG_piplus.root","READ");
+    fin[2] = new TFile("../test_HERMES/backup-202003/OutputROOT.20191115.BLE.root","READ");
+    fin[3] = new TFile("../test_HERMES/backup-202003/OutputROOT.20191115.BLE30.root","READ");
 
     TGraphErrors *tg[4];
     tg[0] = (TGraphErrors*) fin[0]->Get("tg_lp");
@@ -129,7 +131,7 @@ void PlotLP() {
     const char* LundLinearShort = "([0]+2*[1]-2*x*[1])/(2*[2])";
     const char* LundLinearLong = "(0.5*[0] + [1]*(0.5 + 0.5*sqrt(1 + [3]*[3]/([1]*[1])) - x))/[2]";
 
-    TF1 *fg0 = new TF1("fg1", LundLinearLong, 0, 1.2);
+    TF1 *fg0 = new TF1("fg0", LundLinearLong, 0, 1.2);
     fg0->SetParName(0,"MP");
     fg0->FixParameter(0,0.938); // 0.9 GeV
     fg0->SetParName(1,"NU"); 

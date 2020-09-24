@@ -48,7 +48,10 @@ class myResult
   double m_cascade;
   double m_cascade_err;
   double m_chi2;
-  double m_c1, m_c2, m_c1_err, m_c2_err;
+  double m_kt;
+  double m_kt_err;
+  double m_c1, m_c2;
+  double m_c1_err, m_c2_err;
   TGraphErrors m_tg_pT;
   TGraphErrors m_tg_Rm;
   TGraphErrors m_tg_data_pT;
