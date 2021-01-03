@@ -3,7 +3,7 @@ CCFLAGS   = -c -Wall
 CCFLAGS  += -fPIC -Wno-deprecated
 CCFLAGS  += -O2
 CCFLAGS  += `root-config --cflags`
-CCFLAGS  += -I./include -I/usr/local/include/
+CCFLAGS  += -I./include -I/usr/local/include -I/opt/boost
 
 LDFLAGS   = `root-config --libs` -lMinuit -lMathMore
 LDFLAGS  += -L/usr/local/lib
