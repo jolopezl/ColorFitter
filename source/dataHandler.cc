@@ -249,7 +249,7 @@ bool OutputResultsToFile(const std::string model, std::vector<myResult> resultCo
     This function is created to simplify the main function regarding the output handling.
     It still needs some tweakign for instance reading from somewhere else the number of z-bins.
     */
-  const int fNzbins = 4; // 10 for JLab and 4 for HERMES !
+  const int fNzbins = 6; // 10 for JLab and 4 for HERMES !
   double z[fNzbins], q0[fNzbins], lp[fNzbins], sigma[fNzbins], dz[fNzbins], kt[fNzbins], c1[fNzbins], c2[fNzbins], cascade[fNzbins];
   double zErr[fNzbins], q0Err[fNzbins], lpErr[fNzbins], sigmaErr[fNzbins], dzErr[fNzbins], ktErr[fNzbins], c1Err[fNzbins], c2Err[fNzbins], cascade_err[fNzbins];
   double chisquared[fNzbins];

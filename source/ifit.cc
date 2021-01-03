@@ -8,32 +8,74 @@
 
 #include <time.h>
 
-const int ZDIM = 4;
+const int ZDIM = 6;
 const int Q2DIM = 1;
-double zbin[ZDIM] = { 0.31, 0.54, 0.75, 0.94 }; // pi+
-double zbinw[ZDIM] = { 0.2, 0.2, 0.2, 0.2 };    // Exact !!
+double zbin[ZDIM] = { 0.33,
+                      0.41000000000000003,
+                      0.475,
+                      0.5549999999999999,
+                      0.675,
+                      0.875 };
+double zbinw[ZDIM] = { -0.10,
+                       -0.06,
+                       -0.07,
+                       -0.10,
+                       -0.15,
+                       -0.25 };
+
+double binratios[6] = { 1, 1, 1, 1, 1, 1 };
+double SIG[6] = { 30, 30, 30, 30, 30, 30 };
 
 double func_array[5] = { 0, 0, 0, 0, 0 };
-double zzz[8] = { 0, 0, 0, 0, 0, 0 };
-double errorzzz[8] = { 0, 0, 0, 0, 0, 0 };
-double xxx[8] = { 0, 0, 0, 0, 0, 0 };
+
+double zzz[6] = { 0, 0, 0, 0, 0, 0 };
+double errorzzz[6] = { 0, 0, 0, 0, 0, 0 };
+double xxx[6] = { 0, 0, 0, 0, 0, 0 };
 
 double pT2[4] = { 0, 0, 0 };
 double Rm[4] = { 0, 0, 0 };
 
-double SIG[4];
-double SIG1[4] = { 27.075, 25.604, 25.109, 24.946 }; // interpolated cross-section for pi+
-double SIG2[4] = { 29.669, 27.653, 26.929, 26.717 }; // interpolated cross-section for pi-
-double SIG3[4] = { 17.281, 17.265, 17.264, 17.267 }; // interpolated cross-section for K+
-double PROD_LEN_INTERP[4] = { 9.61702, 6.60402, 3.85302, 1.36402 };
+double data_points_MR[6][3] = {
+  { 3.060, 5.513, 6.770 },
+  { 1.893, 2.462, 2.85 },
+  { 1.355, 2.130, 2.197 },
+  { 1.277, 1.247, 1.383 },
+  { 1.079, 0.926, 0.837 },
+  { 0.950, 0.684, 0.597 }
+};
 
-double binratios[ZDIM] = { 0.22, 0.43, 0.44, 0.18 }; // PI+ with HERMES cuts
+double data_points_errors_MR[6][3] = {
+  { 0.422, 0.563, 0.855 },
+  { 0.195, 0.195, 0.294 },
+  { 0.121, 0.152, 0.204 },
+  { 0.096, 0.081, 0.115 },
+  { 0.071, 0.051, 0.066 },
+  { 0.096, 0.057, 0.068 }
+};
+
+double data_points_PT2[6][3] = {
+  { -0.011, -0.025, -0.028 },
+  { 0.023, 0.023, 0.032 },
+  { -0.017, 0.026, 0.045 },
+  { 0.110, 0.163, 0.190 },
+  { 0.152, 0.235, 0.268 },
+  { 0.148, 0.244, 0.267 }
+};
+
+double data_points_errors_PT2[6][3] = {
+  { 0.016, 0.016, 0.019 },
+  { 0.017, 0.016, 0.019 },
+  { 0.018, 0.017, 0.019 },
+  { 0.018, 0.018, 0.020 },
+  { 0.024, 0.025, 0.027 },
+  { 0.020, 0.019, 0.021 }
+};
 
 // I would like this not to be global, it's already a pointer, but fcn does not have more arguments ¿?
 Model* m;
 ModelOutput model_output;
 
-const int DIM = 8;
+const int DIM = 6; // carbon, iron, lead * 2
 TMatrixD V(DIM, DIM);
 TVectorD data(DIM);
 TVectorD model(DIM);
@@ -70,18 +112,13 @@ double chisq(double* par)
   callModel(xxx[2], par);
   pT2[2] = func_array[0];
   Rm[2] = func_array[1];
-  callModel(xxx[3], par);
-  pT2[3] = func_array[0];
-  Rm[3] = func_array[1];
 
   model(0) = pT2[0];
   model(1) = pT2[1];
   model(2) = pT2[2];
-  model(3) = pT2[3];
-  model(4) = Rm[0];
-  model(5) = Rm[1];
-  model(6) = Rm[2];
-  model(7) = Rm[3];
+  model(3) = Rm[0];
+  model(4) = Rm[1];
+  model(5) = Rm[2];
 
   chisq = (data - model) * (V * (data - model)); // Uses matrix form for the Chi^2
   return chisq;
@@ -103,27 +140,12 @@ std::vector<myResult> ifit(myConfig* config)
   m->DoCascade(config->m_cascade);
   m->DoFixedLp(config->fixedLp);
 
-  if (config->m_particletype == "piplus") {
-    for (int i = 0; i < 4; i++)
-      SIG[i] = SIG1[i];
-  } else if (config->m_particletype == "piminus") {
-    for (int i = 0; i < 4; i++)
-      SIG[i] = SIG2[i];
-  } else if (config->m_particletype == "Kplus") {
-    for (int i = 0; i < 4; i++)
-      SIG[i] = SIG3[i];
-  } else {
-    std::cerr << "Wrong particle type *****!!" << std::endl;
-  }
-
-  xxx[0] = std::cbrt(4.0026);  // Helium
-  xxx[1] = std::cbrt(20.1797); // Neon
-  xxx[2] = std::cbrt(83.7980); // Krypton
-  xxx[3] = std::cbrt(131.293); // Xenon
-  xxx[4] = xxx[0];
-  xxx[5] = xxx[1];
-  xxx[6] = xxx[2];
-  xxx[7] = xxx[3];
+  xxx[0] = std::cbrt(12.0107); // Carbon
+  xxx[1] = std::cbrt(55.845);  // Iron
+  xxx[2] = std::cbrt(207.2);   // Lead
+  xxx[3] = xxx[0];
+  xxx[4] = xxx[1];
+  xxx[5] = xxx[2];
 
   double input_value = 0;
   double input_error = 0;
@@ -131,12 +153,12 @@ std::vector<myResult> ifit(myConfig* config)
     double A = pow(xxx[i], 3.0);
     std::cout << "Value of c " << m->GetC((int)A) << " for A " << (int)A << std::endl;
   }
-  std::cout << "Calling dataHandler" << std::endl;
-  auto fc = dataHandler(config);
-  std::cout << "dataHandler run succesfuly" << std::endl;
+  // std::cout << "Calling dataHandler" << std::endl;
+  // auto fc = dataHandler(config);
+  // std::cout << "dataHandler run succesfuly" << std::endl;
   // TFile *fout = new TFile("fullfit.root","RECREATE");
-  TFile* fInputData = new TFile("HERMES_InputData.root", "READ");
-  std::pair<TGraphErrors*, TGraphErrors*> tge;
+  // TFile* fInputData = new TFile("HERMES_InputData.root", "READ");
+  // std::pair<TGraphErrors*, TGraphErrors*> tge;
 
   for (int iQ2 = 0; iQ2 < Q2DIM; ++iQ2) { // There is only one bin in Q2 for HERMES
     for (int iz = 0; iz < ZDIM; ++iz) {
@@ -145,44 +167,19 @@ std::vector<myResult> ifit(myConfig* config)
         std::cout << "Ignoring this bin" << std::endl;
         continue;
       }
-      if (config->m_particletype == "piplus") {
-        tge.first = (TGraphErrors*)fInputData->Get(Form("tg_pt_piplus_slice_0_zbin_%d", iz));
-        tge.second = (TGraphErrors*)fInputData->Get(Form("tg_RM_piplus_slice_0_zbin_%d", iz));
-      } else if (config->m_particletype == "piminus") {
-        tge.first = (TGraphErrors*)fInputData->Get(Form("tg_pt_piminus_slice_0_zbin_%d", iz));
-        tge.second = (TGraphErrors*)fInputData->Get(Form("tg_RM_piminus_slice_0_zbin_%d", iz));
-      } else if (config->m_particletype == "Kplus") {
-        tge.first = (TGraphErrors*)fInputData->Get(Form("tg_pt_Kplus_slice_0_zbin_%d", iz));
-        tge.second = (TGraphErrors*)fInputData->Get(Form("tg_RM_Kplus_slice_0_zbin_%d", iz));
-      } else {
-        std::cerr << "Wrong 0!!" << std::endl;
-      }
-      if (tge.first == nullptr) {
-        std::cerr << "Wrong 1!!" << std::endl;
-      }
-      if (tge.second == nullptr) {
-        std::cerr << "Wrong 2!!" << std::endl;
-      }
-      double* p1 = tge.first->GetY();
-      double* p2 = tge.second->GetY();
-      double* pe1 = tge.first->GetEY();
-      double* pe2 = tge.second->GetEY();
-      zzz[0] = p1[0];
-      zzz[1] = p1[1];
-      zzz[2] = p1[2];
-      zzz[3] = p1[3];
-      zzz[4] = p2[0];
-      zzz[5] = p2[1];
-      zzz[6] = p2[2];
-      zzz[7] = p2[3];
-      errorzzz[0] = pe1[0];
-      errorzzz[1] = pe1[1];
-      errorzzz[2] = pe1[2];
-      errorzzz[3] = pe1[3];
-      errorzzz[4] = pe2[0];
-      errorzzz[5] = pe2[1];
-      errorzzz[6] = pe2[2];
-      errorzzz[7] = pe2[3];
+
+      zzz[0] = data_points_PT2[iz][0];
+      zzz[1] = data_points_PT2[iz][1];
+      zzz[2] = data_points_PT2[iz][2];
+      zzz[3] = data_points_MR[iz][0];
+      zzz[4] = data_points_MR[iz][1];
+      zzz[5] = data_points_MR[iz][2];
+      errorzzz[0] = data_points_errors_PT2[iz][0];
+      errorzzz[1] = data_points_errors_PT2[iz][1];
+      errorzzz[2] = data_points_errors_PT2[iz][2];
+      errorzzz[3] = data_points_errors_MR[iz][0];
+      errorzzz[4] = data_points_errors_MR[iz][1];
+      errorzzz[5] = data_points_errors_MR[iz][2];
 
       m->setZ(zbin[iz]);
       m->SetBinRatio(iz, zbinw[iz], binratios[iz]); // For energy loss
@@ -193,8 +190,6 @@ std::vector<myResult> ifit(myConfig* config)
       data(3) = zzz[3];
       data(4) = zzz[4];
       data(5) = zzz[5];
-      data(6) = zzz[6];
-      data(7) = zzz[7];
 
       V(0, 0) = TMath::Power(errorzzz[0], 2);
       V(1, 1) = TMath::Power(errorzzz[1], 2);
@@ -202,18 +197,16 @@ std::vector<myResult> ifit(myConfig* config)
       V(3, 3) = TMath::Power(errorzzz[3], 2);
       V(4, 4) = TMath::Power(errorzzz[4], 2);
       V(5, 5) = TMath::Power(errorzzz[5], 2);
-      V(6, 6) = TMath::Power(errorzzz[6], 2);
-      V(7, 7) = TMath::Power(errorzzz[7], 2);
 
-      const double rho = 0;
-      V(0, 4) = rho * errorzzz[0] * errorzzz[4];
-      V(1, 5) = rho * errorzzz[1] * errorzzz[5];
-      V(2, 6) = rho * errorzzz[2] * errorzzz[6];
-      V(3, 7) = rho * errorzzz[3] * errorzzz[7];
-      V(4, 0) = V(0, 4);
-      V(5, 1) = V(1, 5);
-      V(6, 2) = V(2, 6);
-      V(7, 3) = V(3, 7);
+      // const double rho = 0;
+      // V(0, 4) = rho * errorzzz[0] * errorzzz[4];
+      // V(1, 5) = rho * errorzzz[1] * errorzzz[5];
+      // V(2, 6) = rho * errorzzz[2] * errorzzz[6];
+      // V(3, 7) = rho * errorzzz[3] * errorzzz[7];
+      // V(4, 0) = V(0, 4);
+      // V(5, 1) = V(1, 5);
+      // V(6, 2) = V(2, 6);
+      // V(7, 3) = V(3, 7);
 
       V.Print();
       V.Invert();
@@ -231,12 +224,12 @@ std::vector<myResult> ifit(myConfig* config)
       // const double sigma0 = config->m_initial_sigma;
 
       gMinuit->mnparm(0, "Q0", 2.0, 0.01, 0, 10, ierflg);              // q-hat
-      gMinuit->mnparm(1, "LP", 1.6, 0.01, 0.0001, 40, ierflg);         // production length
+      gMinuit->mnparm(1, "LP", 1.6, 0.01, 0.0001, 100, ierflg);         // production length
       gMinuit->mnparm(2, "SIGMA", SIG[iz], 0.01, 0.0001, 100, ierflg); // prehadron cross section
       gMinuit->mnparm(3, "DLOG", 2.5, 0.01, 0.0001, 100, ierflg);      // parameter needed for log description
-      gMinuit->mnparm(4, "ELOSS", 0, 0.1, -10, 10, ierflg);         // z shift due to energy loss
+      gMinuit->mnparm(4, "ELOSS", 0, 0.1, -10, 10, ierflg);            // z shift due to energy loss
       gMinuit->mnparm(5, "CASCAD", 0.2, 0.01, -0.1, 10, ierflg);       // Cascade parameter
-      gMinuit->mnparm(6, "kT2", -0.0038, 0.0001, -0.05, 0.05, ierflg); // new coeff 1
+      gMinuit->mnparm(6, "kT2", -0.0038, 0.0001, -0.1, 0.1, ierflg); // new coeff 1
       gMinuit->mnparm(7, "C1", 0, 0.1, -10, 10, ierflg);               // new coeff 2
       gMinuit->mnparm(8, "C2", 0, 0.1, -10, 10, ierflg);               // new coeff 2
 
@@ -268,8 +261,8 @@ std::vector<myResult> ifit(myConfig* config)
       // gMinuit->FixParameter(1);
       // gMinuit->Release(4);      // simple energy loss shift
       // gMinuit->Release(6);      // kT
-      // gMinuit->FixParameter(7); // C1
-      // gMinuit->FixParameter(8); // C2
+      gMinuit->FixParameter(7); // C1
+      gMinuit->FixParameter(8); // C2
 
       // Now ready for minimization step
       arglist[0] = 500;
@@ -280,10 +273,10 @@ std::vector<myResult> ifit(myConfig* config)
         std::cerr << "Check the output of your fit, something went wrong with bin-#" << iz + 1 << std::endl;
       }
 
-      gMinuit->FixParameter(1); // L0
-      gMinuit->Release(7);      // C1
-      // gMinuit->Release(8);      // C2
-      gMinuit->mnexcm("MIGRAD", arglist, 9, ierflg);
+      // gMinuit->FixParameter(1); // L0
+      // gMinuit->Release(7);      // C1
+      // // gMinuit->Release(8);      // C2
+      // gMinuit->mnexcm("MIGRAD", arglist, 9, ierflg);
 
       /*
             std::cout << "STARTING TO SEARCH FOR A FIT IMPROVEMENT" << std::endl;
@@ -360,37 +353,31 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
   TRandom3* rr = new TRandom3(); // this forces all gRandom uses to be TRandom3 instead of TRandom, the default.
   rr->SetSeed(9234);
 
-  double z1[4], x1[4], errorz1[4];
-  double z2[4], x2[4], errorz2[4];
+  double z1[6], x1[6], errorz1[6];
+  double z2[6], x2[6], errorz2[6];
   z1[0] = zzz[0];
   z1[1] = zzz[1];
   z1[2] = zzz[2];
-  z1[3] = zzz[3];
 
-  z2[0] = zzz[4];
-  z2[1] = zzz[5];
-  z2[2] = zzz[6];
-  z2[3] = zzz[7];
+  z2[0] = zzz[3];
+  z2[1] = zzz[4];
+  z2[2] = zzz[5];
 
   x1[0] = xxx[0];
   x1[1] = xxx[1];
   x1[2] = xxx[2];
-  x1[3] = xxx[3];
 
-  x2[0] = xxx[4];
-  x2[1] = xxx[5];
-  x2[2] = xxx[6];
-  x2[3] = xxx[7];
+  x2[0] = xxx[3];
+  x2[1] = xxx[4];
+  x2[2] = xxx[5];
 
   errorz1[0] = errorzzz[0];
   errorz1[1] = errorzzz[1];
   errorz1[2] = errorzzz[2];
-  errorz1[3] = errorzzz[3];
 
-  errorz2[0] = errorzzz[4];
-  errorz2[1] = errorzzz[5];
-  errorz2[2] = errorzzz[6];
-  errorz2[3] = errorzzz[7];
+  errorz2[0] = errorzzz[3];
+  errorz2[1] = errorzzz[4];
+  errorz2[2] = errorzzz[5];
 
   double val = 0;
   double err = 0;
@@ -559,12 +546,12 @@ void modelplot(TMinuit* g, myConfig* config, std::string bin_info,
       x += dx;
     }
 
-    result.m_tg_data_pT = TGraphErrors(4, x1, z1, errorz1, errorz1);
-    result.m_tg_data_Rm = TGraphErrors(4, x2, z2, errorz2, errorz2);
+    result.m_tg_data_pT = TGraphErrors(3, x1, z1, errorz1, errorz1);
+    result.m_tg_data_Rm = TGraphErrors(3, x2, z2, errorz2, errorz2);
 
     double zeros[3] = { 0, 0, 0 };
-    result.m_tg_pT = TGraphErrors(4, x1, pT2, zeros, zeros);
-    result.m_tg_Rm = TGraphErrors(4, x2, Rm, zeros, zeros);
+    result.m_tg_pT = TGraphErrors(3, x1, pT2, zeros, zeros);
+    result.m_tg_Rm = TGraphErrors(3, x2, Rm, zeros, zeros);
 
     int npoints = pt_x.size();
     result.m_tg_average_density = TGraph(npoints, pt_x.data(), average_density_fit.data());
