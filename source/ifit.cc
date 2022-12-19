@@ -228,7 +228,7 @@ std::vector<myResult> ifit(myConfig* config)
       gMinuit->mnparm(2, "SIGMA", SIG[iz], 0.01, 0.0001, 100, ierflg); // prehadron cross section
       gMinuit->mnparm(3, "DLOG", 2.5, 0.01, 0.0001, 100, ierflg);      // parameter needed for log description
       gMinuit->mnparm(4, "ELOSS", 0, 0.1, -10, 10, ierflg);            // z shift due to energy loss
-      gMinuit->mnparm(5, "CASCAD", 0.2, 0.01, -0.1, 10, ierflg);       // Cascade parameter
+      gMinuit->mnparm(5, "CASCAD", 0.0, 0.01, -0.5, 20, ierflg);       // Cascade parameter
       gMinuit->mnparm(6, "kT2", -0.0038, 0.0001, -0.1, 0.1, ierflg); // new coeff 1
       gMinuit->mnparm(7, "C1", 0, 0.1, -10, 10, ierflg);               // new coeff 2
       gMinuit->mnparm(8, "C2", 0, 0.1, -10, 10, ierflg);               // new coeff 2
@@ -256,6 +256,8 @@ std::vector<myResult> ifit(myConfig* config)
         gMinuit->FixParameter(7); // C1
         gMinuit->FixParameter(8); // C2
       }
+
+      if (iz > 0) gMinuit->FixParameter(6);
 
       // For testing only - Force fixing some parameters.
       // gMinuit->FixParameter(1);

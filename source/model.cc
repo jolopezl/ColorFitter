@@ -470,7 +470,7 @@ int Model::Compute(const double A)
     double multiplicity_ratio = 0;
     if (zrange2 > 0 && (isOutside == false)) {
       if (m_doCascade == true) {
-        multiplicity_ratio = (exp(-temp * m_sigma_ph / 10.) + 1 - exp(-temp * m_cascade / 10.)) * weight;
+        multiplicity_ratio = exp(-temp * m_sigma_ph / 10.) * m_cascade; // fudge factor
         // accumulator2 += (exp(-temp*m_sigma_ph/10.) + log(m_cascade))*weight;
       } else {
         multiplicity_ratio = exp(-temp * m_sigma_ph / 10.);

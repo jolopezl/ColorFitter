@@ -49,7 +49,7 @@ def getChiSq(data, model):
 def create_plot():
     print("Model results")
     # f = ROOT.TFile.Open("OutputROOT.20200707.BL30_piplus.root", "READ")
-    f = ROOT.TFile.Open("OutputROOT.20200804.BL30NN_piplus.root", "READ")
+    f = ROOT.TFile.Open("OutputROOT.20220724.BL30lambda.root", "READ")
 
     dof = 8 - 4
 
@@ -194,7 +194,7 @@ def create_plot():
     fig.align_ylabels(axs[:, 0])
 
     # output_file_name = "/Users/lopez/Dropbox/Paper-Color-Lifetime copy/Figures2020/Fig03_ModelOutput_BL_FixedSIG_MPL.pdf"
-    output_file_name = "Fig03_ModelOutput_BL_SIG_deltakT_D_piplus.pdf"
+    output_file_name = "model_results.pdf"
     plt.savefig(output_file_name)
 
     subprocess.call(["open", output_file_name])
